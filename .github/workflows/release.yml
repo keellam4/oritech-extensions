@@ -1,26 +1,37 @@
 name: Release
 
-# Publishes a version to Modrinth, CurseForge and GitHub Releases when a tag like v0.1.0 is pushed.
+# Publishes a version when you publish a GitHub Release:
+#   Releases → Draft a new release → choose a tag → type v<version> → "Create new tag on publish" → Publish.
+# The tag must match mod_version in gradle.properties, and CHANGELOG.md needs a "## [<version>]" section.
 #
-# One-time setup in the repo's Settings → Secrets and variables → Actions:
+# The workflow builds and tests the jar, attaches it to the GitHub release, fills in empty release notes
+# from CHANGELOG.md, and uploads it to Modrinth and CurseForge.
+#
+# One-time setup in Settings → Secrets and variables → Actions:
 #   Variables: MODRINTH_PROJECT_ID, CURSEFORGE_PROJECT_ID   (from each project's page)
 #   Secrets:   MODRINTH_TOKEN, CURSEFORGE_TOKEN
-# A platform without its ID/token is skipped, so you can start with just one.
-#
-# To release: set mod_version (and release_type) in gradle.properties, add a CHANGELOG.md section
-# "## [<version>]", merge, then push the tag:  git tag v<version> && git push origin v<version>
+# A platform whose project ID variable isn't set is skipped.
 on:
-  push:
-    tags: ['v*']
+  release:
+    types: [published]
 
 permissions:
   contents: write
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - uses: actions/setup-java@v5
         with:
@@ -33,17 +44,13 @@ jobs:
         run: |
           version=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
           type=$(grep '^release_type=' gradle.properties | cut -d= -f2)
-          if [ "${GITHUB_REF_NAME#v}" != "$version" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME doesn't match mod_version=$version in gradle.properties"; exit 1
+          if [ "${TAG#v}" != "$version" ]; then
+            echo "::error::Release tag $TAG doesn't match mod_version=$version in gradle.properties. Merge the version bump first, or fix the tag."
+            exit 1
           fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
           echo "RELEASE_TYPE=${type:-beta}" >> "$GITHUB_ENV"
-
-      - name: Build
-        run: ./gradlew build --stacktrace
-
-      - name: Game tests
-        run: ./gradlew runGameTestServer --stacktrace
+          echo "JAR=build/libs/oritech_extensions-neoforge-1.21.1-$version.jar" >> "$GITHUB_ENV"
 
       - name: Release notes from CHANGELOG.md
         run: |
@@ -53,33 +60,72 @@ jobs:
           text = open("CHANGELOG.md", encoding="utf-8").read()
           match = re.search(rf"^## \[{re.escape(version)}\][^\n]*\n(.*?)(?=^## |\Z)", text, re.S | re.M)
           if not match:
-              raise SystemExit(f"::error::CHANGELOG.md has no section for [{version}]")
+              raise SystemExit(f"::error::CHANGELOG.md has no '## [{version}]' section. Rename [Unreleased] to [{version}] in the release PR.")
           open("release-notes.md", "w", encoding="utf-8").write(match.group(1).strip() + "\n")
           PY
           cat release-notes.md
 
-      - name: Publish
+      - name: Build
+        run: ./gradlew build --stacktrace
+
+      - name: Game tests
+        run: ./gradlew runGameTestServer --stacktrace
+
+      - name: Attach the jar to the GitHub release
+        run: |
+          gh release upload "$TAG" "$JAR" --clobber
+          # Keep notes you wrote (or generated) in the release form; otherwise use the changelog.
+          if [ -z "$(gh release view "$TAG" --json body --jq .body | tr -d '[:space:]')" ]; then
+            gh release edit "$TAG" --notes-file release-notes.md
+          fi
+          if [ "$RELEASE_TYPE" != "release" ]; then
+            gh release edit "$TAG" --prerelease
+          fi
+
+      - name: Publish to Modrinth
+        if: vars.MODRINTH_PROJECT_ID != ''
         uses: Kir-Antipov/mc-publish@v3.3
         with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           name: Oritech Extensions ${{ env.VERSION }}
           version: ${{ env.VERSION }}
           version-type: ${{ env.RELEASE_TYPE }}
           changelog-file: release-notes.md
-          files: build/libs/oritech_extensions-neoforge-1.21.1-${{ env.VERSION }}.jar
+          files: ${{ env.JAR }}
           loaders: neoforge
           game-versions: 1.21.1
           java: 21
           dependencies: |
-            oritech(required){modrinth:oritech}{curseforge:oritech}
-            geckolib(required){modrinth:geckolib}{curseforge:geckolib}
-            oritech-things(optional){modrinth:oritech-things}{curseforge:oritech-things}
+            oritech(required)
+            geckolib(required)
+            oritech-things(optional)
 
-          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-
+      - name: Publish to CurseForge
+        if: vars.CURSEFORGE_PROJECT_ID != ''
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
           curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          name: Oritech Extensions ${{ env.VERSION }}
+          version: ${{ env.VERSION }}
+          version-type: ${{ env.RELEASE_TYPE }}
+          changelog-file: release-notes.md
+          files: ${{ env.JAR }}
+          loaders: neoforge
+          game-versions: 1.21.1
+          java: 21
+          dependencies: |
+            oritech(required)
+            geckolib(required)
+            oritech-things(optional)
 
-          github-tag: ${{ github.ref_name }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          github-prerelease: ${{ env.RELEASE_TYPE != 'release' }}
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Oritech Extensions ${VERSION:-?}"
+            echo "- GitHub release: ${{ github.event.release.html_url }}"
+            echo "- Modrinth: ${{ vars.MODRINTH_PROJECT_ID != '' && 'published' || 'skipped (MODRINTH_PROJECT_ID not set)' }}"
+            echo "- CurseForge: ${{ vars.CURSEFORGE_PROJECT_ID != '' && 'published' || 'skipped (CURSEFORGE_PROJECT_ID not set)' }}"
+          } >> "$GITHUB_STEP_SUMMARY"

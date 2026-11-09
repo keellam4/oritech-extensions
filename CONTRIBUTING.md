@@ -32,9 +32,10 @@ Every pull request runs the build, the game tests, and a headless client smoke t
 3. If the block isn't built on Oritech's `MachineAddonBlock`, it also needs code changes. Open an issue first.
 
 ## Pull requests
-- Keep each PR to one change, and add a line to `CHANGELOG.md`.
+- Keep each PR to one change.
+- Add a line to `CHANGELOG.md` under `## [Unreleased]` for anything players would notice. A maintainer adds the `skip-changelog` label for docs and CI changes.
 - Only include textures or code you made yourself or that are under a compatible license. Oritech is CC0; Oritech Things is CC-BY 4.0 and is only read at runtime, never copied into this repo.
 - By contributing, you agree your contribution is licensed under the project's MIT license.
 
 ## Releases
-Releases are made by the maintainer by pushing a `v<version>` tag. See "Releasing" in the README.
+The maintainer publishes releases from GitHub Releases. See "Releasing" in the README.

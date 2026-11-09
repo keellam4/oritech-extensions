@@ -13,6 +13,7 @@ body:
       options:
         - Hangar Door Extension
         - Painting machine addons
+        - Crash
         - Other / not sure
     validations:
       required: true

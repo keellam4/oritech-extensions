@@ -1,5 +1,12 @@
 # Changelog
 
+Add a line under **[Unreleased]** in every pull request that players would notice. The release PR renames it to the new version.
+
+## [Unreleased]
+
+### Changed
+- The in-game mod list now links to the issue tracker and source code.
+
 ## [0.1.0] - Beta
 
 First public beta, for Minecraft 1.21.1 (NeoForge) and Oritech 1.2.x.
