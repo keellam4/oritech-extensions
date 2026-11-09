@@ -25,11 +25,32 @@ Oritech's Industrial Hangar Door is 3 blocks long. The **Industrial Hangar Door 
 
 A ceiling door and a floor door that meet in the middle cover twice the configured length. For example, set 20 to close a 40-block opening.
 
+## Paintable machine addons
+
+Oritech's machine paints (Color Cartridges) normally only work on its big machines. With this mod they also work on **machine addon blocks**: Oritech's own addons and those from mods built on them, such as **Oritech Things'** tiered addons.
+
+- Right-click or shift-right-click an addon with a paint. It uses one cartridge (none in creative), the same as painting a machine.
+- Orange Machine Paint returns the block to its normal look.
+- A painted addon keeps its colour when you break it and place it again. The item tooltip shows the paint.
+- Painted textures are generated from the original textures when the game loads, using the colour swap Oritech uses for its own paints. Nothing from the other mods is copied into this one.
+
+| Addon | Paints cleanly? |
+|---|---|
+| Oritech: Speed, Efficiency, Ultimate, Processing, Capacitor, Fluid, Yield, Hunter, Silk Touch, Burst, Crop Filter, Quarry, Steam Boiler, Inventory Proxy | Yes |
+| Oritech: Extender, Acceptor | Partly. They keep some of their own orange shades |
+| Oritech Things: Speed, Efficiency, Efficient Speed, Processing, Capacitor (all tiers), Cross Dimensional | Yes |
+| Oritech Things: Acceptor (all tiers) | Barely changes. It uses its own oranges |
+
+The list of recoloured textures is in `src/main/resources/assets/minecraft/atlases/blocks.json`. The palettes come from `tools/paint/generate_palettes.py`.
+
+Oritech Things is © its authors, licensed CC-BY 4.0. This mod only reads its textures at runtime to recolour them.
+
 ## Requirements
 
 - Minecraft 1.21.1, NeoForge 21.1.200+
 - Oritech 1.2.x (NeoForge)
 - GeckoLib 4.6+
+- Optional: Oritech Things (its addons become paintable)
 
 ## Building
 
@@ -39,6 +60,10 @@ A ceiling door and a floor door that meet in the middle cover twice the configur
 
 The jar ends up in `build/libs/`. Every push also builds on GitHub Actions. Download the jar from the run's **oritech-extensions-jar** artifact.
 
+CI also runs:
+- `runGameTestServer`: server-side game tests against Oritech 1.2.13 and Oritech Things 0.0.48 (hangar doors, painting).
+- `runClientSmokeTest`: starts the real client headless and checks that the painted textures exist and the addon models get wrapped.
+
 ## Layout
 
 ```
@@ -47,7 +72,9 @@ src/main/java/dev/garciajg/oritechextensions/
   Config.java                   common config
   ModContent.java               registry (blocks, items, block entities)
   hangar/                       hangar door extension: block + block entity
-  client/                       renderer, GeckoLib model, client setup
+  paint/                        addon painting: cartridge handling, storage, sync
+  client/                       renderers, GeckoLib model, painted addon models, client setup
+  test/                         game tests
 ```
 
 New add-ons go in their own package next to `hangar/`.

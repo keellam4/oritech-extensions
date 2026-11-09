@@ -1,0 +1,58 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:paletted_permutations",
+      "textures": [
+        "oritech:block/machine_speed_addon_off",
+        "oritech:block/machine_speed_addon_on",
+        "oritech:block/machine_efficiency_addon_off",
+        "oritech:block/machine_efficiency_addon_on",
+        "oritech:block/machine_ultimate_addon_off",
+        "oritech:block/machine_ultimate_addon_on",
+        "oritech:block/machine_processing_addon_off",
+        "oritech:block/machine_processing_addon_on",
+        "oritech:block/machine_capacitor_addon_off",
+        "oritech:block/machine_capacitor_addon_on",
+        "oritech:block/machine_acceptor_addon_off",
+        "oritech:block/machine_acceptor_addon_on",
+        "oritech:block/machine_fluid_addon_off",
+        "oritech:block/machine_fluid_addon_on",
+        "oritech:block/machine_yield_addon_off",
+        "oritech:block/machine_yield_addon_on",
+        "oritech:block/machine_hunter_addon_off",
+        "oritech:block/machine_hunter_addon_on",
+        "oritech:block/machine_silk_touch_addon_off",
+        "oritech:block/machine_silk_touch_addon_on",
+        "oritech:block/machine_burst_addon_off",
+        "oritech:block/machine_burst_addon_on",
+        "oritech:block/crop_filter_addon_off",
+        "oritech:block/crop_filter_addon_on",
+        "oritech:block/quarry_addon_off",
+        "oritech:block/quarry_addon_on",
+        "oritech:block/steam_boiler_addon_off",
+        "oritech:block/steam_boiler_addon_on",
+        "oritech:block/machine_inventory_proxy_addon",
+        "oritech:block/machine_extender",
+        "oritech:block/machine_extender_off",
+        "oritechthings:block/addon_block_speed",
+        "oritechthings:block/addon_block_efficiency",
+        "oritechthings:block/addon_block_efficient_speed",
+        "oritechthings:block/addon_block_processing",
+        "oritechthings:block/addon_block_capacitor",
+        "oritechthings:block/addon_block_cross_dimensional",
+        "oritechthings:block/addon_block_acceptor"
+      ],
+      "palette_key": "oritech_extensions:colormap/paint/key",
+      "permutations": {
+        "paint_camo": "oritech_extensions:colormap/paint/camo",
+        "paint_diamond": "oritech_extensions:colormap/paint/diamond",
+        "paint_fluxite": "oritech_extensions:colormap/paint/fluxite",
+        "paint_white": "oritech_extensions:colormap/paint/white",
+        "paint_industrial": "oritech_extensions:colormap/paint/industrial",
+        "paint_netherite": "oritech_extensions:colormap/paint/netherite",
+        "paint_redstone": "oritech_extensions:colormap/paint/redstone",
+        "paint_sculk": "oritech_extensions:colormap/paint/sculk"
+      }
+    }
+  ]
+}

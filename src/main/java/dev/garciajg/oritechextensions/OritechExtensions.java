@@ -7,6 +7,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.NeoForge;
+import dev.garciajg.oritechextensions.paint.PaintEvents;
+import dev.garciajg.oritechextensions.paint.PaintSyncPayload;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.slf4j.Logger;
 
@@ -19,6 +22,8 @@ public class OritechExtensions {
     public OritechExtensions(IEventBus modEventBus, ModContainer modContainer) {
         ModContent.register(modEventBus);
         modEventBus.addListener(this::addCreative);
+        modEventBus.addListener(PaintSyncPayload::register);
+        PaintEvents.register(NeoForge.EVENT_BUS);
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
