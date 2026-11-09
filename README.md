@@ -36,7 +36,7 @@ Oritech's machine paints (Color Cartridges) normally only work on its big machin
 
 | Addon | Paints cleanly? |
 |---|---|
-| Oritech: Speed, Efficiency, Ultimate, Processing, Capacitor, Fluid, Yield, Hunter, Silk Touch, Burst, Crop Filter, Quarry, Steam Boiler, Inventory Proxy | Yes |
+| Oritech: Speed, Efficiency, Ultimate, Processing, Capacitor, Fluid, Yield, Hunter, Silk Touch, Burst, Crop Filter, Quarry, Steam Boiler, Inventory Proxy, Capacitor Addon Extender | Yes |
 | Oritech: Extender, Acceptor | Partly. They keep some of their own orange shades |
 | Oritech Things: Speed, Efficiency, Efficient Speed, Processing, Capacitor (all tiers), Cross Dimensional | Yes |
 | Oritech Things: Acceptor (all tiers) | Barely changes. It uses its own oranges |
