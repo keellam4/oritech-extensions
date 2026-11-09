@@ -143,6 +143,7 @@ public class HangarDoorExtensionRenderer extends GeoBlockRenderer<HangarDoorExte
     // ---------------------------------------------------------------- culling
 
     /** Segments slide through other blocks while animating, so cover everything from the anchor to here. */
+    @Override
     public AABB getRenderBoundingBox(HangarDoorExtensionBlockEntity extension) {
         var pos = extension.getBlockPos();
         var anchor = HangarDoorExtensionBlock.anchorPos(pos, extension.getBlockState());
