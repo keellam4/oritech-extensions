@@ -26,6 +26,17 @@ jobs:
       - name: Game tests (real Oritech, headless server)
         run: ./gradlew runGameTestServer --stacktrace
 
+      - name: Client smoke test (headless, software OpenGL)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb libgl1-mesa-dri mesa-utils > /dev/null
+          export LIBGL_ALWAYS_SOFTWARE=1
+          timeout 900 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClientSmokeTest --stacktrace || echo "client exited with $?"
+          log=run/logs/latest.log
+          grep -E "\[paint\]|\[smoke test\]|Unable to find texture|Failed to load|paletted" "$log" | tee smoke-summary.txt || true
+          grep -q "\[smoke test\] Title screen reached" "$log" || { echo "::error::client did not reach the title screen"; tail -150 "$log"; exit 1; }
+          grep -q "Made [1-9][0-9]* addon block models paintable" "$log" || { echo "::error::no addon models were wrapped"; exit 1; }
+          if grep -q "Painted texture .*: MISSING" "$log"; then echo "::error::painted textures missing from the block atlas"; exit 1; fi
+
       - name: Upload mod jar
         uses: actions/upload-artifact@v4
         with:

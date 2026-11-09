@@ -13,6 +13,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 
@@ -24,7 +30,29 @@ public final class PaintClient {
 
     public static void register(IEventBus modBus, IEventBus gameBus) {
         modBus.addListener(PaintClient::wrapAddonModels);
+        modBus.addListener(PaintClient::checkPaintedTextures);
         gameBus.addListener(PaintClient::addTooltip);
+        if (Boolean.getBoolean(SMOKE_TEST_PROPERTY)) gameBus.addListener(PaintClient::quitAtTitleScreen);
+    }
+
+    /** Set by the clientSmokeTest run: load everything, report, then quit once the title screen opens. */
+    private static final String SMOKE_TEST_PROPERTY = "oritech_extensions.smokeTest";
+
+    private static void quitAtTitleScreen(ScreenEvent.Opening event) {
+        if (event.getNewScreen() instanceof TitleScreen) {
+            OritechExtensions.LOGGER.info("[smoke test] Title screen reached, quitting");
+            Minecraft.getInstance().stop();
+        }
+    }
+
+    /** Logs whether the generated painted textures made it into the block atlas (one sample per mod). */
+    private static void checkPaintedTextures(TextureAtlasStitchedEvent event) {
+        if (!event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) return;
+        for (var sample : new String[]{"oritech:block/machine_speed_addon_on_paint_white", "oritechthings:block/addon_block_speed_paint_sculk"}) {
+            var sprite = event.getAtlas().getSprite(ResourceLocation.parse(sample));
+            boolean found = !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation());
+            OritechExtensions.LOGGER.info("[paint] Painted texture {}: {}", sample, found ? "present" : "MISSING");
+        }
     }
 
     /** Applies colours from the server and re-renders the affected blocks. */
@@ -68,7 +96,7 @@ public final class PaintClient {
                 }
             }
         }
-        OritechExtensions.LOGGER.debug("Made {} addon block models paintable", wrapped);
+        OritechExtensions.LOGGER.info("[paint] Made {} addon block models paintable", wrapped);
     }
 
     private static void addTooltip(ItemTooltipEvent event) {
