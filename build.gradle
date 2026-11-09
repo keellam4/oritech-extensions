@@ -48,6 +48,11 @@ neoForge {
             server()
             programArgument '--nogui'
         }
+        // Runs every @GameTest in this mod against the real Oritech, then exits (non-zero on failure).
+        gameTestServer {
+            type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
         configureEach {
             logLevel = org.slf4j.event.Level.INFO
         }
@@ -70,6 +75,11 @@ dependencies {
     compileOnly "curse.maven:oritech-1030830:${oritech_curse_file_id}"
     compileOnly "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
     compileOnly "dev.architectury:architectury-neoforge:${architectury_version}"
+
+    // Present when running the game from this project (runClient / runGameTestServer), not shipped.
+    localRuntime "curse.maven:oritech-1030830:${oritech_curse_file_id}"
+    localRuntime "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    localRuntime "dev.architectury:architectury-neoforge:${architectury_version}"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
