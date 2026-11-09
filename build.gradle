@@ -89,6 +89,10 @@ dependencies {
     // Tests run against the newest Oritech plus Oritech Things, so compatibility with both is checked on every push.
     localRuntime "maven.modrinth:oritech:${oritech_runtime_version_id}"
     localRuntime "maven.modrinth:oritech-things:${oritech_things_runtime_version_id}"
+    // Oritech's client-only connected-textures library; needed to start the client (pass -Pathena_version_id=<modrinth id>).
+    if (project.hasProperty('athena_version_id')) {
+        localRuntime "maven.modrinth:athena-ctm:${project.athena_version_id}"
+    }
     localRuntime "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
     localRuntime "dev.architectury:architectury-neoforge:${architectury_version}"
 }
