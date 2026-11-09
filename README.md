@@ -1,6 +1,13 @@
 # Oritech Extensions
 
+[![Build](https://github.com/keellam4/oritech-extensions/actions/workflows/build.yml/badge.svg)](https://github.com/keellam4/oritech-extensions/actions/workflows/build.yml)
+[![Modrinth](https://img.shields.io/badge/Modrinth-oritech--extensions-1bd96a)](https://modrinth.com/mod/oritech-extensions)
+[![CurseForge](https://img.shields.io/badge/CurseForge-oritech--extensions-f16436)](https://www.curseforge.com/minecraft/mc-mods/oritech-extensions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Small add-ons for [Oritech](https://github.com/Rearth/Oritech) on **NeoForge 1.21.1** (built for All the Mods 10).
+
+Found a bug or have an idea? [Open an issue](https://github.com/keellam4/oritech-extensions/issues/new/choose). Want to help? See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Hangar Door Extension
 

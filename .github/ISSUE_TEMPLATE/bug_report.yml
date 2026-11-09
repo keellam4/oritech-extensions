@@ -1,0 +1,79 @@
+name: Bug report
+description: Something doesn't work or looks wrong
+labels: [bug, triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this! Please check the [open issues](https://github.com/keellam4/oritech-extensions/issues) first.
+  - type: dropdown
+    id: feature
+    attributes:
+      label: Which part of the mod?
+      options:
+        - Hangar Door Extension
+        - Painting machine addons
+        - Other / not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead? Screenshots help a lot, especially for visual issues.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Place an Industrial Hangar Door on a ceiling
+        2. Add 5 extensions
+        3. Power the door
+    validations:
+      required: true
+  - type: input
+    id: mod-version
+    attributes:
+      label: Oritech Extensions version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: oritech-version
+    attributes:
+      label: Oritech version
+      placeholder: "1.2.13"
+    validations:
+      required: true
+  - type: input
+    id: neoforge-version
+    attributes:
+      label: NeoForge version
+      placeholder: "21.1.x"
+    validations:
+      required: true
+  - type: input
+    id: things-version
+    attributes:
+      label: Oritech Things version (if installed)
+  - type: input
+    id: modpack
+    attributes:
+      label: Modpack (if any)
+      placeholder: "All the Mods 10 5.x"
+  - type: dropdown
+    id: side
+    attributes:
+      label: Where does it happen?
+      options:
+        - Singleplayer
+        - Multiplayer (server)
+        - Both
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or crash report
+      description: Paste `logs/latest.log` or the crash report, or a link to it on https://mclo.gs
+      render: shell
