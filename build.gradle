@@ -52,6 +52,11 @@ neoForge {
             server()
             programArgument '--nogui'
         }
+        // Starts the real client headless, loads all textures/models, logs paint checks, quits at the title screen.
+        clientSmokeTest {
+            client()
+            systemProperty 'oritech_extensions.smokeTest', 'true'
+        }
         // Runs every @GameTest in this mod against the real Oritech, then exits (non-zero on failure).
         gameTestServer {
             type = "gameTestServer"
