@@ -1,0 +1,37 @@
+name: Mod compatibility request
+description: Ask for another mod's blocks to work with Oritech Extensions (e.g. make its addons paintable)
+labels: [compatibility, triage]
+body:
+  - type: input
+    id: mod
+    attributes:
+      label: Which mod?
+      description: Name and a link (CurseForge, Modrinth or GitHub).
+    validations:
+      required: true
+  - type: input
+    id: mod-version
+    attributes:
+      label: Its version
+      placeholder: "0.0.48"
+  - type: dropdown
+    id: feature
+    attributes:
+      label: Which feature should it work with?
+      options:
+        - Painting (Oritech machine paints)
+        - Hangar Door Extensions
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: blocks
+    attributes:
+      label: Which blocks or items?
+      description: Screenshots of the blocks help.
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
