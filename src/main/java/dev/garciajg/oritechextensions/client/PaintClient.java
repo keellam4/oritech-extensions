@@ -13,9 +13,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
-import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -32,16 +31,18 @@ public final class PaintClient {
         modBus.addListener(PaintClient::wrapAddonModels);
         modBus.addListener(PaintClient::checkPaintedTextures);
         gameBus.addListener(PaintClient::addTooltip);
-        if (Boolean.getBoolean(SMOKE_TEST_PROPERTY)) gameBus.addListener(PaintClient::quitAtTitleScreen);
+        if (Boolean.getBoolean(SMOKE_TEST_PROPERTY)) gameBus.addListener(PaintClient::quitWhenLoaded);
     }
 
-    /** Set by the clientSmokeTest run: load everything, report, then quit once the title screen opens. */
+    /** Set by the clientSmokeTest run: load everything, report, then quit once the first menu is shown. */
     private static final String SMOKE_TEST_PROPERTY = "oritech_extensions.smokeTest";
 
-    private static void quitAtTitleScreen(ScreenEvent.Opening event) {
-        if (event.getNewScreen() instanceof TitleScreen) {
-            OritechExtensions.LOGGER.info("[smoke test] Title screen reached, quitting");
-            Minecraft.getInstance().stop();
+    private static void quitWhenLoaded(ClientTickEvent.Post event) {
+        var minecraft = Minecraft.getInstance();
+        // Loading is done once the resource-loading overlay is gone and a menu (title or first-launch screen) is open.
+        if (minecraft.getOverlay() == null && minecraft.screen != null) {
+            OritechExtensions.LOGGER.info("[smoke test] Title screen reached ({}), quitting", minecraft.screen.getClass().getSimpleName());
+            minecraft.stop();
         }
     }
 
