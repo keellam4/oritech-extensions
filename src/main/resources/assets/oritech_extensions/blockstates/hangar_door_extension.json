@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "oritech_extensions:block/hangar_door_extension" }
+  }
+}

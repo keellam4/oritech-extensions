@@ -1,0 +1,10 @@
+{
+  "block.oritech_extensions.hangar_door_extension": "Industrial Hangar Door Extension",
+  "tooltip.oritech_extensions.hangar_door_extension.1": "Place on the tip of an Industrial Hangar Door to make it 1 block longer.",
+  "tooltip.oritech_extensions.hangar_door_extension.2": "Maximum door length: %s blocks.",
+  "message.oritech_extensions.hangar_door_extension.no_door": "Place this on the tip of an Industrial Hangar Door or another extension.",
+  "message.oritech_extensions.hangar_door_extension.too_long": "This door is already at the maximum length of %s blocks.",
+  "oritech_extensions.configuration.title": "Oritech Extensions",
+  "oritech_extensions.configuration.maxHangarDoorLength": "Max Hangar Door Length",
+  "oritech_extensions.configuration.maxHangarDoorLength.tooltip": "Total door length in blocks, including Oritech's original 3 blocks."
+}
