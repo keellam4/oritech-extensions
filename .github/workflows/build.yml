@@ -2,8 +2,14 @@ name: Build
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
+
+# One run per PR (or per push to main); a new push to a PR cancels the run it replaces.
+concurrency:
+  group: build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:

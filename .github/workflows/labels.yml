@@ -1,0 +1,29 @@
+name: Labels
+
+# Creates or updates the repo's issue labels from .github/labels.json. Existing labels not in the file are kept.
+on:
+  push:
+    branches: [main]
+    paths: [.github/labels.json]
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          jq -c '.[]' .github/labels.json | while read -r label; do
+            name=$(jq -r .name <<< "$label")
+            gh label create "$name" \
+              --color "$(jq -r .color <<< "$label")" \
+              --description "$(jq -r .description <<< "$label")" \
+              --force
+            echo "✓ $name"
+          done

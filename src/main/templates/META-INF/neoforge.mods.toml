@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="${loader_version_range}"
 license="${mod_license}"
+issueTrackerURL="https://github.com/keellam4/oritech-extensions/issues"
 
 [[mods]]
 modId="${mod_id}"
@@ -8,6 +9,7 @@ version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
 logoFile="icon.png"
+displayURL="https://github.com/keellam4/oritech-extensions"
 credits="Built on Oritech by Rearth. Paint support for Oritech Things (by Lumengrid and contributors, CC-BY 4.0) reads its textures at runtime."
 description='''
 Small add-ons for Oritech:

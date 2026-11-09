@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Modrinth page
+    url: https://modrinth.com/mod/oritech-extensions
+    about: Downloads and version history
+  - name: CurseForge page
+    url: https://www.curseforge.com/minecraft/mc-mods/oritech-extensions
+    about: Downloads and version history
+  - name: Security issue
+    url: https://github.com/keellam4/oritech-extensions/security/advisories/new
+    about: Please report security problems privately instead of opening a public issue
