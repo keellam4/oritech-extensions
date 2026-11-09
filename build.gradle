@@ -27,6 +27,10 @@ repositories {
         filter { includeGroup 'software.bernie.geckolib' }
     }
     exclusiveContent {
+        forRepository { maven { url = 'https://api.modrinth.com/maven' } }
+        filter { includeGroup 'maven.modrinth' }
+    }
+    exclusiveContent {
         forRepository { maven { url = 'https://maven.architectury.dev/' } }
         filter { includeGroup 'dev.architectury' }
     }
@@ -77,7 +81,9 @@ dependencies {
     compileOnly "dev.architectury:architectury-neoforge:${architectury_version}"
 
     // Present when running the game from this project (runClient / runGameTestServer), not shipped.
-    localRuntime "curse.maven:oritech-1030830:${oritech_curse_file_id}"
+    // Tests run against the newest Oritech plus Oritech Things, so compatibility with both is checked on every push.
+    localRuntime "maven.modrinth:oritech:${oritech_runtime_version_id}"
+    localRuntime "maven.modrinth:oritech-things:${oritech_things_runtime_version_id}"
     localRuntime "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
     localRuntime "dev.architectury:architectury-neoforge:${architectury_version}"
 }
