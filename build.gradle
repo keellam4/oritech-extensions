@@ -1,0 +1,105 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+    id 'idea'
+}
+
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = "${mod_id}-neoforge-${minecraft_version}"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    exclusiveContent {
+        forRepository { maven { url = 'https://cursemaven.com' } }
+        filter { includeGroup 'curse.maven' }
+    }
+    exclusiveContent {
+        forRepository { maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' } }
+        filter { includeGroup 'software.bernie.geckolib' }
+    }
+    exclusiveContent {
+        forRepository { maven { url = 'https://maven.architectury.dev/' } }
+        filter { includeGroup 'dev.architectury' }
+    }
+}
+
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        configureEach {
+            logLevel = org.slf4j.event.Level.INFO
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    // Compile against Oritech and the libraries its public classes reference.
+    // These are only needed at compile time; players already have them installed (ATM10 ships all three).
+    compileOnly "curse.maven:oritech-1030830:${oritech_curse_file_id}"
+    compileOnly "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    compileOnly "dev.architectury:architectury-neoforge:${architectury_version}"
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            oritech_version_range  : oritech_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
