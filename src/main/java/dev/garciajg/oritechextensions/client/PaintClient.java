@@ -49,7 +49,10 @@ public final class PaintClient {
     /** Logs whether the generated painted textures made it into the block atlas (one sample per mod). */
     private static void checkPaintedTextures(TextureAtlasStitchedEvent event) {
         if (!event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) return;
-        for (var sample : new String[]{"oritech:block/machine_speed_addon_on_paint_white", "oritechthings:block/addon_block_speed_paint_sculk"}) {
+        for (var sample : new String[]{
+                "oritech:block/machine_speed_addon_on_paint_white",
+                "oritech:block/capacitor_ctm/horizontal_paint_netherite", // Capacitor Addon Extender (Athena connected textures)
+                "oritechthings:block/addon_block_speed_paint_sculk"}) {
             var sprite = event.getAtlas().getSprite(ResourceLocation.parse(sample));
             boolean found = !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation());
             OritechExtensions.LOGGER.info("[paint] Painted texture {}: {}", sample, found ? "present" : "MISSING");

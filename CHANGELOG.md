@@ -1,0 +1,18 @@
+# Changelog
+
+## [0.1.0] - Beta
+
+First public beta, for Minecraft 1.21.1 (NeoForge) and Oritech 1.2.x.
+
+### Added
+- **Industrial Hangar Door Extension.** Place it on the tip of an Oritech hangar door to make the door 1 block longer, and keep stacking up to a 16-block door (Oritech's 3 + 13 extensions). The limit is configurable from 4 to 32.
+  - Opens and closes with the door, including linked doors, and slides into the door's housing in time with Oritech's animation.
+  - Matches the door's paint colour.
+  - Breaking the door drops every extension.
+  - Recipe: 1 Industrial Hangar Door → 3 extensions.
+- **Paintable machine addons.** Oritech's machine paints now work on machine addon blocks: Oritech's own (Speed, Efficiency, Capacitor, Processing, and more, including the Capacitor Addon Extender) and Oritech Things' tiered addons.
+  - Uses one cartridge per coat. Orange removes the paint.
+  - Painted addons keep their colour when broken and placed again.
+
+### Known limitations
+- Oritech's Extender and Acceptor, and Oritech Things' Acceptor, use some orange shades of their own, so they only partly change colour.
