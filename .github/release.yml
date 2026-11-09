@@ -1,0 +1,15 @@
+# Sections used by GitHub's "Generate release notes" button on the release form.
+changelog:
+  exclude:
+    labels: [skip-changelog]
+  categories:
+    - title: New features
+      labels: [enhancement]
+    - title: Mod compatibility
+      labels: [compatibility]
+    - title: Fixes
+      labels: [bug]
+    - title: Dependency updates
+      labels: [dependencies]
+    - title: Other changes
+      labels: ["*"]

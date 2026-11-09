@@ -1,6 +1,13 @@
 # Oritech Extensions
 
+[![Build](https://github.com/keellam4/oritech-extensions/actions/workflows/build.yml/badge.svg)](https://github.com/keellam4/oritech-extensions/actions/workflows/build.yml)
+[![Modrinth](https://img.shields.io/badge/Modrinth-oritech--extensions-1bd96a)](https://modrinth.com/mod/oritech-extensions)
+[![CurseForge](https://img.shields.io/badge/CurseForge-oritech--extensions-f16436)](https://www.curseforge.com/minecraft/mc-mods/oritech-extensions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Small add-ons for [Oritech](https://github.com/Rearth/Oritech) on **NeoForge 1.21.1** (built for All the Mods 10).
+
+Found a bug or have an idea? [Open an issue](https://github.com/keellam4/oritech-extensions/issues/new/choose). Want to help? See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Hangar Door Extension
 
@@ -66,17 +73,28 @@ CI also runs:
 
 ## Releasing
 
-Releases are published to Modrinth, CurseForge and GitHub Releases by `.github/workflows/release.yml`:
+Pushing to `main` only builds and tests. Players get an update when you publish a GitHub Release:
 
-1. Set `mod_version` (and `release_type`: `alpha`, `beta` or `release`) in `gradle.properties`.
-2. Add a `## [<version>]` section to `CHANGELOG.md`. It becomes the release notes.
-3. Merge to `main`, then tag: `git tag v<version> && git push origin v<version>`.
+1. **Release PR.** Bump `mod_version` (and `release_type`: `alpha`, `beta` or `release`) in `gradle.properties`. In `CHANGELOG.md`, rename `## [Unreleased]` to `## [<version>] - Beta` and add a new empty `## [Unreleased]` above it. Merge once CI passes.
+2. **Publish the release.** Go to **Releases → Draft a new release → Choose a tag**, type `v<version>`, pick **Create new tag on publish** (target `main`), and click **Publish release**. You can leave the notes empty; they're filled in from the changelog.
+3. **Done.** The **Release** workflow builds, tests, attaches the jar to the GitHub release, and uploads it to Modrinth and CurseForge. Beta and alpha versions are marked as pre-releases.
 
-One-time setup, in **Settings → Secrets and variables → Actions**:
+One-time setup in **Settings → Secrets and variables → Actions**:
 - Variables: `MODRINTH_PROJECT_ID`, `CURSEFORGE_PROJECT_ID`
 - Secrets: `MODRINTH_TOKEN`, `CURSEFORGE_TOKEN`
 
-A platform without its ID or token is skipped. The icon is drawn by `tools/branding/icon.py`.
+A platform whose project ID variable isn't set is skipped.
+
+## Workflows
+
+| Workflow | When | What |
+|---|---|---|
+| Build | Pull requests, pushes to `main` | Compile, game tests, headless client smoke test, upload jar (required check) |
+| Changelog | Pull requests | Reminds you to update `CHANGELOG.md` (skip with the `skip-changelog` label) |
+| Release | A GitHub Release is published | Build, test, publish to GitHub, Modrinth, CurseForge |
+| Labels | `.github/labels.json` changes on `main` | Creates or updates issue labels |
+
+The icon is drawn by `tools/branding/icon.py`.
 
 ## License
 
