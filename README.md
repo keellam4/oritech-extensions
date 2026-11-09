@@ -64,6 +64,24 @@ CI also runs:
 - `runGameTestServer`: server-side game tests against Oritech 1.2.13 and Oritech Things 0.0.48 (hangar doors, painting).
 - `runClientSmokeTest`: starts the real client headless and checks that the painted textures exist and the addon models get wrapped.
 
+## Releasing
+
+Releases are published to Modrinth, CurseForge and GitHub Releases by `.github/workflows/release.yml`:
+
+1. Set `mod_version` (and `release_type`: `alpha`, `beta` or `release`) in `gradle.properties`.
+2. Add a `## [<version>]` section to `CHANGELOG.md`. It becomes the release notes.
+3. Merge to `main`, then tag: `git tag v<version> && git push origin v<version>`.
+
+One-time setup, in **Settings → Secrets and variables → Actions**:
+- Variables: `MODRINTH_PROJECT_ID`, `CURSEFORGE_PROJECT_ID`
+- Secrets: `MODRINTH_TOKEN`, `CURSEFORGE_TOKEN`
+
+A platform without its ID or token is skipped. The icon is drawn by `tools/branding/icon.py`.
+
+## License
+
+MIT. See `LICENSE`.
+
 ## Layout
 
 ```
