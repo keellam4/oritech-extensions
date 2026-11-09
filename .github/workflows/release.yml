@@ -1,0 +1,85 @@
+name: Release
+
+# Publishes a version to Modrinth, CurseForge and GitHub Releases when a tag like v0.1.0 is pushed.
+#
+# One-time setup in the repo's Settings → Secrets and variables → Actions:
+#   Variables: MODRINTH_PROJECT_ID, CURSEFORGE_PROJECT_ID   (from each project's page)
+#   Secrets:   MODRINTH_TOKEN, CURSEFORGE_TOKEN
+# A platform without its ID/token is skipped, so you can start with just one.
+#
+# To release: set mod_version (and release_type) in gradle.properties, add a CHANGELOG.md section
+# "## [<version>]", merge, then push the tag:  git tag v<version> && git push origin v<version>
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Read version and check it matches the tag
+        run: |
+          version=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
+          type=$(grep '^release_type=' gradle.properties | cut -d= -f2)
+          if [ "${GITHUB_REF_NAME#v}" != "$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match mod_version=$version in gradle.properties"; exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "RELEASE_TYPE=${type:-beta}" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: ./gradlew build --stacktrace
+
+      - name: Game tests
+        run: ./gradlew runGameTestServer --stacktrace
+
+      - name: Release notes from CHANGELOG.md
+        run: |
+          python3 - <<'PY'
+          import os, re
+          version = os.environ["VERSION"]
+          text = open("CHANGELOG.md", encoding="utf-8").read()
+          match = re.search(rf"^## \[{re.escape(version)}\][^\n]*\n(.*?)(?=^## |\Z)", text, re.S | re.M)
+          if not match:
+              raise SystemExit(f"::error::CHANGELOG.md has no section for [{version}]")
+          open("release-notes.md", "w", encoding="utf-8").write(match.group(1).strip() + "\n")
+          PY
+          cat release-notes.md
+
+      - name: Publish
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          name: Oritech Extensions ${{ env.VERSION }}
+          version: ${{ env.VERSION }}
+          version-type: ${{ env.RELEASE_TYPE }}
+          changelog-file: release-notes.md
+          files: build/libs/oritech_extensions-neoforge-1.21.1-${{ env.VERSION }}.jar
+          loaders: neoforge
+          game-versions: 1.21.1
+          java: 21
+          dependencies: |
+            oritech(required){modrinth:oritech}{curseforge:oritech}
+            geckolib(required){modrinth:geckolib}{curseforge:geckolib}
+            oritech-things(optional){modrinth:oritech-things}{curseforge:oritech-things}
+
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          github-tag: ${{ github.ref_name }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-prerelease: ${{ env.RELEASE_TYPE != 'release' }}

@@ -7,8 +7,12 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
+logoFile="icon.png"
+credits="Built on Oritech by Rearth. Paint support for Oritech Things (by Lumengrid and contributors, CC-BY 4.0) reads its textures at runtime."
 description='''
-Small add-ons for Oritech. Currently: Hangar Door Extensions, which lengthen Industrial Hangar Doors beyond 3 blocks.
+Small add-ons for Oritech:
+ - Hangar Door Extensions: make Industrial Hangar Doors up to 16 blocks long (configurable).
+ - Paintable machine addons: Oritech's machine paints now work on Oritech's addons and Oritech Things' tiered addons.
 '''
 
 [[dependencies.${mod_id}]]
