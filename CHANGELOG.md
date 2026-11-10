@@ -4,6 +4,9 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 
 ## [Unreleased]
 
+### Added
+- **Paintable standard item and fluid pipes.** Oritech Color Cartridges paint a whole connected standard pipe network (item or fluid). Orange clears the colour. Colour is world-only (broken pipes drop unpainted). New pipes inherit when they touch a same-type neighbour of one colour. Cost mode is configurable (`network` = one cartridge per network, or `per_block`). Framed, duct, transparent and energy pipes are not painted yet.
+
 ### Changed
 - The in-game mod list now links to the issue tracker and source code.
 

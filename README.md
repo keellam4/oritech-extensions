@@ -32,6 +32,23 @@ Oritech's Industrial Hangar Door is 3 blocks long. The **Industrial Hangar Door 
 
 A ceiling door and a floor door that meet in the middle cover twice the configured length. For example, set 20 to close a 40-block opening.
 
+## Paintable standard pipes
+
+Oritech's Color Cartridges can paint **standard item pipes** and **standard fluid pipes** (including their connection segments).
+
+- Right-click a pipe with a cartridge. The whole connected network of that type is painted.
+- Orange Machine Paint clears the network back to the default look.
+- Colour is stored in the world only. Broken pipes always drop unpainted.
+- A newly placed standard pipe inherits colour if it touches a same-type painted neighbour of one consistent colour. Conflicting neighbours leave it unpainted.
+- **Not painted in this version:** framed, duct, transparent item pipes, or energy pipes. Item filters and smart splitters keep Oritech's own paint behaviour.
+
+### Pipe paint config
+
+| Key | Default | Meaning |
+|---|---|---|
+| `pipePaintCostMode` | `NETWORK` | `NETWORK` = one cartridge for the whole network; `PER_BLOCK` = one cartridge per pipe block (spreads until the stack runs out) |
+| `pipePaintIsolation` | `false` | Reserved for a future release (same-colour connection gating). Unused today. |
+
 ## Paintable machine addons
 
 Oritech's machine paints (Color Cartridges) normally only work on its big machines. With this mod they also work on **machine addon blocks**: Oritech's own addons and those from mods built on them, such as **Oritech Things'** tiered addons.
@@ -108,8 +125,8 @@ src/main/java/dev/garciajg/oritechextensions/
   Config.java                   common config
   ModContent.java               registry (blocks, items, block entities)
   hangar/                       hangar door extension: block + block entity
-  paint/                        addon painting: cartridge handling, storage, sync
-  client/                       renderers, GeckoLib model, painted addon models, client setup
+  paint/                        addon + pipe painting: cartridge handling, storage, sync
+  client/                       renderers, GeckoLib model, painted models, client setup
   test/                         game tests
 ```
 
