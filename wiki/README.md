@@ -54,15 +54,21 @@ Plain Markdown (headings, lists, tables, links, code blocks) works everywhere. O
 | `[](@oritech_extensions:guide)` | Link to an item's page (an empty label uses the page/item name) |
 | `[text](getting_started)` | Link to another page, relative, no `.mdx` |
 | `![Caption](@oritech_extensions:pipes/layout)` | Image from `wiki/assets/oritech_extensions/pipes/layout.png` |
-| `<CraftingRecipe slots={[...9 ids...]} result="..." count={1} />` | 3×3 recipe grid |
+| `<CraftingRecipe slots={[...9 ids...]} result="..." count={1} />` | Crafting-table recipe with item icons (see below) |
 | `<VideoEmbed id="youtubeId" />` | YouTube video (a button in-game) |
 | `?[word](hover text)` | Hover tooltip |
 
 The website build fails on broken links, missing images, and pages not in `_meta.json`.
 
+### Recipes and item icons
+
+`<CraftingRecipe>` shows as a crafting grid in-game, and on the website as a Minecraft-style panel with item icons and a large picture of the result. For this mod's own items, the build also compares the recipe on the page with the real one in `src/main/resources/data/oritech_extensions/recipe/` and fails if the ingredients or count don't match.
+
+Icons are drawn at build time from this mod's textures plus the vanilla and Oritech jars (`tools/wiki/fetch_assets.py` downloads them; they're never committed). Flat items use their texture, and full blocks are drawn as an isometric cube. Items with custom 3D models (like the hangar door) show their name instead, and the build log lists them. To give one an icon, add a PNG at `wiki/assets/items/<namespace>/<item>.png`, for example a cropped screenshot of the inventory icon. That file wins over anything generated.
+
 ### Previewing
 
-- **Website:** `pip install -r tools/wiki/requirements.txt`, then `python3 tools/wiki/build_site.py && mkdocs serve -f build/wiki-site/mkdocs.yml` (re-run the script after editing).
+- **Website:** `pip install -r tools/wiki/requirements.txt`, then `python3 tools/wiki/fetch_assets.py` once (for icons), then `python3 tools/wiki/build_site.py && mkdocs serve -f build/wiki-site/mkdocs.yml` (re-run the script after editing).
 - **In-game:** `./gradlew runClient` with Oracle Index in your dev mods. Oracle Index has no hot reload, so restart to see changes.
 
 ### Translations

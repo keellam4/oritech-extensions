@@ -154,9 +154,40 @@ def attrs(tag_body: str) -> dict:
     return out
 
 
+def load_recipes() -> dict[str, dict]:
+    """Crafting recipes in this mod's data/, keyed by result id (used to check the docs match the game)."""
+    out = {}
+    for f in sorted((ROOT / "src/main/resources/data").glob("*/recipe/**/*.json")):
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        kind = data.get("type", "")
+        if kind not in ("minecraft:crafting_shaped", "minecraft:crafting_shapeless"):
+            continue
+        if kind.endswith("shapeless"):
+            ingredients = data.get("ingredients", [])
+        else:
+            pattern, key = data.get("pattern", []), data.get("key", {})
+            ingredients = [key[c] for row in pattern for c in row if c != " " and c in key]
+        items = []
+        for ing in ingredients:
+            ing = ing[0] if isinstance(ing, list) and len(ing) == 1 else ing
+            if not isinstance(ing, dict) or "item" not in ing:  # tags / alternatives: can't compare
+                items = None
+                break
+            items.append(ing["item"])
+        result = data.get("result", {})
+        out[result.get("id", "")] = {"file": rel(f), "items": sorted(items) if items is not None else None,
+                                     "count": result.get("count", 1), "shapeless": kind.endswith("shapeless")}
+    return out
+
+
 class Converter:
-    def __init__(self, pages: list[Page], lang: dict, errors: list[str]):
-        self.lang, self.errors = lang, errors
+    def __init__(self, pages: list[Page], lang: dict, errors: list[str], icons=None):
+        self.lang, self.errors, self.icons = lang, errors, icons
+        self.used_icons: dict[str, object] = {}   # output path inside docs/ -> PIL image
+        self.recipes = load_recipes()
         self.by_id = {p.meta["id"]: p for p in pages if p.meta.get("id")}
         self.by_ref = {p.meta["ref"]: p for p in pages if p.meta.get("ref")}
         self.by_slug = {p.rel: p for p in pages if p.section == "docs"}
@@ -187,16 +218,20 @@ class Converter:
 
         text = self.callouts(text)
         text = self.alerts(text)
-        text = re.sub(r"<CraftingRecipe\b(.*?)/>", lambda m: self.recipe(attrs(m.group(1))), text, flags=re.S)
+        text = re.sub(r"<CraftingRecipe\b(.*?)/>", lambda m: self.recipe(page, attrs(m.group(1))), text, flags=re.S)
         text = re.sub(r"<(?:Mod)?Asset\b(.*?)/>", lambda m: self.asset_tag(page, attrs(m.group(1))), text, flags=re.S)
         text = re.sub(r"<VideoEmbed\b(.*?)/>", lambda m: self.video(attrs(m.group(1))), text, flags=re.S)
         text = re.sub(r"<Audio\b(.*?)/>", lambda m: f"[Sound: {attrs(m.group(1)).get('src', '')}]"
                       f"({self.asset(page, attrs(m.group(1)).get('src', ''), '.ogg')})", text, flags=re.S)
-        text = re.sub(r'<img\s+src="(@?[\w.-]+:[^"]+)"', lambda m: f'<img src="{self.asset(page, m.group(1))}"', text)
+        text = re.sub(r'<img\s+src="(@?[\w.-]+:[^"]+)"',
+                      lambda m: f'<img src="{self.html_root(page)}{self.asset(page, m.group(1)).lstrip("./")}"', text)
         text = re.sub(r"\?\[([^\]]+)\]\(([^)]*)\)", r'<abbr title="\2">\1</abbr>', text)
         text = re.sub(r"(!?)\[([^\]]*)\]\(([^)\s]+)\)(\{[^}]*\})?", lambda m: self.link(page, *m.groups()), text)
 
         text = re.sub(r"\x00(\d+)\x00", lambda m: fences[int(m.group(1))], text)
+        head_icon = self.icon(page, page.meta.get("icon", ""), "mc-inline mc-title-icon")
+        if head_icon:
+            text = re.sub(r"^# ", "# " + head_icon, text, count=1, flags=re.M)
         related = self.related(page)
         if related:  # just below the page's H1, or at the top if it has none
             h1 = re.search(r"^# .*\n", text, flags=re.M)
@@ -204,17 +239,36 @@ class Converter:
             text = text[:at] + "\n" + related + text[at:]
         return f"---\ntitle: {json.dumps(page.title)}\n---\n\n" + text.rstrip() + "\n"
 
+    @staticmethod
+    def html_root(page: Page) -> str:
+        """Prefix from a page's URL back to the site root, for raw HTML (MkDocs only rewrites Markdown links).
+        Pages are served as folders (content/guide.md -> /content/guide/), so it's one level deeper than the file."""
+        return "" if page.out == "index.md" else "../" * len(Path(page.out).with_suffix("").parts)
+
+    def icon(self, page: Page, item_id: str, cls: str = "mc-icon") -> str:
+        """<img> for an item's icon, or "" when there isn't one."""
+        found = self.icons.get(item_id) if self.icons and item_id else None
+        if not found:
+            return ""
+        kind, img = found
+        ns, _, path = item_id.partition(":")
+        out = f"assets/items/{ns}/{path}.png"
+        self.used_icons[out] = img
+        src = self.html_root(page) + out
+        name = item_name(item_id, self.lang)
+        return f'<img class="{cls} {kind}" src="{src}" alt="{name}" title="{name}">'
+
     def related(self, page: Page) -> str:
         items = page.meta.get("related_items") or []
         if not items:
             return ""
-        names = ", ".join(f"{item_name(i, self.lang)} (`{i}`)" for i in items)
+        names = ", ".join(f"{self.icon(page, i, 'mc-inline')}{item_name(i, self.lang)} (`{i}`)" for i in items)
         return f'!!! abstract "Related items"\n    {names}\n\n'
 
     def link(self, page: Page, bang: str, label: str, target: str, attr_block: str | None) -> str:
         if bang:  # image
             if attr_block and "item" in attr_block and target.startswith("@"):
-                return f"**{label or item_name(target[1:], self.lang)}**"  # in-game item icon; no texture on the web
+                return f"{self.icon(page, target[1:], 'mc-inline')}**{label or item_name(target[1:], self.lang)}**"
             src = self.asset(page, target) if re.match(r"@?[\w.-]+:[^/]", target) and "://" not in target else target
             if attr_block and "item" in attr_block:
                 return f'![{label}]({src}){{ width="32" }}'
@@ -271,18 +325,52 @@ class Converter:
                              for lang, name, code in blocks)
         return re.sub(r"<CodeTabs>(.*?)</CodeTabs>", tab, text, flags=re.S)
 
-    def recipe(self, a: dict) -> str:
+    def recipe(self, page: Page, a: dict) -> str:
+        """<CraftingRecipe> as a crafting-table panel: 3x3 grid, arrow, result, and a large result preview."""
         slots = re.findall(r"['\"]([^'\"]*)['\"]", str(a.get("slots", "")))
+        result_id = str(a.get("result", ""))
+        count = str(a.get("count", "1"))
         if len(slots) != 9:
+            self.errors.append(f"{rel(page.src)}: <CraftingRecipe> needs exactly 9 slots, got {len(slots)}")
             return ""
-        def cell(item_id: str) -> str:
-            name = item_name(item_id, self.lang) if item_id else ""
-            return f'<span class="slot" title="{item_id}">{name}</span>'
-        grid = "".join(cell(s) for s in slots)
-        result = item_name(str(a.get("result", "")), self.lang)
-        count = a.get("count", "1")
-        return (f'<div class="recipe"><div class="grid">{grid}</div><span class="arrow">&#8594;</span>'
-                f'<span class="slot result">{result}{" × " + str(count) if str(count) != "1" else ""}</span></div>\n')
+        shapeless = self.check_recipe(page, slots, result_id, count)
+
+        def slot(item_id: str, extra: str = "", badge: str = "") -> str:
+            if not item_id:
+                return f'<span class="mc-slot{extra}"></span>'
+            name = item_name(item_id, self.lang)
+            inner = self.icon(page, item_id) or f'<span class="mc-label">{name}</span>'
+            return f'<span class="mc-slot{extra}" title="{name}">{inner}{badge}</span>'
+
+        result_name = item_name(result_id, self.lang)
+        badge = f'<span class="mc-count">{count}</span>' if count != "1" else ""
+        table = self.icon(page, "minecraft:crafting_table", "mc-station")
+        preview = self.icon(page, result_id, "mc-preview")
+        tag = '<span class="mc-tag">Shapeless</span>' if shapeless else ""
+        return (
+            '<div class="mc-recipe"><div class="mc-panel">'
+            f'<div class="mc-heading">{result_name}</div>'
+            '<div class="mc-body">'
+            f'<div class="mc-grid">{"".join(slot(s) for s in slots)}</div>'
+            f'<div class="mc-mid">{table}<span class="mc-arrow"></span>{tag}</div>'
+            f'{slot(result_id, " mc-result", badge)}'
+            f'{preview}'
+            '</div></div></div>\n'
+        )
+
+    def check_recipe(self, page: Page, slots: list[str], result_id: str, count: str) -> bool:
+        """Compare a documented recipe with this mod's recipe JSON for the same result. Returns shapeless."""
+        actual = self.recipes.get(result_id)
+        if actual is None:  # another mod's recipe; nothing to compare against
+            return False
+        documented = sorted(s for s in slots if s)
+        if actual["items"] is not None and documented != actual["items"]:
+            self.errors.append(f"{rel(page.src)}: recipe for {result_id} shows {documented}, but "
+                               f"{actual['file']} uses {actual['items']}")
+        if count != str(actual["count"]):
+            self.errors.append(f"{rel(page.src)}: recipe for {result_id} says count {count}, but "
+                               f"{actual['file']} makes {actual['count']}")
+        return actual["shapeless"]
 
     def asset_tag(self, page: Page, a: dict) -> str:
         loc = a.get("location") or a.get("src") or ""
@@ -313,7 +401,17 @@ def main() -> int:
     if not any(p.out == "index.md" for p in pages):
         errors.append("wiki/docs/intro.mdx is missing (it's the home page in-game and on the website)")
 
-    conv = Converter(pages, lang, errors)
+    icons = None
+    if not args.check:
+        try:
+            from icons import Icons
+            icons = Icons()
+            if not icons.src.has_jars:
+                print("note: no game jars in build/wiki-cache (run tools/wiki/fetch_assets.py); "
+                      "vanilla/Oritech items will show names instead of icons")
+        except ImportError:
+            print("note: Pillow isn't installed, so recipes show item names instead of icons")
+    conv = Converter(pages, lang, errors, icons)
     rendered = {p.out: conv.convert(p) for p in pages}
 
     if errors:
@@ -330,7 +428,13 @@ def main() -> int:
         (docs / out).parent.mkdir(parents=True, exist_ok=True)
         (docs / out).write_text(text, encoding="utf-8")
     if (WIKI / "assets").exists():
-        shutil.copytree(WIKI / "assets", docs / "assets")
+        shutil.copytree(WIKI / "assets", docs / "assets", ignore=shutil.ignore_patterns("items"))
+    for out, img in conv.used_icons.items():
+        (docs / out).parent.mkdir(parents=True, exist_ok=True)
+        img.save(docs / out)
+    if icons:
+        print(f"icons: {len(conv.used_icons)} drawn" + (f"; no icon for {', '.join(sorted(icons.missing))} "
+              f"(add wiki/assets/items/<ns>/<item>.png to supply one)" if icons.missing else ""))
     extra = Path(__file__).with_name("site")
     if extra.exists():
         shutil.copytree(extra, docs, dirs_exist_ok=True)
