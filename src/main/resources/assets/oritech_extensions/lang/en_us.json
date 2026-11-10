@@ -11,5 +11,7 @@
   "item.oritech_extensions.guide": "Oritech Extensions Guide",
   "tooltip.oritech_extensions.guide": "Right-click to read about this mod's features.",
   "message.oritech_extensions.guide.no_oracle": "Install Oracle Index to read the guide in-game, or open it online: %s",
-  "message.oritech_extensions.guide.open_web": "Open the guide in your browser"
+  "message.oritech_extensions.guide.open_web": "Open the guide in your browser",
+  "oracle_index.title.oritech_extensions": "Oritech Extensions",
+  "oracle_index.title.oritech-extensions": "Oritech Extensions"
 }
