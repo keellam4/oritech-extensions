@@ -133,7 +133,7 @@ MIT. See `LICENSE`.
 ## Layout
 
 ```
-src/main/java/dev/garciajg/oritechextensions/
+src/main/java/io/github/keellam4/oritechextensions/
   OritechExtensions.java        mod entry point
   Config.java                   common config
   ModContent.java               registry (blocks, items, block entities)
