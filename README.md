@@ -34,13 +34,13 @@ A ceiling door and a floor door that meet in the middle cover twice the configur
 
 ## Paintable standard pipes
 
-Oritech's Color Cartridges can paint **standard item pipes** and **standard fluid pipes** (including their connection segments).
+Oritech's Color Cartridges can paint **standard item pipes**, **transparent item pipes** and **standard fluid pipes** (including their connection segments). Transparent and standard item pipes are one network, so they paint together.
 
 - Right-click a pipe with a cartridge. The whole connected network of that type is painted.
 - Orange Machine Paint clears the network back to the default look.
 - Colour is stored in the world only. Broken pipes always drop unpainted.
 - A newly placed standard pipe inherits colour if it touches a same-type painted neighbour of one consistent colour. Conflicting neighbours leave it unpainted.
-- **Not painted in this version:** framed, duct, transparent item pipes, or energy pipes. Item filters and smart splitters keep Oritech's own paint behaviour.
+- **Not painted in this version:** framed, duct, or energy pipes. Item filters and smart splitters keep Oritech's own paint behaviour.
 
 ### Pipe paint config
 
