@@ -1,0 +1,53 @@
+# Base config for the GitHub Pages site. tools/wiki/build_site.py copies this into build/wiki-site/mkdocs.yml
+# and appends the nav it reads from wiki/**/_meta.json. Edit pages in wiki/, not in build/.
+site_name: Oritech Extensions
+site_description: Small add-ons for Oritech on NeoForge 1.21.1
+site_url: https://keellam4.github.io/oritech-extensions/
+repo_url: https://github.com/keellam4/oritech-extensions
+repo_name: keellam4/oritech-extensions
+edit_uri: ""
+copyright: Oritech Extensions is MIT licensed. Not affiliated with Oritech.
+
+theme:
+  name: material
+  icon:
+    logo: material/book-open-page-variant
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  features:
+    - navigation.sections
+    - navigation.instant
+    - navigation.footer
+    - content.tabs.link
+    - search.highlight
+
+extra_css:
+  - stylesheets/oritech.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search

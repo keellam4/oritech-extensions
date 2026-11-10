@@ -7,5 +7,9 @@
   "oritech_extensions.configuration.title": "Oritech Extensions",
   "oritech_extensions.configuration.maxHangarDoorLength": "Max Hangar Door Length",
   "oritech_extensions.configuration.maxHangarDoorLength.tooltip": "Total door length in blocks, including Oritech's original 3 blocks.",
-  "tooltip.oritech_extensions.painted": "Painted: %s"
+  "tooltip.oritech_extensions.painted": "Painted: %s",
+  "item.oritech_extensions.guide": "Oritech Extensions Guide",
+  "tooltip.oritech_extensions.guide": "Right-click to read about this mod's features.",
+  "message.oritech_extensions.guide.no_oracle": "Install Oracle Index to read the guide in-game, or open it online: %s",
+  "message.oritech_extensions.guide.open_web": "Open the guide in your browser"
 }
