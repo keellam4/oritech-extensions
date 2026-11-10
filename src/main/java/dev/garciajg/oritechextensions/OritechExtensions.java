@@ -39,5 +39,8 @@ public class OritechExtensions {
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS || event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(ModContent.HANGAR_DOOR_EXTENSION_ITEM.get());
         }
+        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+            event.accept(ModContent.GUIDE.get());
+        }
     }
 }
