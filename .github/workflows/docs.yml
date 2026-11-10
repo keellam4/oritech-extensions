@@ -7,9 +7,9 @@ name: Docs
 on:
   push:
     branches: [main]
-    paths: [wiki/**, tools/wiki/**, src/main/resources/assets/**, src/main/resources/data/**, gradle.properties, .github/workflows/docs.yml]
+    paths: [wiki/**, tools/wiki/**, src/main/resources/assets/**, src/main/resources/data/**, src/main/java/**/client/IconExporter.java, gradle.properties, .github/workflows/docs.yml]
   pull_request:
-    paths: [wiki/**, tools/wiki/**, src/main/resources/data/**/recipe/**, .github/workflows/docs.yml]
+    paths: [wiki/**, tools/wiki/**, src/main/resources/data/**/recipe/**, src/main/java/**/client/IconExporter.java, .github/workflows/docs.yml]
   workflow_dispatch:
 
 permissions:
@@ -42,6 +42,28 @@ jobs:
 
       - name: Fetch game jars for item icons
         run: python3 tools/wiki/fetch_assets.py
+
+      # Render the items the wiki shows with the real game client, so 3D/GeckoLib items get proper icons.
+      # If this fails the site still builds, using icons drawn from textures instead.
+      - name: Setup JDK 21
+        uses: actions/setup-java@v6
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Render item icons (headless client)
+        continue-on-error: true
+        run: |
+          python3 tools/wiki/build_site.py --list-items
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb libgl1-mesa-dri > /dev/null
+          export LIBGL_ALWAYS_SOFTWARE=1
+          athena=$(curl -sfG "https://api.modrinth.com/v2/project/athena-ctm/version" \
+                     --data-urlencode 'loaders=["neoforge"]' --data-urlencode 'game_versions=["1.21.1"]' | jq -r '.[0].id')
+          timeout 600 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClientIconExport -Pathena_version_id="$athena" || true
+          grep "\[icons\]" run/logs/latest.log || { echo "::warning::item icons were not rendered"; tail -60 run/logs/latest.log; }
 
       - name: Check wiki/ and generate the site source
         run: python3 tools/wiki/build_site.py

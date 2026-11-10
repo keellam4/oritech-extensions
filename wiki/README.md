@@ -64,11 +64,11 @@ The website build fails on broken links, missing images, and pages not in `_meta
 
 `<CraftingRecipe>` shows as a crafting grid in-game, and on the website as a Minecraft-style panel with item icons and a large picture of the result. For this mod's own items, the build also compares the recipe on the page with the real one in `src/main/resources/data/oritech_extensions/recipe/` and fails if the ingredients or count don't match.
 
-Icons are drawn at build time from this mod's textures plus the vanilla and Oritech jars (`tools/wiki/fetch_assets.py` downloads them; they're never committed). Flat items use their texture, and full blocks are drawn as an isometric cube. Items with custom 3D models (like the hangar door) show their name instead, and the build log lists them. To give one an icon, add a PNG at `wiki/assets/items/<namespace>/<item>.png`, for example a cropped screenshot of the inventory icon. That file wins over anything generated.
+Icons are the real inventory icons. CI starts the game client headless (`./gradlew runClientIconExport`) and renders every item the pages use, including 3D and GeckoLib models like the hangar door. If that step can't run (for example in a local preview without Java), icons are drawn from textures instead: flat items from the vanilla/Oritech jars (`tools/wiki/fetch_assets.py`, never committed) and full blocks as an isometric cube. Items with custom models then show their name. To replace any icon by hand, add a PNG at `wiki/assets/items/<namespace>/<item>.png`.
 
 ### Previewing
 
-- **Website:** `pip install -r tools/wiki/requirements.txt`, then `python3 tools/wiki/fetch_assets.py` once (for icons), then `python3 tools/wiki/build_site.py && mkdocs serve -f build/wiki-site/mkdocs.yml` (re-run the script after editing).
+- **Website:** `pip install -r tools/wiki/requirements.txt`, then `python3 tools/wiki/fetch_assets.py` once (for icons; for real rendered icons also run `python3 tools/wiki/build_site.py --list-items && ./gradlew runClientIconExport`), then `python3 tools/wiki/build_site.py && mkdocs serve -f build/wiki-site/mkdocs.yml` (re-run the script after editing).
 - **In-game:** `./gradlew runClient` with Oracle Index in your dev mods. Oracle Index has no hot reload, so restart to see changes.
 
 ### Translations
