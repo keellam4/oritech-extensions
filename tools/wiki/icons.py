@@ -1,9 +1,10 @@
 """Item icons for the docs site, built from the mod's own resources and the game jars in build/wiki-cache/.
 
 Lookup order for an item id like ``oritech:nickel_ingot``:
-  1. ``wiki/assets/items/<ns>/<path>.png``: a hand-made icon. Use this for items with complex 3D models
-     (e.g. take an in-game screenshot of the inventory icon and crop it).
-  2. The item model ``assets/<ns>/models/item/<path>.json``, followed through its parents:
+  1. ``wiki/assets/items/<ns>/<path>.png``: a hand-made icon, if you ever want to replace one.
+  2. ``build/wiki-icons/<ns>/<path>.png``: the item rendered by the real game client, exactly like the
+     inventory icon (CI runs ``./gradlew runClientIconExport``). Covers GeckoLib and other custom models.
+  3. The item model ``assets/<ns>/models/item/<path>.json``, followed through its parents:
      * flat items (``item/generated``, ``item/handheld``): their ``layer0``/``layer1`` textures;
      * full blocks (anything built on ``block/cube``): an isometric cube like the inventory icon.
   Anything else (custom/GeckoLib models) has no icon, and recipes show its name instead.
@@ -22,6 +23,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "wiki" / "assets" / "items"
+RENDERED = ROOT / "build" / "wiki-icons"   # real inventory renders from `./gradlew runClientIconExport`
 CACHE = ROOT / "build" / "wiki-cache"
 FLAT_PARENTS = {"item/generated", "item/handheld", "item/handheld_rod", "builtin/generated"}
 CUBE_SIZE = 128  # px; rendered big and shown scaled down with crisp pixels
@@ -81,6 +83,11 @@ class Icons:
         if override.exists():
             img = Image.open(override).convert("RGBA")
             return ("block" if img.width > 32 else "flat"), img
+        rendered = RENDERED / ns / f"{path}.png"
+        if rendered.exists():
+            img = Image.open(rendered).convert("RGBA")
+            if img.getbbox():  # skip blank renders
+                return "block", img
 
         model = self._model(f"{ns}:item/{path}")
         if model is None:

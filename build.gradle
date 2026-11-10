@@ -57,6 +57,13 @@ neoForge {
             client()
             systemProperty 'oritech_extensions.smokeTest', 'true'
         }
+        // Like clientSmokeTest, but first renders the items the wiki uses to build/wiki-icons/ for the docs site.
+        // Run `python3 tools/wiki/build_site.py --list-items` first to write the item list.
+        clientIconExport {
+            client()
+            systemProperty 'oritech_extensions.smokeTest', 'true'
+            systemProperty 'oritech_extensions.exportIcons', file('build/wiki-icons/items.txt').absolutePath
+        }
         // Runs every @GameTest in this mod against the real Oritech, then exits (non-zero on failure).
         gameTestServer {
             type = "gameTestServer"
