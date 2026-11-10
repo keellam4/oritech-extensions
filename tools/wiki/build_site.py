@@ -15,6 +15,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import json
 import re
@@ -501,6 +502,14 @@ def main() -> int:
         shutil.copytree(extra, docs, dirs_exist_ok=True)
 
     config = BASE_CONFIG.read_text(encoding="utf-8")
+    # Cache-buster: GitHub Pages lets browsers keep CSS/JS for 10 minutes, so after a deploy a visitor could get
+    # new pages with an old stylesheet. A hash of the site's own CSS/JS in their URLs forces fresh copies.
+    digest = hashlib.sha256()
+    for f in sorted(extra.rglob("*")) if extra.exists() else []:
+        if f.is_file():
+            digest.update(f.read_bytes())
+    version = digest.hexdigest()[:10]
+    config = re.sub(r"(stylesheets/oritech\.css|javascripts/paint-viewer\.js)", rf"\1?v={version}", config)
     config += "\nnav:\n" + "".join(nav_yaml(nav, 1))
     (OUT / "mkdocs.yml").write_text(config, encoding="utf-8")
     print(f"Wrote {rel(OUT)}/ — now run: mkdocs build -f {rel(OUT)}/mkdocs.yml")

@@ -110,6 +110,16 @@ function repaint(group, root, paint) {
   }
 }
 
+/**
+ * Sizes the stage and canvas with inline styles so the layout never depends on the stylesheet. Without this, a
+ * stale cached oritech.css (no viewer rules) let the canvas size the stage, the resize handler grow the canvas
+ * to match, and so on forever: an endless page that could crash the browser.
+ */
+export function lockLayout(stage, canvas, height) {
+  Object.assign(stage.style, { position: 'relative', overflow: 'hidden', height: `${height}px` });
+  Object.assign(canvas.style, { position: 'absolute', inset: '0', width: '100%', height: '100%', display: 'block' });
+}
+
 export function setup(container) {
   if (container.dataset.ready) return;
   container.dataset.ready = '1';
@@ -131,6 +141,7 @@ export function setup(container) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   stage.prepend(renderer.domElement);
+  lockLayout(stage, renderer.domElement, 320);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 1, 200);
   const pivot = new THREE.Group();
@@ -139,8 +150,11 @@ export function setup(container) {
   let current = null, paint = 'orange', yaw = Math.PI / 4, pitch = 0.5, spinning = true, dragging = null, distance = 46;
   const cache = new Map();
 
+  let size = '';
   function resize() {
-    const w = stage.clientWidth, h = stage.clientHeight;
+    const w = Math.min(stage.clientWidth, 2000), h = Math.min(stage.clientHeight, 1200);
+    if (!w || !h || `${w}x${h}` === size) return;
+    size = `${w}x${h}`;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
