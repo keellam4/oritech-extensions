@@ -12,12 +12,41 @@
 .md-typeset .video { position: relative; padding-top: 56.25%; }
 .md-typeset .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
-/* <CraftingRecipe> rendered as a 3x3 grid. */
-.md-typeset .recipe { display: flex; align-items: center; gap: .8rem; margin: 1em 0; }
-.md-typeset .recipe .grid { display: grid; grid-template-columns: repeat(3, 4.2rem); gap: 2px;
-  padding: 3px; background: var(--md-default-fg-color--lightest); border-radius: 4px; }
-.md-typeset .recipe .slot { display: flex; align-items: center; justify-content: center; text-align: center;
-  min-height: 4.2rem; padding: .2rem; font-size: .62rem; line-height: 1.2;
-  background: var(--md-code-bg-color); border-radius: 2px; }
-.md-typeset .recipe .result { width: 5rem; border: 2px solid var(--md-accent-fg-color); }
-.md-typeset .recipe .arrow { font-size: 1.4rem; color: var(--md-accent-fg-color); }
+/* ---- Item icons ---- */
+.md-typeset img.mc-icon, .md-typeset img.mc-inline, .md-typeset img.mc-preview, .md-typeset img.mc-station {
+  image-rendering: pixelated; image-rendering: crisp-edges; }
+.md-typeset img.mc-inline { width: 1.4em; height: 1.4em; vertical-align: -0.35em; margin-right: .25em; }
+.md-typeset h1 img.mc-title-icon { width: 1.1em; height: 1.1em; vertical-align: -0.12em; margin-right: .3em; }
+
+/* ---- <CraftingRecipe>: a crafting-table panel in Minecraft's GUI style ---- */
+.md-typeset .mc-recipe { margin: 1.2em 0; overflow-x: auto; }
+.md-typeset .mc-panel {
+  --mc-light: #ffffff; --mc-face: #c6c6c6; --mc-dark: #555555; --mc-slot: #8b8b8b; --mc-slot-dark: #373737;
+  display: inline-block; min-width: max-content; padding: .9rem 1.1rem 1.1rem; color: #3f3f3f;
+  background: var(--mc-face); border: 2px solid #000; border-radius: 6px;
+  box-shadow: inset 3px 3px 0 var(--mc-light), inset -3px -3px 0 var(--mc-dark);
+}
+.md-typeset .mc-heading { font-weight: 700; margin: 0 0 .55rem .1rem; letter-spacing: .02em; }
+.md-typeset .mc-body { display: flex; align-items: center; gap: 1.1rem; }
+.md-typeset .mc-grid { display: grid; grid-template-columns: repeat(3, 2.7rem); gap: 0; }
+.md-typeset .mc-slot {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  width: 2.7rem; height: 2.7rem; background: var(--mc-slot);
+  box-shadow: inset 2px 2px 0 var(--mc-slot-dark), inset -2px -2px 0 var(--mc-light);
+}
+.md-typeset .mc-slot img.mc-icon { width: 2.1rem; height: 2.1rem; }
+.md-typeset .mc-slot .mc-label { font-size: .48rem; line-height: 1.05; text-align: center; color: #fff;
+  padding: 0 .15rem; text-shadow: 1px 1px 0 #3f3f3f; overflow-wrap: anywhere; }
+.md-typeset .mc-result { width: 3.6rem; height: 3.6rem; }
+.md-typeset .mc-result img.mc-icon { width: 2.6rem; height: 2.6rem; }
+.md-typeset .mc-count { position: absolute; right: .2rem; bottom: .05rem; color: #fff; font-weight: 700;
+  font-size: .8rem; text-shadow: 2px 2px 0 #3f3f3f; }
+.md-typeset .mc-mid { display: flex; flex-direction: column; align-items: center; gap: .35rem; min-width: 3rem; }
+.md-typeset img.mc-station { width: 1.6rem; height: 1.6rem; }
+/* Pixel arrow, like the crafting table's. */
+.md-typeset .mc-arrow { width: 2.2rem; height: 1.5rem; background: #8b8b8b;
+  clip-path: polygon(0 35%, 60% 35%, 60% 0, 100% 50%, 60% 100%, 60% 65%, 0 65%); }
+.md-typeset .mc-tag { font-size: .55rem; text-transform: uppercase; letter-spacing: .06em; color: #555; }
+.md-typeset img.mc-preview { width: 7rem; height: 7rem; margin-left: .8rem;
+  filter: drop-shadow(3px 4px 0 rgba(0, 0, 0, .25)); }
+@media (max-width: 40em) { .md-typeset img.mc-preview { display: none; } }
