@@ -30,6 +30,7 @@ final class IconExporter {
 
     static final String PROPERTY = "oritech_extensions.exportIcons";
     private static final int SIZE = 128;
+    private static boolean done; // the quit tick can fire again before the game closes
 
     private IconExporter() {}
 
@@ -39,6 +40,8 @@ final class IconExporter {
 
     /** Must run on the render thread, with resources loaded. */
     static void export() {
+        if (done) return;
+        done = true;
         Path list = Path.of(System.getProperty(PROPERTY));
         List<String> ids;
         try {
