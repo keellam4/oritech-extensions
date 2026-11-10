@@ -1,0 +1,60 @@
+name: Docs
+
+# Builds the website from wiki/ and publishes it to GitHub Pages: https://keellam4.github.io/oritech-extensions/
+# Pull requests only check that wiki/ is valid and the site builds; pushes to main also deploy it.
+#
+# One-time setup: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+on:
+  push:
+    branches: [main]
+    paths: [wiki/**, tools/wiki/**, src/main/resources/assets/oritech_extensions/lang/en_us.json, .github/workflows/docs.yml]
+  pull_request:
+    paths: [wiki/**, tools/wiki/**, .github/workflows/docs.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tools/wiki/requirements.txt
+
+      - name: Check wiki/ and generate the site source
+        run: python3 tools/wiki/build_site.py
+
+      - name: Build the site
+        run: |
+          pip install -q -r tools/wiki/requirements.txt
+          mkdocs build --strict -f build/wiki-site/mkdocs.yml
+
+      - name: Upload site
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: build/wiki-site/site
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
