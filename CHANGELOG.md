@@ -4,6 +4,8 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 
 ## [Unreleased]
 
+## [0.2.0] - Beta
+
 ### Added
 - **Paintable standard item and fluid pipes.** Oritech Color Cartridges paint a whole connected standard pipe network (item or fluid). Orange clears the colour. Colour is world-only (broken pipes drop unpainted). New pipes inherit when they touch a same-type neighbour of one colour. Cost mode is configurable (`network` = one cartridge per network, or `per_block`). Transparent item pipes paint together with standard item pipes. Framed, duct and energy pipes are not painted yet.
 - **Oritech Extensions Guide.** A craftable book (Book + any nickel ingot, so AllTheOres nickel works in ATM10) that opens this mod's wiki in-game through Oracle Index. Without Oracle Index it posts a link to the online docs.
