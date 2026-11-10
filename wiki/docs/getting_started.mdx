@@ -1,0 +1,35 @@
+---
+title: Getting Started
+icon: oritech_extensions:guide
+---
+
+# Getting Started
+
+## Requirements
+
+- Minecraft 1.21.1 with NeoForge 21.1.200 or newer
+- [Oritech](https://modrinth.com/mod/oritech) 1.2.x
+- GeckoLib 4.6 or newer
+
+Optional:
+
+- [Oracle Index](https://modrinth.com/mod/oracle-index) to read this wiki in-game
+- Oritech Things, whose machine addons also become paintable
+
+## Reading this guide in-game
+
+Craft the [](@oritech_extensions:guide) from a Book and a Nickel Ingot, then right-click it.
+
+<Callout variant="tip">
+Oracle Index is client-side only. Players who want the in-game guide install it themselves; servers don't need it.
+</Callout>
+
+## Config
+
+Settings live in `config/oritech_extensions-common.toml`, or in the in-game mod list under **Config**.
+
+| Key | Default | What it does |
+|---|---|---|
+| `maxHangarDoorLength` | `16` | Longest a hangar door can be, including Oritech's 3 blocks |
+| `pipePaintCostMode` | `NETWORK` | `NETWORK` = one cartridge per network, `PER_BLOCK` = one per pipe |
+| `pipePaintIsolation` | `false` | Reserved for a future same-colour connection mode |

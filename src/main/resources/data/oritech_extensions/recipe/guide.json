@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "minecraft:book" },
+    { "item": "oritech:nickel_ingot" }
+  ],
+  "result": {
+    "id": "oritech_extensions:guide",
+    "count": 1
+  }
+}

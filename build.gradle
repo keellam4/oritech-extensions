@@ -93,6 +93,11 @@ dependencies {
     if (project.hasProperty('athena_version_id')) {
         localRuntime "maven.modrinth:athena-ctm:${project.athena_version_id}"
     }
+    // Optional in-game wiki viewer, to test the guide book in runClient (pass -Poracle_index_version_id=<modrinth id>).
+    // Not needed to compile: the guide book reaches Oracle Index by reflection.
+    if (project.hasProperty('oracle_index_version_id')) {
+        localRuntime "maven.modrinth:oracle-index:${project.oracle_index_version_id}"
+    }
     localRuntime "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
     localRuntime "dev.architectury:architectury-neoforge:${architectury_version}"
 }
@@ -102,6 +107,7 @@ def oracleWikiOut = layout.buildDirectory.dir('generated/oracleWiki')
 tasks.register('syncOracleWiki', Copy) {
     from('wiki') {
         into 'assets/oracle_index/books/oritech_extensions'
+        exclude 'README.md' // contributor notes for GitHub, not a wiki page
     }
     into oracleWikiOut
 }

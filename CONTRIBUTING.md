@@ -22,9 +22,12 @@ Every pull request runs the build, the game tests, and a headless client smoke t
 | `src/main/java/.../hangar/` | Hangar Door Extension block and block entity |
 | `src/main/java/.../paint/` | Painting machine addons: cartridge handling, storage, sync |
 | `src/main/java/.../client/` | Renderers, models, client setup |
+| `src/main/java/.../guide/` | The guide book item (opens the wiki in Oracle Index) |
 | `src/main/java/.../test/` | Game tests |
 | `src/main/resources/assets/minecraft/atlases/blocks.json` | Which textures get painted versions |
 | `tools/paint/generate_palettes.py` | Rebuilds the paint palettes from an Oritech jar |
+| `wiki/` | Documentation: in-game guide, website and GitHub. See [`wiki/README.md`](wiki/README.md) |
+| `tools/wiki/` | Builds the GitHub Pages site from `wiki/` |
 
 ## Making another addon texture paintable
 1. Check that the texture uses Oritech's orange accent shades (`src/main/resources/assets/oritech_extensions/textures/colormap/paint/key.png`).
@@ -33,6 +36,7 @@ Every pull request runs the build, the game tests, and a headless client smoke t
 
 ## Pull requests
 - Keep each PR to one change.
+- New item, block or feature? Add or update its page in `wiki/` in the same PR ([how](wiki/README.md#adding-a-page)).
 - Add a line to `CHANGELOG.md` under `## [Unreleased]` for anything players would notice. A maintainer adds the `skip-changelog` label for docs and CI changes.
 - Only include textures or code you made yourself or that are under a compatible license. Oritech is CC0; Oritech Things is CC-BY 4.0 and is only read at runtime, never copied into this repo.
 - By contributing, you agree your contribution is licensed under the project's MIT license.

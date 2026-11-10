@@ -69,11 +69,17 @@ The list of recoloured textures is in `src/main/resources/assets/minecraft/atlas
 
 Oritech Things is © its authors, licensed CC-BY 4.0. This mod only reads its textures at runtime to recolour them.
 
-## In-game wiki (Oracle Index)
+## Documentation
 
-Documentation lives in `wiki/` and is copied into the jar for [Oracle Index](https://modrinth.com/mod/oracle-index) (optional). With Oracle Index installed, open the wiki (default **H**) and pick **Oritech Extensions**. Pages cover hangar doors, addon paint, and pipe paint.
+📖 **<https://keellam4.github.io/oritech-extensions/>**
 
-Edit files under `wiki/`; `./gradlew build` (or any task that runs `processResources`) syncs them into `assets/oracle_index/books/oritech_extensions/`.
+The docs live in [`wiki/`](wiki/) and are written once for three places:
+
+- **In-game:** craft the **Oritech Extensions Guide** (Book + Nickel Ingot) and right-click it, or press **H**. This needs [Oracle Index](https://modrinth.com/mod/oracle-index) (optional, client-side). Without it, the book posts a link to the website instead.
+- **Website:** GitHub Pages, rebuilt from `wiki/` on every push to `main` (`.github/workflows/docs.yml`).
+- **GitHub:** browse [`wiki/`](wiki/). Its README explains how to add a page.
+
+`./gradlew build` copies `wiki/` into the jar under `assets/oracle_index/books/oritech_extensions/`. Run `python3 tools/wiki/build_site.py --check` to validate pages.
 
 ## Requirements
 

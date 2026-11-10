@@ -1,11 +1,13 @@
 package dev.garciajg.oritechextensions;
 
+import dev.garciajg.oritechextensions.guide.GuideBookItem;
 import dev.garciajg.oritechextensions.hangar.HangarDoorExtensionBlock;
 import dev.garciajg.oritechextensions.hangar.HangarDoorExtensionBlockEntity;
 import dev.garciajg.oritechextensions.paint.PaintColors;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -39,6 +41,10 @@ public class ModContent {
 
     public static final DeferredItem<BlockItem> HANGAR_DOOR_EXTENSION_ITEM =
             ITEMS.registerSimpleBlockItem("hangar_door_extension", HANGAR_DOOR_EXTENSION);
+
+    /** Opens this mod's wiki in Oracle Index (or posts a link to the website). Crafted from a book + nickel ingot. */
+    public static final DeferredItem<GuideBookItem> GUIDE = ITEMS.registerItem(
+            "guide", GuideBookItem::new, new Item.Properties().stacksTo(1));
 
     @SuppressWarnings("DataFlowIssue")
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HangarDoorExtensionBlockEntity>> HANGAR_DOOR_EXTENSION_ENTITY =
