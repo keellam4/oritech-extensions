@@ -142,8 +142,9 @@ function retracted(open, t) {
 
 // ------------------------------------------------------------------ viewer
 
+// Fallback names; the page passes Oritech's own names in data-names (read from its lang file at build time).
 const PAINT_NAMES = {
-  orange: 'Unpainted', camo: 'Camo', diamond: 'Diamond', fluxite: 'Fluxite', white: 'White',
+  orange: 'Unpainted', camo: 'Camo', diamond: 'Adamant', fluxite: 'Fluxite', white: 'White',
   industrial: 'Industrial', netherite: 'Netherite', redstone: 'Redstone', sculk: 'Sculk',
 };
 
@@ -163,6 +164,7 @@ export async function setup(container) {
   const base = `${root}assets/viewer/door/`;
   const paints = JSON.parse(container.dataset.paints || '[]');
   const swatches = JSON.parse(container.dataset.swatches || '{}');
+  const names = { ...PAINT_NAMES, ...JSON.parse(container.dataset.names || '{}') };
   const [doorGeo, anims, extGeo] = await Promise.all(
     ['hangar_door.geo.json', 'hangar_door.animation.json', 'extension.geo.json'].map(f => fetch(base + f).then(r => r.json())));
 
@@ -230,7 +232,7 @@ export async function setup(container) {
     btn.type = 'button';
     btn.setAttribute('role', 'radio');
     btn.setAttribute('aria-checked', name === 'orange');
-    btn.title = PAINT_NAMES[name] || name;
+    btn.title = names[name] || name;
     btn.innerHTML = `<span class="pv-dot" style="background:${swatches[name] || '#888'}"></span><span class="pv-label">${btn.title}</span>`;
     btn.addEventListener('click', () => {
       material.map = texture(base + (name === 'orange' ? 'hangar_door.png' : `hangar_door_${name}.png`));

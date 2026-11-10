@@ -296,7 +296,7 @@ class Converter:
             return ""
         attr = lambda v: html.escape(json.dumps(v, separators=(",", ":")), quote=True)
         return (f'<div class="paint-viewer" data-root="{self.html_root(page)}" data-blocks="{attr(blocks)}" '
-                f'data-swatches="{attr(self.viewer.swatches)}"></div>\n\n')
+                f'data-swatches="{attr(self.viewer.swatches)}" data-names="{attr(self.viewer.paint_names)}"></div>\n\n')
 
     def door_viewer(self, page: Page) -> str:
         """Animated hangar door (`door_viewer: true` frontmatter). Website only."""
@@ -307,7 +307,8 @@ class Converter:
             return ""
         attr = lambda v: html.escape(json.dumps(v, separators=(",", ":")), quote=True)
         return (f'<div class="door-viewer" data-root="{self.html_root(page)}" '
-                f'data-paints="{attr(paints)}" data-swatches="{attr(self.viewer.swatches)}"></div>\n\n')
+                f'data-paints="{attr(paints)}" data-swatches="{attr(self.viewer.swatches)}" '
+                f'data-names="{attr(self.viewer.paint_names)}"></div>\n\n')
 
     def related(self, page: Page) -> str:
         items = page.meta.get("related_items") or []

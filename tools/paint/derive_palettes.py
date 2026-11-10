@@ -21,7 +21,7 @@ VARIANTS = ['camo', 'diamond', 'fluxite', 'white', 'industrial', 'netherite', 'r
 # Accent for the extenders' red trim, per paint: picked to contrast with (but suit) the paint colour.
 ACCENTS = {
     'camo': (201, 176, 112),       # khaki
-    'diamond': (40, 74, 168),      # deep blue
+    'diamond': (40, 74, 168),      # deep blue (Oritech's code says DIAMOND; the paint is called "Adamant" in game)
     'fluxite': (122, 64, 190),     # violet
     'white': (78, 116, 158),       # steel blue
     'industrial': (52, 52, 58),    # charcoal (hazard stripes)
