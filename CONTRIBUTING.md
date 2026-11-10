@@ -21,7 +21,7 @@ Every pull request runs the build, the game tests, and a headless client smoke t
 |---|---|
 | `src/main/java/.../hangar/` | Hangar Door Extension block and block entity |
 | `src/main/java/.../paint/` | Painting machine addons: cartridge handling, storage, sync |
-| `src/main/java/.../client/` | Renderers, models, client setup |
+| `src/main/java/.../client/` | Renderers, models, client setup (plus `IconExporter`, which renders item icons for the docs site) |
 | `src/main/java/.../guide/` | The guide book item (opens the wiki in Oracle Index) |
 | `src/main/java/.../test/` | Game tests |
 | `src/main/resources/assets/minecraft/atlases/blocks.json` | Which textures get painted versions |

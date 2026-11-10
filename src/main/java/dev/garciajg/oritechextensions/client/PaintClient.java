@@ -43,6 +43,7 @@ public final class PaintClient {
         // Loading is done once the resource-loading overlay is gone and a menu (title or first-launch screen) is open.
         if (minecraft.getOverlay() == null && minecraft.screen != null) {
             OritechExtensions.LOGGER.info("[smoke test] Title screen reached ({}), quitting", minecraft.screen.getClass().getSimpleName());
+            if (IconExporter.requested()) IconExporter.export(); // docs site icons (clientIconExport run)
             minecraft.stop();
         }
     }

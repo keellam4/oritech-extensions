@@ -154,6 +154,17 @@ def attrs(tag_body: str) -> dict:
     return out
 
 
+class Recorder:
+    """Stands in for Icons with --list-items: notes every item a page wants an icon for."""
+    def __init__(self):
+        self.seen: set[str] = set()
+
+    def get(self, item_id: str):
+        if ":" in item_id:
+            self.seen.add(item_id)
+        return None
+
+
 def load_recipes() -> dict[str, dict]:
     """Crafting recipes in this mod's data/, keyed by result id (used to check the docs match the game)."""
     out = {}
@@ -388,6 +399,8 @@ class Converter:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true", help="only validate wiki/")
+    ap.add_argument("--list-items", action="store_true",
+                    help="write build/wiki-icons/items.txt (items the pages show) for ./gradlew runClientIconExport")
     args = ap.parse_args()
 
     errors: list[str] = []
@@ -402,7 +415,9 @@ def main() -> int:
         errors.append("wiki/docs/intro.mdx is missing (it's the home page in-game and on the website)")
 
     icons = None
-    if not args.check:
+    if args.list_items:
+        icons = Recorder()
+    elif not args.check:
         try:
             from icons import Icons
             icons = Icons()
@@ -414,6 +429,12 @@ def main() -> int:
     conv = Converter(pages, lang, errors, icons)
     rendered = {p.out: conv.convert(p) for p in pages}
 
+    if args.list_items:
+        out = ROOT / "build" / "wiki-icons" / "items.txt"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text("\n".join(sorted(icons.seen)) + "\n", encoding="utf-8")
+        print(f"Wrote {len(icons.seen)} item ids to {rel(out)}")
+        return 0
     if errors:
         print("wiki/ has problems:\n  " + "\n  ".join(errors), file=sys.stderr)
         return 1
