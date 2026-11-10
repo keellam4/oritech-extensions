@@ -15,6 +15,7 @@ description='''
 Small add-ons for Oritech:
  - Hangar Door Extensions: make Industrial Hangar Doors up to 16 blocks long (configurable).
  - Paintable machine addons: Oritech's machine paints now work on Oritech's addons and Oritech Things' tiered addons.
+ - Paintable standard item and fluid pipes: Color Cartridges paint whole connected pipe networks.
 '''
 
 [[dependencies.${mod_id}]]
@@ -44,3 +45,10 @@ Small add-ons for Oritech:
     versionRange="[4.6,5)"
     ordering="AFTER"
     side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="oracle_index"
+    type="optional"
+    versionRange="[1.0,)"
+    ordering="NONE"
+    side="CLIENT"

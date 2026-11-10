@@ -32,6 +32,23 @@ Oritech's Industrial Hangar Door is 3 blocks long. The **Industrial Hangar Door 
 
 A ceiling door and a floor door that meet in the middle cover twice the configured length. For example, set 20 to close a 40-block opening.
 
+## Paintable standard pipes
+
+Oritech's Color Cartridges can paint **standard item pipes** and **standard fluid pipes** (including their connection segments).
+
+- Right-click a pipe with a cartridge. The whole connected network of that type is painted.
+- Orange Machine Paint clears the network back to the default look.
+- Colour is stored in the world only. Broken pipes always drop unpainted.
+- A newly placed standard pipe inherits colour if it touches a same-type painted neighbour of one consistent colour. Conflicting neighbours leave it unpainted.
+- **Not painted in this version:** framed, duct, transparent item pipes, or energy pipes. Item filters and smart splitters keep Oritech's own paint behaviour.
+
+### Pipe paint config
+
+| Key | Default | Meaning |
+|---|---|---|
+| `pipePaintCostMode` | `NETWORK` | `NETWORK` = one cartridge for the whole network; `PER_BLOCK` = one cartridge per pipe block (spreads until the stack runs out) |
+| `pipePaintIsolation` | `false` | Reserved for a future release (same-colour connection gating). Unused today. |
+
 ## Paintable machine addons
 
 Oritech's machine paints (Color Cartridges) normally only work on its big machines. With this mod they also work on **machine addon blocks**: Oritech's own addons and those from mods built on them, such as **Oritech Things'** tiered addons.
@@ -52,12 +69,19 @@ The list of recoloured textures is in `src/main/resources/assets/minecraft/atlas
 
 Oritech Things is © its authors, licensed CC-BY 4.0. This mod only reads its textures at runtime to recolour them.
 
+## In-game wiki (Oracle Index)
+
+Documentation lives in `wiki/` and is copied into the jar for [Oracle Index](https://modrinth.com/mod/oracle-index) (optional). With Oracle Index installed, open the wiki (default **H**) and pick **Oritech Extensions**. Pages cover hangar doors, addon paint, and pipe paint.
+
+Edit files under `wiki/`; `./gradlew build` (or any task that runs `processResources`) syncs them into `assets/oracle_index/books/oritech_extensions/`.
+
 ## Requirements
 
 - Minecraft 1.21.1, NeoForge 21.1.200+
 - Oritech 1.2.x (NeoForge)
 - GeckoLib 4.6+
 - Optional: Oritech Things (its addons become paintable)
+- Optional: Oracle Index (in-game wiki viewer)
 
 ## Building
 
@@ -108,8 +132,8 @@ src/main/java/dev/garciajg/oritechextensions/
   Config.java                   common config
   ModContent.java               registry (blocks, items, block entities)
   hangar/                       hangar door extension: block + block entity
-  paint/                        addon painting: cartridge handling, storage, sync
-  client/                       renderers, GeckoLib model, painted addon models, client setup
+  paint/                        addon + pipe painting: cartridge handling, storage, sync
+  client/                       renderers, GeckoLib model, painted models, client setup
   test/                         game tests
 ```
 

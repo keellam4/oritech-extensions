@@ -44,7 +44,7 @@ jobs:
           if grep -q "Missing or unsupported mandatory dependencies" "$log"; then grep -A5 "Missing or unsupported" "$log"; echo "::error::mod loading failed"; exit 1; fi
           grep -E "\[paint\]|\[smoke test\]|Unable to find texture|Failed to load|paletted" "$log" | tee smoke-summary.txt || true
           grep -q "\[smoke test\] Title screen reached" "$log" || { echo "::error::client did not reach the title screen"; tail -150 "$log"; exit 1; }
-          grep -q "Made [1-9][0-9]* addon block models paintable" "$log" || { echo "::error::no addon models were wrapped"; exit 1; }
+          grep -qE "Made [1-9][0-9]* addon block models and [1-9][0-9]* pipe block models paintable" "$log" || { echo "::error::addon/pipe models were not wrapped"; exit 1; }
           if grep -q "Painted texture .*: MISSING" "$log"; then echo "::error::painted textures missing from the block atlas"; exit 1; fi
 
       - name: Upload mod jar

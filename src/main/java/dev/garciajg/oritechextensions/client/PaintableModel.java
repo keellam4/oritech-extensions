@@ -35,13 +35,17 @@ final class PaintableModel extends BakedModelWrapper<BakedModel> {
         this.sprites = sprites;
     }
 
-    /** Called when the chunk containing the block is (re)built: pick up the block's paint colour. */
+    /** Called when the chunk containing the block is (re)built: pick up addon BE paint or pipe-map paint. */
     @Override
     public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData modelData) {
         var data = super.getModelData(level, pos, state, modelData);
         var blockEntity = level.getBlockEntity(pos);
         if (blockEntity != null && blockEntity.hasData(ModContent.PAINT)) {
             return data.derive().with(PAINT, blockEntity.getData(ModContent.PAINT)).build();
+        }
+        var pipePaint = PipePaintClient.get(pos);
+        if (PaintColors.isPainted(pipePaint)) {
+            return data.derive().with(PAINT, pipePaint).build();
         }
         return data;
     }
