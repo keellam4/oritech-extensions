@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     { "item": "minecraft:book" },
-    { "item": "oritech:nickel_ingot" }
+    { "tag": "c:ingots/nickel" }
   ],
   "result": {
     "id": "oritech_extensions:guide",
