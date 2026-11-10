@@ -1,0 +1,25 @@
+---
+title: Hangar Door Extension
+id: oritech_extensions:hangar_door_extension
+icon: oritech_extensions:hangar_door_extension
+related_items: ["oritech_extensions:hangar_door_extension", "oritech:hangar_door"]
+---
+
+# Hangar Door Extension
+
+Oritech's Industrial Hangar Door is 3 blocks long. Each **Hangar Door Extension** adds 1 block. Stack them on the tip of the door (or on the previous extension).
+
+## Limits
+
+- Default maximum length: **16** blocks (Oritech's 3 + 13 extensions).
+- Configurable: `maxHangarDoorLength` in `config/oritech_extensions-common.toml` (range 4–32).
+
+## Behaviour
+
+- Copies the door's direction, rotation, open/closed state, and paint colour.
+- Opens and closes with the door, including linked doors.
+- Breaking the door or any extension drops every extension past that point.
+
+## Recipe
+
+Shapeless: 1 Industrial Hangar Door → 3 Hangar Door Extensions.

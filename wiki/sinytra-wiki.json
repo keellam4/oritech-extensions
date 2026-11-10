@@ -1,0 +1,8 @@
+{
+  "id": "oritech_extensions",
+  "schema": "1",
+  "platforms": {
+    "modrinth": "oritech-extensions"
+  },
+  "owners": ["keellam4"]
+}
