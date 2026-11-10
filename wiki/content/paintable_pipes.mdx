@@ -1,0 +1,32 @@
+---
+title: Paintable Standard Pipes
+icon: oritech:item_pipe
+related_items: ["oritech:item_pipe", "oritech:fluid_pipe", "oritech:white_paint", "oritech:orange_paint"]
+---
+
+# Paintable Standard Pipes
+
+Color Cartridges can paint **standard item pipes** and **standard fluid pipes** (including their connection segments).
+
+## How it works
+
+1. Right-click a standard pipe with a Color Cartridge.
+2. The whole connected network of that type is painted.
+3. **Orange** clears the network back to the default look.
+
+## Rules
+
+- Colour is **world-only**. Broken pipes always drop unpainted.
+- A newly placed standard pipe inherits colour if it touches a same-type painted neighbour of **one** colour. Conflicting neighbours leave it unpainted.
+- Item filters and smart splitters keep Oritech's own paint behaviour; network paint does not recolour them.
+
+## Config
+
+| Key | Default | Meaning |
+|---|---|---|
+| `pipePaintCostMode` | `NETWORK` | `NETWORK` = one cartridge for the whole network; `PER_BLOCK` = one per block |
+| `pipePaintIsolation` | `false` | Reserved for a future same-colour connection mode |
+
+## Not yet supported
+
+Framed pipes, duct pipes, transparent item pipes, and energy pipes.

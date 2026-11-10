@@ -97,6 +97,20 @@ dependencies {
     localRuntime "dev.architectury:architectury-neoforge:${architectury_version}"
 }
 
+// Author wiki pages under wiki/; ship them as Oracle Index books without duplicating into src/.
+def oracleWikiOut = layout.buildDirectory.dir('generated/oracleWiki')
+tasks.register('syncOracleWiki', Copy) {
+    from('wiki') {
+        into 'assets/oracle_index/books/oritech_extensions'
+    }
+    into oracleWikiOut
+}
+sourceSets.main.resources.srcDir oracleWikiOut
+tasks.named('processResources').configure {
+    dependsOn('syncOracleWiki')
+}
+neoForge.ideSyncTask tasks.named('syncOracleWiki')
+
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
             minecraft_version      : minecraft_version,

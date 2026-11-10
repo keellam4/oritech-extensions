@@ -20,15 +20,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
+import dev.garciajg.oritechextensions.paint.PipePaint;
 
-/** Client side of addon painting: receives colours, wraps addon block models, item tooltip. */
+/** Client side of painting: receives colours, wraps paintable block models, item tooltip. */
 public final class PaintClient {
 
     private PaintClient() {
     }
 
     public static void register(IEventBus modBus, IEventBus gameBus) {
-        modBus.addListener(PaintClient::wrapAddonModels);
+        modBus.addListener(PaintClient::wrapPaintableModels);
         modBus.addListener(PaintClient::checkPaintedTextures);
         gameBus.addListener(PaintClient::addTooltip);
         if (Boolean.getBoolean(SMOKE_TEST_PROPERTY)) gameBus.addListener(PaintClient::quitWhenLoaded);
@@ -52,7 +53,9 @@ public final class PaintClient {
         for (var sample : new String[]{
                 "oritech:block/machine_speed_addon_on_paint_white",
                 "oritech:block/capacitor_ctm/horizontal_paint_netherite", // Capacitor Addon Extender (Athena connected textures)
-                "oritechthings:block/addon_block_speed_paint_sculk"}) {
+                "oritechthings:block/addon_block_speed_paint_sculk",
+                "oritech:block/item_pipe_paint_white",
+                "oritech:block/fluid_pipe_paint_sculk"}) {
             var sprite = event.getAtlas().getSprite(ResourceLocation.parse(sample));
             boolean found = !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation());
             OritechExtensions.LOGGER.info("[paint] Painted texture {}: {}", sample, found ? "present" : "MISSING");
@@ -81,26 +84,29 @@ public final class PaintClient {
     }
 
     /**
-     * Wraps the baked model of every block built on Oritech's MachineAddonBlock (Oritech's own addons and those of
-     * addon mods such as Oritech Things) so painted blocks render with the painted textures.
+     * Wraps baked models for machine addons and standard item/fluid pipes so painted blocks use painted textures.
      */
-    private static void wrapAddonModels(ModelEvent.ModifyBakingResult event) {
+    private static void wrapPaintableModels(ModelEvent.ModifyBakingResult event) {
         var models = event.getModels();
         var sprites = new PaintedSprites();
-        int wrapped = 0;
+        int addons = 0;
+        int pipes = 0;
 
         for (var block : BuiltInRegistries.BLOCK) {
-            if (!(block instanceof MachineAddonBlock)) continue;
+            boolean addon = block instanceof MachineAddonBlock;
+            boolean pipe = PipePaint.isPaintablePipe(block);
+            if (!addon && !pipe) continue;
             for (var state : block.getStateDefinition().getPossibleStates()) {
                 var location = BlockModelShaper.stateToModelLocation(state);
                 var model = models.get(location);
                 if (model != null && !(model instanceof PaintableModel)) {
                     models.put(location, new PaintableModel(model, sprites));
-                    wrapped++;
+                    if (addon) addons++;
+                    else pipes++;
                 }
             }
         }
-        OritechExtensions.LOGGER.info("[paint] Made {} addon block models paintable", wrapped);
+        OritechExtensions.LOGGER.info("[paint] Made {} addon block models and {} pipe block models paintable", addons, pipes);
     }
 
     private static void addTooltip(ItemTooltipEvent event) {
