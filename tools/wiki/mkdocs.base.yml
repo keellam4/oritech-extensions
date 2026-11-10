@@ -37,6 +37,10 @@ theme:
 extra_css:
   - stylesheets/oritech.css
 
+extra_javascript:
+  - path: javascripts/paint-viewer.js
+    type: module
+
 markdown_extensions:
   - admonition
   - attr_list
