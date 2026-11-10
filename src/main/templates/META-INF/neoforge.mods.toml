@@ -45,3 +45,10 @@ Small add-ons for Oritech:
     versionRange="[4.6,5)"
     ordering="AFTER"
     side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="oracle_index"
+    type="optional"
+    versionRange="[1.0,)"
+    ordering="NONE"
+    side="CLIENT"

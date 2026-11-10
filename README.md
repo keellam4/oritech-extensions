@@ -69,12 +69,19 @@ The list of recoloured textures is in `src/main/resources/assets/minecraft/atlas
 
 Oritech Things is © its authors, licensed CC-BY 4.0. This mod only reads its textures at runtime to recolour them.
 
+## In-game wiki (Oracle Index)
+
+Documentation lives in `wiki/` and is copied into the jar for [Oracle Index](https://modrinth.com/mod/oracle-index) (optional). With Oracle Index installed, open the wiki (default **H**) and pick **Oritech Extensions**. Pages cover hangar doors, addon paint, and pipe paint.
+
+Edit files under `wiki/`; `./gradlew build` (or any task that runs `processResources`) syncs them into `assets/oracle_index/books/oritech_extensions/`.
+
 ## Requirements
 
 - Minecraft 1.21.1, NeoForge 21.1.200+
 - Oritech 1.2.x (NeoForge)
 - GeckoLib 4.6+
 - Optional: Oritech Things (its addons become paintable)
+- Optional: Oracle Index (in-game wiki viewer)
 
 ## Building
 
