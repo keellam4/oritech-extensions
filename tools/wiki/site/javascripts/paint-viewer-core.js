@@ -22,8 +22,9 @@ const DEFAULT_UV = {
   east: (a, b) => [16 - b[2], 16 - b[1], 16 - a[2], 16 - a[1]],
 };
 const AXES = { x: new THREE.Vector3(1, 0, 0), y: new THREE.Vector3(0, 1, 0), z: new THREE.Vector3(0, 0, 1) };
+// Fallback names; the page passes Oritech's own names in data-names (read from its lang file at build time).
 const PAINT_NAMES = {
-  orange: 'Unpainted', camo: 'Camo', diamond: 'Diamond', fluxite: 'Fluxite', white: 'White',
+  orange: 'Unpainted', camo: 'Camo', diamond: 'Adamant', fluxite: 'Fluxite', white: 'White',
   industrial: 'Industrial', netherite: 'Netherite', redstone: 'Redstone', sculk: 'Sculk',
 };
 
@@ -126,6 +127,7 @@ export function setup(container) {
   const root = container.dataset.root || '';
   const blocks = JSON.parse(container.dataset.blocks);
   const swatches = JSON.parse(container.dataset.swatches);
+  const names = { ...PAINT_NAMES, ...JSON.parse(container.dataset.names || '{}') };
 
   container.innerHTML = `
     <div class="pv-stage"><span class="pv-hint">Drag to rotate</span></div>
@@ -202,7 +204,7 @@ export function setup(container) {
     btn.dataset.paint = name;
     btn.setAttribute('role', 'radio');
     btn.setAttribute('aria-checked', name === paint);
-    btn.title = PAINT_NAMES[name] || name;
+    btn.title = names[name] || name;
     btn.innerHTML = `<span class="pv-dot" style="background:${colour}"></span><span class="pv-label">${btn.title}</span>`;
     btn.addEventListener('click', () => {
       paint = name;

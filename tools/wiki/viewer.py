@@ -54,6 +54,11 @@ class Viewer:
         oritech_lang = self.src.read("assets/oritech/lang/en_us.json")
         if oritech_lang:
             self.lang = {**json.loads(oritech_lang), **lang}
+        # Paint names as Oritech shows them (e.g. the "diamond" paint is called "Adamant" in game).
+        self.paint_names = {"orange": "Unpainted"}
+        for v in self.variants:
+            item = self.lang.get(f"item.oritech.{v}_paint", "")
+            self.paint_names[v] = item.removesuffix(" Machine Paint").strip() or v.title()
 
     # ------------------------------------------------------------------ models
 
