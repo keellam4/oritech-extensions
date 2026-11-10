@@ -72,6 +72,10 @@ Add `paint_viewer: ["oritech:machine_speed_addon", "oritech:item_pipe"]` to a pa
 
 It draws the blocks from their model files: a pipe's straight piece, an addon's "on" model, otherwise the item's block model. The painted versions use the same palettes as the game (`assets/minecraft/atlases/blocks.json`), so what you see matches in-game. Blocks drawn in code (GeckoLib, like the hangar door) can't be shown this way, and the build tells you if a block can't be drawn. Local previews need `npm install --prefix build/npm three@0.170.0` once.
 
+### Animated hangar door (website)
+
+`door_viewer: true` in a page's frontmatter adds the animated hangar door: Oritech's own GeckoLib model playing its real open/close animations, with this mod's extensions sliding exactly like in game (timings from `HangarDoorExtensionRenderer`). Visitors can open/close it, pick 0–8 extensions, try paints, and drag to rotate. Code: `tools/wiki/door.py` and `site/javascripts/door-viewer-core.js`.
+
 ### Previewing
 
 - **Website:** `pip install -r tools/wiki/requirements.txt`, then `python3 tools/wiki/fetch_assets.py` once (for icons; for real rendered icons also run `python3 tools/wiki/build_site.py --list-items && ./gradlew runClientIconExport`), then `python3 tools/wiki/build_site.py && mkdocs serve -f build/wiki-site/mkdocs.yml` (re-run the script after editing).
