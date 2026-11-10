@@ -15,6 +15,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import re
 import shutil
@@ -28,6 +29,7 @@ OUT = ROOT / "build" / "wiki-site"
 BASE_CONFIG = Path(__file__).with_name("mkdocs.base.yml")
 LANG = ROOT / "src/main/resources/assets/oritech_extensions/lang/en_us.json"
 SECTIONS = {"docs": "Guide", "content": "Items & Blocks"}
+THREE_JS = ROOT / "build/npm/node_modules/three/build/three.module.min.js"  # npm install --prefix build/npm three@0.170.0
 
 ADMONITION = {"note": "note", "info": "info", "default": "note", "tip": "tip", "important": "important",
               "warning": "warning", "caution": "danger", "danger": "danger", "error": "danger"}
@@ -195,8 +197,8 @@ def load_recipes() -> dict[str, dict]:
 
 
 class Converter:
-    def __init__(self, pages: list[Page], lang: dict, errors: list[str], icons=None):
-        self.lang, self.errors, self.icons = lang, errors, icons
+    def __init__(self, pages: list[Page], lang: dict, errors: list[str], icons=None, viewer=None):
+        self.lang, self.errors, self.icons, self.viewer = lang, errors, icons, viewer
         self.used_icons: dict[str, object] = {}   # output path inside docs/ -> PIL image
         self.recipes = load_recipes()
         self.by_id = {p.meta["id"]: p for p in pages if p.meta.get("id")}
@@ -243,7 +245,7 @@ class Converter:
         head_icon = self.icon(page, page.meta.get("icon", ""), "mc-inline mc-title-icon")
         if head_icon:
             text = re.sub(r"^# ", "# " + head_icon, text, count=1, flags=re.M)
-        related = self.related(page)
+        related = self.related(page) + self.paint_viewer(page)
         if related:  # just below the page's H1, or at the top if it has none
             h1 = re.search(r"^# .*\n", text, flags=re.M)
             at = h1.end() if h1 else 0
@@ -268,6 +270,32 @@ class Converter:
         src = self.html_root(page) + out
         name = item_name(item_id, self.lang)
         return f'<img class="{cls} {kind}" src="{src}" alt="{name}" title="{name}">'
+
+    def paint_viewer(self, page: Page) -> str:
+        """3D viewer for the blocks in `paint_viewer:` frontmatter (website only; Oracle Index ignores the key)."""
+        ids = page.meta.get("paint_viewer")
+        if not ids:
+            return ""
+        if not isinstance(ids, list):
+            self.errors.append(f"{rel(page.src)}: `paint_viewer` must be a list like [\"oritech:item_pipe\"]")
+            return ""
+        for item_id in ids:
+            self.icon(page, item_id)  # copies the icon (and lists it for --list-items)
+        if not self.viewer:
+            return ""
+        blocks = []
+        for item_id in ids:
+            block = self.viewer.block(item_id, self.errors, rel(page.src))
+            if block:
+                ns, _, path = item_id.partition(":")
+                if f"assets/items/{ns}/{path}.png" in self.used_icons:
+                    block["icon"] = f"assets/items/{ns}/{path}.png"
+                blocks.append(block)
+        if not blocks:
+            return ""
+        attr = lambda v: html.escape(json.dumps(v, separators=(",", ":")), quote=True)
+        return (f'<div class="paint-viewer" data-root="{self.html_root(page)}" data-blocks="{attr(blocks)}" '
+                f'data-swatches="{attr(self.viewer.swatches)}"></div>\n\n')
 
     def related(self, page: Page) -> str:
         items = page.meta.get("related_items") or []
@@ -426,7 +454,15 @@ def main() -> int:
                       "vanilla/Oritech items will show names instead of icons")
         except ImportError:
             print("note: Pillow isn't installed, so recipes show item names instead of icons")
-    conv = Converter(pages, lang, errors, icons)
+    viewer = None
+    if icons is not None and not args.list_items and any(p.meta.get("paint_viewer") for p in pages):
+        if THREE_JS.exists():
+            from viewer import Viewer
+            viewer = Viewer(lang)
+        else:
+            print("note: three.js isn't installed (npm install --prefix build/npm three@0.170.0), "
+                  "so pages are built without the 3D paint viewer")
+    conv = Converter(pages, lang, errors, icons, viewer)
     rendered = {p.out: conv.convert(p) for p in pages}
 
     if args.list_items:
@@ -450,6 +486,10 @@ def main() -> int:
         (docs / out).write_text(text, encoding="utf-8")
     if (WIKI / "assets").exists():
         shutil.copytree(WIKI / "assets", docs / "assets", ignore=shutil.ignore_patterns("items"))
+    if viewer:
+        viewer.write(docs)
+        (docs / "javascripts/vendor").mkdir(parents=True, exist_ok=True)
+        shutil.copy(THREE_JS, docs / "javascripts/vendor/three.module.min.js")
     for out, img in conv.used_icons.items():
         (docs / out).parent.mkdir(parents=True, exist_ok=True)
         img.save(docs / out)

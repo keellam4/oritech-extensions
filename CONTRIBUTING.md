@@ -27,7 +27,7 @@ Every pull request runs the build, the game tests, and a headless client smoke t
 | `src/main/resources/assets/minecraft/atlases/blocks.json` | Which textures get painted versions |
 | `tools/paint/generate_palettes.py` | Rebuilds the paint palettes from an Oritech jar |
 | `wiki/` | Documentation: in-game guide, website and GitHub. See [`wiki/README.md`](wiki/README.md) |
-| `tools/wiki/` | Builds the GitHub Pages site from `wiki/` |
+| `tools/wiki/` | Builds the GitHub Pages site from `wiki/` (incl. the 3D paint viewer in `site/javascripts/`) |
 
 ## Making another addon texture paintable
 1. Check that the texture uses Oritech's orange accent shades (`src/main/resources/assets/oritech_extensions/textures/colormap/paint/key.png`).

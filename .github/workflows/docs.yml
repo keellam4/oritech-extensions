@@ -34,6 +34,9 @@ jobs:
       - name: Install MkDocs and Pillow
         run: pip install -q -r tools/wiki/requirements.txt
 
+      - name: Install three.js (3D paint viewer)
+        run: npm install --no-save --silent --prefix build/npm three@0.170.0
+
       # Vanilla + Oritech jars, for item icons in recipes. Only used to build the site; never committed.
       - uses: actions/cache@v4
         with:
