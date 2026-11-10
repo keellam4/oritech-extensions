@@ -32,13 +32,6 @@
         "oritech:block/steam_boiler_addon_off",
         "oritech:block/steam_boiler_addon_on",
         "oritech:block/machine_inventory_proxy_addon",
-        "oritech:block/machine_extender",
-        "oritech:block/machine_extender_off",
-        "oritech:block/capacitor_ctm/center",
-        "oritech:block/capacitor_ctm/horizontal",
-        "oritech:block/capacitor_ctm/vertical",
-        "oritech:block/capacitor_ctm/particle",
-        "oritech:block/item_pipe",
         "oritech:block/fluid_pipe",
         "oritech:block/generic_pipe",
         "oritechthings:block/addon_block_speed",
@@ -59,6 +52,46 @@
         "paint_netherite": "oritech_extensions:colormap/paint/netherite",
         "paint_redstone": "oritech_extensions:colormap/paint/redstone",
         "paint_sculk": "oritech_extensions:colormap/paint/sculk"
+      }
+    },
+    {
+      "type": "minecraft:paletted_permutations",
+      "textures": [
+        "oritech:block/machine_extender",
+        "oritech:block/machine_extender_off",
+        "oritech:block/capacitor_ctm/center",
+        "oritech:block/capacitor_ctm/horizontal",
+        "oritech:block/capacitor_ctm/vertical",
+        "oritech:block/capacitor_ctm/particle"
+      ],
+      "palette_key": "oritech_extensions:colormap/paint/extender_key",
+      "permutations": {
+        "paint_camo": "oritech_extensions:colormap/paint/extender_camo",
+        "paint_diamond": "oritech_extensions:colormap/paint/extender_diamond",
+        "paint_fluxite": "oritech_extensions:colormap/paint/extender_fluxite",
+        "paint_white": "oritech_extensions:colormap/paint/extender_white",
+        "paint_industrial": "oritech_extensions:colormap/paint/extender_industrial",
+        "paint_netherite": "oritech_extensions:colormap/paint/extender_netherite",
+        "paint_redstone": "oritech_extensions:colormap/paint/extender_redstone",
+        "paint_sculk": "oritech_extensions:colormap/paint/extender_sculk"
+      }
+    },
+    {
+      "type": "minecraft:paletted_permutations",
+      "textures": [
+        "oritech:block/item_pipe",
+        "oritech:block/transparent_item_pipe"
+      ],
+      "palette_key": "oritech_extensions:colormap/paint/pipe_key",
+      "permutations": {
+        "paint_camo": "oritech_extensions:colormap/paint/pipe_camo",
+        "paint_diamond": "oritech_extensions:colormap/paint/pipe_diamond",
+        "paint_fluxite": "oritech_extensions:colormap/paint/pipe_fluxite",
+        "paint_white": "oritech_extensions:colormap/paint/pipe_white",
+        "paint_industrial": "oritech_extensions:colormap/paint/pipe_industrial",
+        "paint_netherite": "oritech_extensions:colormap/paint/pipe_netherite",
+        "paint_redstone": "oritech_extensions:colormap/paint/pipe_redstone",
+        "paint_sculk": "oritech_extensions:colormap/paint/pipe_sculk"
       }
     }
   ]

@@ -56,6 +56,8 @@ public final class PaintClient {
                 "oritech:block/capacitor_ctm/horizontal_paint_netherite", // Capacitor Addon Extender (Athena connected textures)
                 "oritechthings:block/addon_block_speed_paint_sculk",
                 "oritech:block/item_pipe_paint_white",
+                "oritech:block/transparent_item_pipe_paint_redstone",
+                "oritech:block/machine_extender_paint_netherite", // extender trim accents (separate palette)
                 "oritech:block/fluid_pipe_paint_sculk"}) {
             var sprite = event.getAtlas().getSprite(ResourceLocation.parse(sample));
             boolean found = !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation());
