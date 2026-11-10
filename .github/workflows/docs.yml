@@ -7,9 +7,9 @@ name: Docs
 on:
   push:
     branches: [main]
-    paths: [wiki/**, tools/wiki/**, src/main/resources/assets/oritech_extensions/lang/en_us.json, .github/workflows/docs.yml]
+    paths: [wiki/**, tools/wiki/**, src/main/resources/assets/**, src/main/resources/data/**, gradle.properties, .github/workflows/docs.yml]
   pull_request:
-    paths: [wiki/**, tools/wiki/**, .github/workflows/docs.yml]
+    paths: [wiki/**, tools/wiki/**, src/main/resources/data/**/recipe/**, .github/workflows/docs.yml]
   workflow_dispatch:
 
 permissions:
@@ -31,13 +31,23 @@ jobs:
           cache: pip
           cache-dependency-path: tools/wiki/requirements.txt
 
+      - name: Install MkDocs and Pillow
+        run: pip install -q -r tools/wiki/requirements.txt
+
+      # Vanilla + Oritech jars, for item icons in recipes. Only used to build the site; never committed.
+      - uses: actions/cache@v4
+        with:
+          path: build/wiki-cache
+          key: wiki-jars-${{ hashFiles('gradle.properties') }}
+
+      - name: Fetch game jars for item icons
+        run: python3 tools/wiki/fetch_assets.py
+
       - name: Check wiki/ and generate the site source
         run: python3 tools/wiki/build_site.py
 
       - name: Build the site
-        run: |
-          pip install -q -r tools/wiki/requirements.txt
-          mkdocs build --strict -f build/wiki-site/mkdocs.yml
+        run: mkdocs build --strict -f build/wiki-site/mkdocs.yml
 
       - name: Upload site
         if: github.event_name != 'pull_request'
