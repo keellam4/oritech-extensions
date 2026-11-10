@@ -198,8 +198,8 @@ def load_recipes() -> dict[str, dict]:
 
 
 class Converter:
-    def __init__(self, pages: list[Page], lang: dict, errors: list[str], icons=None, viewer=None):
-        self.lang, self.errors, self.icons, self.viewer = lang, errors, icons, viewer
+    def __init__(self, pages: list[Page], lang: dict, errors: list[str], icons=None, viewer=None, door=None):
+        self.lang, self.errors, self.icons, self.viewer, self.door = lang, errors, icons, viewer, door
         self.used_icons: dict[str, object] = {}   # output path inside docs/ -> PIL image
         self.recipes = load_recipes()
         self.by_id = {p.meta["id"]: p for p in pages if p.meta.get("id")}
@@ -246,7 +246,7 @@ class Converter:
         head_icon = self.icon(page, page.meta.get("icon", ""), "mc-inline mc-title-icon")
         if head_icon:
             text = re.sub(r"^# ", "# " + head_icon, text, count=1, flags=re.M)
-        related = self.related(page) + self.paint_viewer(page)
+        related = self.related(page) + self.paint_viewer(page) + self.door_viewer(page)
         if related:  # just below the page's H1, or at the top if it has none
             h1 = re.search(r"^# .*\n", text, flags=re.M)
             at = h1.end() if h1 else 0
@@ -297,6 +297,17 @@ class Converter:
         attr = lambda v: html.escape(json.dumps(v, separators=(",", ":")), quote=True)
         return (f'<div class="paint-viewer" data-root="{self.html_root(page)}" data-blocks="{attr(blocks)}" '
                 f'data-swatches="{attr(self.viewer.swatches)}"></div>\n\n')
+
+    def door_viewer(self, page: Page) -> str:
+        """Animated hangar door (`door_viewer: true` frontmatter). Website only."""
+        if str(page.meta.get("door_viewer", "")).lower() != "true" or not (self.door and self.viewer):
+            return ""
+        paints = self.door.collect(self.errors, rel(page.src))
+        if paints is None:
+            return ""
+        attr = lambda v: html.escape(json.dumps(v, separators=(",", ":")), quote=True)
+        return (f'<div class="door-viewer" data-root="{self.html_root(page)}" '
+                f'data-paints="{attr(paints)}" data-swatches="{attr(self.viewer.swatches)}"></div>\n\n')
 
     def related(self, page: Page) -> str:
         items = page.meta.get("related_items") or []
@@ -455,15 +466,18 @@ def main() -> int:
                       "vanilla/Oritech items will show names instead of icons")
         except ImportError:
             print("note: Pillow isn't installed, so recipes show item names instead of icons")
-    viewer = None
-    if icons is not None and not args.list_items and any(p.meta.get("paint_viewer") for p in pages):
+    viewer = door = None
+    if icons is not None and not args.list_items and any(p.meta.get("paint_viewer") or p.meta.get("door_viewer")
+                                                          for p in pages):
         if THREE_JS.exists():
             from viewer import Viewer
+            from door import Door
             viewer = Viewer(lang)
+            door = Door(viewer.variants)
         else:
             print("note: three.js isn't installed (npm install --prefix build/npm three@0.170.0), "
                   "so pages are built without the 3D paint viewer")
-    conv = Converter(pages, lang, errors, icons, viewer)
+    conv = Converter(pages, lang, errors, icons, viewer, door)
     rendered = {p.out: conv.convert(p) for p in pages}
 
     if args.list_items:
@@ -487,6 +501,8 @@ def main() -> int:
         (docs / out).write_text(text, encoding="utf-8")
     if (WIKI / "assets").exists():
         shutil.copytree(WIKI / "assets", docs / "assets", ignore=shutil.ignore_patterns("items"))
+    if door and door.files:
+        door.write(docs)
     if viewer:
         viewer.write(docs)
         (docs / "javascripts/vendor").mkdir(parents=True, exist_ok=True)
