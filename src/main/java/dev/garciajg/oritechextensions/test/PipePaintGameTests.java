@@ -37,6 +37,38 @@ public class PipePaintGameTests {
         paintNetwork(helper, BlockContent.FLUID_PIPE);
     }
 
+    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    public static void paintTransparentItemPipeNetwork(GameTestHelper helper) {
+        paintNetwork(helper, BlockContent.TRANSPARENT_ITEM_PIPE);
+    }
+
+    /** Transparent and regular item pipes form one Oritech network, so they paint together. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    public static void paintMixedItemPipeNetwork(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var a = helper.absolutePos(new BlockPos(1, 1, 2));
+        var b = helper.absolutePos(new BlockPos(2, 1, 2));
+        var c = helper.absolutePos(new BlockPos(3, 1, 2));
+        level.setBlockAndUpdate(a, BlockContent.ITEM_PIPE.defaultBlockState());
+        level.setBlockAndUpdate(b, BlockContent.TRANSPARENT_ITEM_PIPE.defaultBlockState());
+        level.setBlockAndUpdate(c, BlockContent.ITEM_PIPE.defaultBlockState());
+
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var paint = new ItemStack(ItemContent.SCULK_PAINT, 4);
+        player.setItemInHand(InteractionHand.MAIN_HAND, paint);
+        if (!PipePaintEvents.tryPaint(level, a, player, InteractionHand.MAIN_HAND, paint)) {
+            helper.fail("painting a mixed item pipe network was refused");
+            return;
+        }
+        for (var pos : new BlockPos[]{a, b, c}) {
+            if (PipePaint.getPaint(level, pos) != ColorVariant.SCULK) {
+                helper.fail("pipe at " + pos + " isn't sculk");
+                return;
+            }
+        }
+        helper.succeed();
+    }
+
     @GameTest(template = TEMPLATE)
     public static void ignoresFramedPipe(GameTestHelper helper) {
         var level = helper.getLevel();

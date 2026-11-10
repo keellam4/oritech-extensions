@@ -16,7 +16,8 @@ import java.util.List;
 
 /**
  * Helpers for discovering and colouring standard Oritech item/fluid pipe networks.
- * Framed, duct and transparent pipes are intentionally excluded (match by block identity).
+ * Transparent item pipes count as item pipes (Oritech joins them into the same network). Framed and duct pipes are
+ * excluded (match by block identity).
  */
 public final class PipePaint {
 
@@ -35,7 +36,8 @@ public final class PipePaint {
 
     @Nullable
     public static Family familyOf(Block block) {
-        if (block == BlockContent.ITEM_PIPE || block == BlockContent.ITEM_PIPE_CONNECTION) {
+        if (block == BlockContent.ITEM_PIPE || block == BlockContent.ITEM_PIPE_CONNECTION
+                || block == BlockContent.TRANSPARENT_ITEM_PIPE || block == BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION) {
             return Family.ITEM;
         }
         if (block == BlockContent.FLUID_PIPE || block == BlockContent.FLUID_PIPE_CONNECTION) {
