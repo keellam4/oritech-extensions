@@ -6,7 +6,8 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 
 ### Added
 - **Paintable standard item and fluid pipes.** Oritech Color Cartridges paint a whole connected standard pipe network (item or fluid). Orange clears the colour. Colour is world-only (broken pipes drop unpainted). New pipes inherit when they touch a same-type neighbour of one colour. Cost mode is configurable (`network` = one cartridge per network, or `per_block`). Framed, duct, transparent and energy pipes are not painted yet.
-- **Oracle Index wiki.** Optional in-game docs (hangar doors, addon paint, pipe paint) under `wiki/`, loaded when Oracle Index is installed.
+- **Oritech Extensions Guide.** A craftable book (Book + Nickel Ingot) that opens this mod's wiki in-game through Oracle Index. Without Oracle Index it posts a link to the online docs.
+- **Documentation.** A wiki covering hangar doors, addon paint, and pipe paint. Read it in-game with Oracle Index (key H or the guide book), or online at https://keellam4.github.io/oritech-extensions/.
 
 ### Changed
 - The in-game mod list now links to the issue tracker and source code.
