@@ -11,9 +11,9 @@ public class Config {
     public static final int BASE_DOOR_LENGTH = 3;
 
     public enum PipePaintCostMode {
-        /** One Color Cartridge paints or clears the whole connected pipe network. */
+        /** One Color Cartridge paints or clears the whole connected group (a pipe network, a reactor, ...). */
         NETWORK,
-        /** One Color Cartridge per pipe block, spreading from the clicked block. */
+        /** One Color Cartridge per block, spreading from the clicked block. */
         PER_BLOCK
     }
 
@@ -25,10 +25,16 @@ public class Config {
             .defineInRange("maxHangarDoorLength", 16, BASE_DOOR_LENGTH + 1, ABSOLUTE_MAX_DOOR_LENGTH);
 
     public static final ModConfigSpec.EnumValue<PipePaintCostMode> PIPE_PAINT_COST_MODE = BUILDER
-            .comment("How Color Cartridges are consumed when painting standard item/fluid pipes.",
-                    "NETWORK = one cartridge for the whole connected network.",
-                    "PER_BLOCK = one cartridge per pipe block (spreads until the stack runs out).")
+            .comment("How Color Cartridges are consumed when painting blocks that are painted as a group:",
+                    "pipe networks, Industrial Glass, reactors and particle accelerators.",
+                    "NETWORK = one cartridge for the whole connected group.",
+                    "PER_BLOCK = one cartridge per block (spreads until the stack runs out).")
             .defineEnum("pipePaintCostMode", PipePaintCostMode.NETWORK);
+
+    public static final ModConfigSpec.IntValue MAX_PAINT_GROUP_SIZE = BUILDER
+            .comment("The most Industrial Glass, reactor or particle accelerator blocks painted by one click.",
+                    "Bigger builds take more than one click. Pipe networks have no limit.")
+            .defineInRange("maxPaintGroupSize", 4096, 16, 65536);
 
     public static final ModConfigSpec.BooleanValue PIPE_PAINT_ISOLATION = BUILDER
             .comment("Reserved for a future release. When enabled, painted pipes will only connect to the same colour.",
@@ -49,5 +55,9 @@ public class Config {
 
     public static PipePaintCostMode pipePaintCostMode() {
         return SPEC.isLoaded() ? PIPE_PAINT_COST_MODE.get() : PIPE_PAINT_COST_MODE.getDefault();
+    }
+
+    public static int maxPaintGroupSize() {
+        return SPEC.isLoaded() ? MAX_PAINT_GROUP_SIZE.get() : MAX_PAINT_GROUP_SIZE.getDefault();
     }
 }

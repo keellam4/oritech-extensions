@@ -10,8 +10,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.NeoForge;
 import io.github.keellam4.oritechextensions.paint.PaintEvents;
 import io.github.keellam4.oritechextensions.paint.PaintSyncPayload;
-import io.github.keellam4.oritechextensions.paint.PipePaintEvents;
-import io.github.keellam4.oritechextensions.paint.PipePaintSyncPayload;
+import io.github.keellam4.oritechextensions.paint.PaintTargets;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.slf4j.Logger;
 
@@ -25,9 +24,8 @@ public class OritechExtensions {
         ModContent.register(modEventBus);
         modEventBus.addListener(this::addCreative);
         modEventBus.addListener(PaintSyncPayload::register);
-        modEventBus.addListener(PipePaintSyncPayload::register);
         PaintEvents.register(NeoForge.EVENT_BUS);
-        PipePaintEvents.register(NeoForge.EVENT_BUS);
+        PaintTargets.register(NeoForge.EVENT_BUS);
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 

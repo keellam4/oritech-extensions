@@ -13,5 +13,9 @@
   "message.oritech_extensions.guide.no_oracle": "Install Oracle Index to read the guide in-game, or open it online: %s",
   "message.oritech_extensions.guide.open_web": "Open the guide in your browser",
   "oracle_index.title.oritech_extensions": "Oritech Extensions",
-  "oracle_index.title.oritech-extensions": "Oritech Extensions"
+  "oracle_index.title.oritech-extensions": "Oritech Extensions",
+  "oritech_extensions.configuration.pipePaintCostMode": "Paint Cost Mode",
+  "oritech_extensions.configuration.pipePaintCostMode.tooltip": "NETWORK: one cartridge paints a whole pipe network, reactor, accelerator or glass wall. PER_BLOCK: one cartridge per block.",
+  "oritech_extensions.configuration.maxPaintGroupSize": "Max Blocks per Paint Click",
+  "oritech_extensions.configuration.maxPaintGroupSize.tooltip": "Most Industrial Glass, reactor or accelerator blocks one click paints. Pipe networks have no limit."
 }

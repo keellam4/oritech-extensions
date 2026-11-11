@@ -4,6 +4,12 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 
 ## [Unreleased]
 
+### Added
+- **Paintable Industrial Glass, reactors and particle accelerators.** Color Cartridges paint a whole wall of Industrial Glass, a whole nuclear reactor (walls, controller, rods, vents, heat pipes and ports) or a whole particle accelerator (controller, rings, motors, sensors, collectors) in one click. Status lights keep their colours. Like pipes, the colour is world-only and new blocks take the colour of the build they join. New config option `maxPaintGroupSize` (default 4096).
+
+### Changed
+- Painting now goes through one shared system for every paintable block, ready for the Detailing Tool. Clicking a hangar door extension with a cartridge now paints the whole door.
+
 ## [0.2.0] - Beta
 
 ### Added
