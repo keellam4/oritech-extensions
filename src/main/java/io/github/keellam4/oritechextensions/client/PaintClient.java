@@ -28,6 +28,9 @@ import io.github.keellam4.oritechextensions.paint.PipePaint;
 import io.github.keellam4.oritechextensions.paint.targets.AddonTarget;
 
 import java.util.Map;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.util.RandomSource;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Client side of painting: receives colours, wraps paintable block models, item tooltip. */
@@ -153,6 +156,34 @@ public final class PaintClient {
         }
         OritechExtensions.LOGGER.info("[paint] Made {} addon block models and {} pipe block models paintable, plus {} glass, reactor and accelerator block models",
                 addons, pipes, others);
+        wrapResourcePackPaintables(models, sprites);
+    }
+
+    /**
+     * Blocks a modpack made paintable with the {@code oritech_extensions:paintable(_connected)} tags. Tags only
+     * reach the client after joining a world, long after models are baked, so instead any block whose model uses
+     * a texture that a resource pack added to the painted-texture atlas (a {@code paletted_permutations} source
+     * with {@code paint_*} permutations in {@code assets/minecraft/atlases/blocks.json}) is made paintable.
+     * The server still decides which blocks actually get paint; untagged blocks never receive a colour.
+     */
+    private static void wrapResourcePackPaintables(Map<ModelResourceLocation, BakedModel> models, PaintedSprites sprites) {
+        var textures = PackPaintables.texturesFromOtherPacks(Minecraft.getInstance().getResourceManager());
+        if (textures.isEmpty()) return;
+        var random = RandomSource.create(42);
+        int wrapped = 0;
+        for (var block : BuiltInRegistries.BLOCK) {
+            if (PaintTargets.findForModel(block) != null) continue;
+            for (var state : block.getStateDefinition().getPossibleStates()) {
+                var location = BlockModelShaper.stateToModelLocation(state);
+                var model = models.get(location);
+                if (model == null || model instanceof PaintableModel) continue;
+                if (PackPaintables.usesAny(model, state, textures, random)) {
+                    models.put(location, new PaintableModel(model, sprites));
+                    wrapped++;
+                }
+            }
+        }
+        OritechExtensions.LOGGER.info("[paint] {} textures from resource packs; made {} more block models paintable", textures.size(), wrapped);
     }
 
     private static void addTooltip(ItemTooltipEvent event) {

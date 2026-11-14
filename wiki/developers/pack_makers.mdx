@@ -27,7 +27,56 @@ Recipes are plain JSON in `data/oritech_extensions/recipe/`. Override or remove 
 |---|---|---|
 | `maxHangarDoorLength` | 16 | Total hangar door length in blocks, including Oritech's 3 (4–32) |
 | `pipePaintCostMode` | `NETWORK` | `NETWORK`: one cartridge per click, whatever the group size. `PER_BLOCK`: one cartridge per block |
-| `maxPaintGroupSize` | 4096 | Most glass, reactor or accelerator blocks painted by one click |
+| `maxPaintGroupSize` | 4096 | Most glass, reactor, accelerator or `paintable_connected` blocks painted by one click |
+| `pipePaintIsolation` | `true` | Painted pipes only connect to the same colour |
+
+## Making more blocks paintable
+
+Any block can take Color Cartridges with a datapack tag and a small resource pack.
+
+**1. Tag the block (datapack).** Use one of these tags:
+
+| Tag | Painting |
+|---|---|
+| `oritech_extensions:paintable` | One block per click. New blocks start unpainted |
+| `oritech_extensions:paintable_connected` | Touching blocks of the same type paint together (up to `maxPaintGroupSize`), and new blocks take their colour |
+
+```json
+// data/oritech_extensions/tags/block/paintable_connected.json
+{
+  "replace": false,
+  "values": ["mymod:fancy_wall"]
+}
+```
+
+**2. Add painted textures (resource pack).** Paint recolours the parts of a texture that use Oritech's orange. List the block's textures in a `paint_*` permutation source of the block atlas. Copy the palette lines exactly:
+
+```json
+// assets/minecraft/atlases/blocks.json
+{
+  "sources": [
+    {
+      "type": "minecraft:paletted_permutations",
+      "textures": [
+        "mymod:block/fancy_wall"
+      ],
+      "palette_key": "oritech_extensions:colormap/paint/key",
+      "permutations": {
+        "paint_camo": "oritech_extensions:colormap/paint/camo",
+        "paint_diamond": "oritech_extensions:colormap/paint/diamond",
+        "paint_fluxite": "oritech_extensions:colormap/paint/fluxite",
+        "paint_white": "oritech_extensions:colormap/paint/white",
+        "paint_industrial": "oritech_extensions:colormap/paint/industrial",
+        "paint_netherite": "oritech_extensions:colormap/paint/netherite",
+        "paint_redstone": "oritech_extensions:colormap/paint/redstone",
+        "paint_sculk": "oritech_extensions:colormap/paint/sculk"
+      }
+    }
+  ]
+}
+```
+
+Textures without Oritech's orange tones won't visibly change. The colour is stored in the world (broken blocks drop unpainted), just like pipes.
 
 ## Claims and protection
 
