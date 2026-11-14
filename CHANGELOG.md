@@ -4,6 +4,8 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 
 ## [Unreleased]
 
+## [0.4.0+mc26.1] - Beta (Minecraft 26.1.2)
+
 ### Added
 - **Colour-isolated pipes.** Painted item and fluid pipes only connect to pipes of the same colour, so two lines can run side by side without merging. Unpainted pipes still connect to every colour. Painting a line no longer spreads into touching pipes of another colour. Controlled by `pipePaintIsolation` (on by default for new configs; existing config files keep `false` until you change it).
 
