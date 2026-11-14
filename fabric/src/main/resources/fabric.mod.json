@@ -17,8 +17,12 @@
     "main": ["io.github.keellam4.oritechextensions.fabric.OritechExtensionsFabric"],
     "client": ["io.github.keellam4.oritechextensions.fabric.OritechExtensionsFabricClient"],
     "fabric-gametest": [
-      "io.github.keellam4.oritechextensions.fabric.test.FabricGuideGameTests",
-      "io.github.keellam4.oritechextensions.fabric.test.FabricPipeIsolationGameTests"
+      "io.github.keellam4.oritechextensions.test.GuideGameTests",
+      "io.github.keellam4.oritechextensions.test.HangarDoorExtensionGameTests",
+      "io.github.keellam4.oritechextensions.test.PaintGameTests",
+      "io.github.keellam4.oritechextensions.test.PaintTargetGameTests",
+      "io.github.keellam4.oritechextensions.test.PipeIsolationGameTests",
+      "io.github.keellam4.oritechextensions.test.PipePaintGameTests"
     ]
   },
   "mixins": [

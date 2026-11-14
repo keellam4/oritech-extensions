@@ -83,6 +83,21 @@ dependencies {
     localRuntime "com.electronwill.night-config:toml:3.8.3"
 }
 
+// Game tests: generated from the NeoForge test classes, so both loaders run the same tests. Only the
+// NeoForge annotations go, and template names get the mod id (Fabric uses template names as written).
+def gameTestsOut = layout.buildDirectory.dir('generated/gameTests/java')
+def generateGameTests = tasks.register('generateGameTests', Copy) {
+    from(rootProject.file('neoforge/src/main/java/io/github/keellam4/oritechextensions/test'))
+    into gameTestsOut.map { it.dir('io/github/keellam4/oritechextensions/test') }
+    filter { String line ->
+        if (line.startsWith('import net.neoforged.neoforge.gametest.') || line.startsWith('@GameTestHolder')
+                || line.startsWith('@PrefixGameTestTemplate')) return null
+        line.replace('"empty_tall"', '"oritech_extensions:empty_tall"')
+    }
+}
+sourceSets.main.java.srcDir(gameTestsOut)
+tasks.named('compileJava').configure { dependsOn(generateGameTests) }
+
 // Wiki pages under wiki/ ship as Oracle Index books, the same as in the NeoForge jar.
 def oracleWikiOut = layout.buildDirectory.dir('generated/oracleWiki')
 tasks.register('syncOracleWiki', Copy) {

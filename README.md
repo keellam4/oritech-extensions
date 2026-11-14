@@ -8,7 +8,7 @@
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-support-ff5e5b?logo=kofi&logoColor=white)](https://ko-fi.com/keellam4)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Small add-ons for [Oritech](https://github.com/Rearth/Oritech) on NeoForge. Built for All the Mods 10, and works with plain Oritech.
+Small add-ons for [Oritech](https://github.com/Rearth/Oritech) on NeoForge and Fabric. Built for All the Mods 10, and works with plain Oritech.
 
 ## Features
 
@@ -25,14 +25,15 @@ Small add-ons for [Oritech](https://github.com/Rearth/Oritech) on NeoForge. Buil
 
 ## Requirements
 
-| Minecraft | NeoForge | Oritech | GeckoLib |
+| Minecraft | Loader | Oritech | Also needs |
 |---|---|---|---|
-| 1.21.1 | 21.1.200+ | 1.2.x | 4.6+ |
-| 26.1.2 | 26.1.2.100+ | 2.0 (experimental) | 5.5+ |
+| 1.21.1 | NeoForge 21.1.200+ | 1.2.x | GeckoLib 4.6+ |
+| 1.21.1 | Fabric (Loader 0.15.11+) | 1.2.x | Fabric API, Architectury API, Forge Config API Port, GeckoLib (all needed by Oritech too) |
+| 26.1.2 | NeoForge 26.1.2.100+ | 2.0 (experimental) | GeckoLib 5.5+ |
 
 These are every Minecraft version Oritech runs on: Oritech has no builds for 1.21.2 to 1.21.11, and its NeoForge builds need 1.21.1 and 26.1.2 exactly. When Oritech adds a version, this mod follows.
 
-Optional on 1.21.1: Oritech Things (its addons become paintable), Oracle Index (in-game wiki). On 26.1, Oritech paints addons itself.
+Optional on 1.21.1: Oritech Things (its addons become paintable; NeoForge only, it has no Fabric build), Oracle Index (in-game wiki). On 26.1, Oritech paints addons itself.
 
 ## Contributing
 

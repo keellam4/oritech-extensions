@@ -3,6 +3,7 @@ package io.github.keellam4.oritechextensions.test;
 import io.github.keellam4.oritechextensions.ModContent;
 import io.github.keellam4.oritechextensions.OritechExtensions;
 import io.github.keellam4.oritechextensions.paint.PaintEvents;
+import io.github.keellam4.oritechextensions.platform.Platform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
@@ -17,7 +18,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import rearth.oritech.init.BlockContent;
@@ -38,7 +38,7 @@ public class PaintGameTests {
 
     @GameTest(template = TEMPLATE, timeoutTicks = 100)
     public static void paintOritechThingsAddon(GameTestHelper helper) {
-        if (!ModList.get().isLoaded("oritechthings")) {
+        if (!Platform.INSTANCE.isModLoaded("oritechthings")) {
             helper.succeed(); // only meaningful when Oritech Things is present (it is in CI)
             return;
         }
@@ -110,7 +110,7 @@ public class PaintGameTests {
         var orange = new ItemStack(ItemContent.ORANGE_PAINT);
         player.setItemInHand(InteractionHand.MAIN_HAND, orange);
         if (!PaintEvents.tryPaint(level, pos, player, InteractionHand.MAIN_HAND, orange)) helper.fail("orange paint was refused");
-        if (level.getBlockEntity(pos).hasData(io.github.keellam4.oritechextensions.neoforge.NeoForgePlatform.PAINT)) helper.fail("orange paint should remove the stored colour");
+        if (Platform.INSTANCE.hasAddonPaint(level.getBlockEntity(pos))) helper.fail("orange paint should remove the stored colour");
 
         helper.succeed();
     }
