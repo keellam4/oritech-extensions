@@ -6,12 +6,11 @@ site_url: https://keellam4.github.io/oritech-extensions/
 repo_url: https://github.com/keellam4/oritech-extensions
 repo_name: keellam4/oritech-extensions
 edit_uri: ""
-copyright: >
-  Oritech Extensions is MIT licensed. Not affiliated with Oritech. –
-  <a href="#__consent">Change cookie settings</a>
+copyright: Oritech Extensions is MIT licensed. Not affiliated with Oritech.
 
 theme:
   name: material
+  custom_dir: overrides
   icon:
     logo: material/book-open-page-variant
   palette:
@@ -37,19 +36,8 @@ theme:
     - search.highlight
 
 extra:
-  # Google Analytics (GA4). Only loads after the visitor accepts the cookie banner below.
-  analytics:
-    provider: google
-    property: G-GF3ZMSVXFR
-  consent:
-    title: Cookie consent
-    description: >-
-      We use cookies to see which wiki pages people read, so we know what to improve.
-      Nothing loads until you accept, and you can change your choice any time from the footer.
-    actions:
-      - accept
-      - reject
-      - manage
+  # Cloudflare Web Analytics site token (public; it ends up in every page). Set to empty to turn it off.
+  cloudflare_analytics_token: 174c7288a47144dca448ae6c2943aa04
 
 extra_css:
   - stylesheets/oritech.css

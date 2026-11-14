@@ -518,6 +518,9 @@ def main() -> int:
     extra = Path(__file__).with_name("site")
     if extra.exists():
         shutil.copytree(extra, docs, dirs_exist_ok=True)
+    overrides = Path(__file__).with_name("overrides")
+    if overrides.exists():
+        shutil.copytree(overrides, OUT / "overrides", dirs_exist_ok=True)
 
     config = BASE_CONFIG.read_text(encoding="utf-8")
     # Cache-buster: GitHub Pages lets browsers keep CSS/JS for 10 minutes, so after a deploy a visitor could get
