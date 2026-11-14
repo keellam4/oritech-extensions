@@ -19,11 +19,14 @@ It uses the [moddedmc.wiki](https://moddedmc.wiki) layout (`sinytra-wiki.json`),
 - Features
   - [Paintable Machine Addons](docs/features/paintable_addons.mdx)
   - [Paintable Pipes](docs/features/paintable_pipes.mdx)
+  - [Paintable Glass, Reactors and Accelerators](docs/features/paintable_structures.mdx)
 
 **Items & Blocks** (`content/`): one page per item or block
 
 - [Oritech Extensions Guide](content/guide.mdx)
 - [Hangar Door Extension](content/hangar_door_extension.mdx)
+
+**Developers** (`developers/`, website only, left out of the in-game book): building, versions, the paint system, modpack notes, releasing
 
 ## Adding a page
 

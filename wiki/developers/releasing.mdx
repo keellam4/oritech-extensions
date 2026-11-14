@@ -1,0 +1,30 @@
+---
+title: Releasing
+---
+
+# Releasing
+
+Pushing to `main` only builds and tests. Players get an update when a GitHub Release is published.
+
+1. **Release PR.** Bump `mod_version` (and `release_type`: `alpha`, `beta` or `release`) in `gradle.properties`. In `CHANGELOG.md`, rename `## [Unreleased]` to `## [<version>] - Beta` and add a new empty `## [Unreleased]` above it. Merge once CI passes.
+2. **Publish the release.** Go to **Releases → Draft a new release → Choose a tag**, type `v<version>`, pick **Create new tag on publish** (target the branch you're releasing), and click **Publish release**. Leave the notes empty; they're filled in from the changelog.
+3. **Done.** The Release workflow builds, tests, attaches the jar to the GitHub release, and uploads it to Modrinth and CurseForge. Beta and alpha versions are marked as pre-releases.
+
+For each Minecraft version, release from its own branch (see [Minecraft Versions](versions)).
+
+One-time setup in **Settings → Secrets and variables → Actions**:
+
+- Variables: `MODRINTH_PROJECT_ID`, `CURSEFORGE_PROJECT_ID`
+- Secrets: `MODRINTH_TOKEN`, `CURSEFORGE_TOKEN`
+
+A platform whose project ID variable isn't set is skipped.
+
+## Workflows
+
+| Workflow | When | What |
+|---|---|---|
+| Build | Pull requests, pushes to `main` | Compile, game tests, headless client smoke test, upload the jar |
+| Changelog | Pull requests | Reminds you to update `CHANGELOG.md` (skip with the `skip-changelog` label) |
+| Docs | Wiki changes | Rebuilds this website |
+| Release | A GitHub Release is published | Build, test, publish to GitHub, Modrinth and CurseForge |
+| Labels | `.github/labels.json` changes on `main` | Creates or updates issue labels |

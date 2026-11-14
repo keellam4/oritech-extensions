@@ -1,0 +1,34 @@
+---
+title: For Modpack Makers
+---
+
+# For Modpack Makers
+
+## Compatibility
+
+- Runs with plain Oritech. Oritech Things and Oracle Index are optional.
+- The guide recipe uses the `c:ingots/nickel` tag, so Oritech's nickel, AllTheOres' nickel and FTB Materials' nickel all work.
+- See [Minecraft Versions](versions) for which build to use.
+
+## Recipes
+
+Recipes are plain JSON in `data/oritech_extensions/recipe/`. Override or remove them with a datapack, KubeJS or CraftTweaker like any other recipe.
+
+| Recipe id | Default |
+|---|---|
+| `oritech_extensions:guide` | Book + any nickel ingot |
+| `oritech_extensions:hangar_door_extension` | 1 Industrial Hangar Door → 3 extensions |
+
+## Config
+
+`config/oritech_extensions-common.toml` is server-side and synced to players.
+
+| Key | Default | Meaning |
+|---|---|---|
+| `maxHangarDoorLength` | 16 | Total hangar door length in blocks, including Oritech's 3 (4–32) |
+| `pipePaintCostMode` | `NETWORK` | `NETWORK`: one cartridge per click, whatever the group size. `PER_BLOCK`: one cartridge per block |
+| `maxPaintGroupSize` | 4096 | Most glass, reactor or accelerator blocks painted by one click |
+
+## Claims and protection
+
+Painting is a normal right-click on a block, so claim mods that block interaction also block painting.

@@ -1,0 +1,29 @@
+---
+title: Minecraft Versions
+---
+
+# Minecraft Versions
+
+Oritech Extensions follows the Minecraft versions Oritech itself supports.
+
+| Branch | Minecraft | Oritech | Status | Used by |
+|---|---|---|---|---|
+| `main` | 1.21.1 | 1.2.x | Stable | All the Mods 10, FTB Evolution, plain Oritech |
+| `26.1` | 26.1.x | 2.0 (experimental) | In progress | FTB Evolution 2 |
+
+There are no Oritech releases for 1.21.2 to 1.21.11, so those versions aren't supported.
+
+## Version numbers
+
+Both lines share the same mod id, so configs carry over. Files are named with the game version: `0.3.0+mc1.21.1` and `0.3.0+mc26.1`. Each upload on CurseForge and Modrinth is tagged with its own game version.
+
+## How changes move between versions
+
+- New features are built on one line and ported to the other where the code allows. The paint system keeps Oritech-specific code in a few small "paint target" classes, so most changes port cleanly.
+- Once Oritech 2.0 leaves experimental, `main` moves to 26.1 and 1.21.1 continues on a `1.21.1` maintenance branch, the same way Oritech's own repository works.
+
+## What's different on 26.1
+
+- **Oritech paints addons itself.** Oritech 2.0 gives machine addons and extenders their own colour and paints a whole machine with its addons in one click. The 26.1 build leaves addon painting to Oritech and drops the extender accent trim.
+- **Some texture names changed** (for example `industrial_glass`, `reactor_heat_vent`, `reactor_neutron_reflector`). `tools/paint/derive_palettes.py` lists both sets of names.
+- **New Minecraft APIs**: block models, block entity saving, GeckoLib 5 renderers and game tests all work differently. The port branch follows Oritech's own 26.1 code where it can.

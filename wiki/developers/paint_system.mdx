@@ -1,0 +1,52 @@
+---
+title: The Paint System
+---
+
+# The Paint System
+
+Every block this mod can paint goes through one registry, `paint/PaintTargets`. Oritech's Color Cartridges (and later the Detailing Tool) only ever talk to that registry, so a new paintable block needs one new class and nothing else in the click handling.
+
+## Paint targets
+
+A `PaintTarget` answers four questions about a kind of block:
+
+| Method | Question |
+|---|---|
+| `matchesBlock` / `matches` | Is this block mine? |
+| `group` | What gets painted together with it? (one block, a pipe network, a whole reactor, a door with its extensions) |
+| `get` | What colour is it now? |
+| `apply` | Paint the group, at most `budget` blocks, and tell nearby players |
+
+The built-in targets, checked in this order:
+
+| Target | Covers | Colour stored | Group |
+|---|---|---|---|
+| `AddonTarget` | Machine addons (Oritech and mods built on its addon block) | On the block entity, kept on the item when broken | One block |
+| `WorldPaintTarget.PIPES` | Standard item and fluid pipes | In the world | The connected network |
+| `WorldPaintTarget.GLASS` | Industrial Glass | In the world | Touching glass |
+| `WorldPaintTarget.REACTOR` | Every reactor block | In the world | The connected reactor |
+| `WorldPaintTarget.ACCELERATOR` | Particle accelerator parts | In the world | Parts up to 8 blocks apart in a line |
+| `HangarDoorTarget` | Hangar door extensions | On Oritech's door | The door |
+
+"In the world" means `PipePaintData`, a saved map of position to colour per dimension. Those blocks drop unpainted, and a newly placed block takes the colour of its painted neighbours when they agree.
+
+## How a painted block looks
+
+Painted textures aren't files in this mod. When the game loads, Minecraft's `paletted_permutations` atlas source makes a recoloured copy of each listed Oritech texture for every paint, named `<texture>_paint_<colour>`. `client/PaintableModel` then swaps those sprites in for painted blocks.
+
+The palettes map Oritech's orange shades to each paint's shades:
+
+| Palette | Used for |
+|---|---|
+| `key` / `<colour>` | Oritech's main orange; also the reactor walls |
+| `pipe_key` / `pipe_<colour>` | Copper shades on pipes |
+| `structure_key` / `structure_<colour>` | Trim on glass frames, reactor parts and accelerator parts. Status lights keep their colours |
+
+## Making another block paintable
+
+1. **Check the texture.** Its orange or copper shades must be in one of the palettes, or added to one in `tools/paint/derive_palettes.py`.
+2. **List the texture** under the right source in `assets/minecraft/atlases/blocks.json`.
+3. **Cover the block** in a paint target. If it fits an existing one (another reactor part, say), add it to that target's block check. Otherwise write a new `PaintTarget` and add it to the list in `PaintTargets`.
+4. **Add a game test** that paints it and checks the group and the cartridge cost.
+
+Run `python3 -P tools/paint/derive_palettes.py <oritech textures folder or jar> src/main/resources/assets/oritech_extensions` after changing the palette lists.
