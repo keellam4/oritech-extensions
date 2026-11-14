@@ -31,9 +31,6 @@ repositories {
 }
 
 loom {
-    mixin {
-        defaultRefmapName = "${mod_id}.refmap.json"
-    }
     runs {
         configureEach {
             runDir = '../run-fabric'
