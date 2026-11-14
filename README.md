@@ -5,6 +5,7 @@
 [![Modrinth](https://img.shields.io/badge/Modrinth-oritech--extensions-1bd96a)](https://modrinth.com/mod/oritech-extensions)
 [![CurseForge](https://img.shields.io/badge/CurseForge-oritech--extensions-f16436)](https://www.curseforge.com/minecraft/mc-mods/oritech-extensions)
 [![Discord](https://img.shields.io/badge/Discord-join-5865f2?logo=discord&logoColor=white)](https://discord.gg/dudwew9JuZ)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-support-ff5e5b?logo=kofi&logoColor=white)](https://ko-fi.com/keellam4)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Small add-ons for [Oritech](https://github.com/Rearth/Oritech) on NeoForge. Built for All the Mods 10, and works with plain Oritech.
@@ -36,6 +37,10 @@ Optional on 1.21.1: Oritech Things (its addons become paintable), Oracle Index (
 ## Contributing
 
 Questions, screenshots or just want to chat? Join the [Discord](https://discord.gg/dudwew9JuZ). Found a bug or have an idea? [Open an issue](https://github.com/keellam4/oritech-extensions/issues/new/choose). Want to help? See [CONTRIBUTING.md](CONTRIBUTING.md) and the [developer docs](https://keellam4.github.io/oritech-extensions/developers/overview/).
+
+## Support
+
+Oritech Extensions is free and always will be. If it helped your base, you can [buy me a coffee on Ko-fi](https://ko-fi.com/keellam4). Bug reports and ideas help just as much.
 
 ## License
 
