@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "Small add-ons for Oritech: Hangar Door Extensions, and Color Cartridges that paint machine addons, pipe networks, Industrial Glass, and whole reactors and particle accelerators.",
+  "authors": ["${mod_authors}"],
+  "contact": {
+    "homepage": "https://keellam4.github.io/oritech-extensions/",
+    "sources": "https://github.com/keellam4/oritech-extensions",
+    "issues": "https://github.com/keellam4/oritech-extensions/issues"
+  },
+  "license": "${mod_license}",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["io.github.keellam4.oritechextensions.fabric.OritechExtensionsFabric"],
+    "client": ["io.github.keellam4.oritechextensions.fabric.OritechExtensionsFabricClient"],
+    "fabric-gametest": [
+      "io.github.keellam4.oritechextensions.fabric.test.FabricGuideGameTests",
+      "io.github.keellam4.oritechextensions.fabric.test.FabricPipeIsolationGameTests"
+    ]
+  },
+  "mixins": [
+    "${mod_id}.mixins.json",
+    "${mod_id}_fabric.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=21",
+    "fabric-api": "*",
+    "oritech": ">=1.2.0",
+    "geckolib": "*",
+    "architectury": "*",
+    "forgeconfigapiport": "*"
+  },
+  "suggests": {
+    "oracle_index": "*"
+  }
+}
