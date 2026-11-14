@@ -7,6 +7,20 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ### Added
 - **Paintable block tags for modpacks.** Add blocks to `oritech_extensions:paintable` (one block per click) or `oritech_extensions:paintable_connected` (touching blocks paint together) with a datapack, and list their textures in the painted-texture atlas with a resource pack. See "For Modpack Makers" on the website.
 
+## [0.4.1+fabric] - Beta (Fabric)
+
+First release for **Fabric** (Minecraft 1.21.1). Needs Oritech 1.2.x for Fabric, Fabric API, Architectury API, Forge Config API Port and GeckoLib (Oritech needs all of them too). Quilt isn't tested.
+
+Same features as the NeoForge version:
+- Industrial Hangar Door Extensions (up to 16 blocks by default, configurable).
+- Color Cartridges paint machine addons and extenders, item and fluid pipe networks (with colour-isolated pipes), Industrial Glass, whole nuclear reactors and whole particle accelerators.
+- Paintable block tags for modpacks (`oritech_extensions:paintable` and `oritech_extensions:paintable_connected`).
+- The Oritech Extensions Guide, with the in-game wiki through Oracle Index.
+
+Not on Fabric:
+- Oritech Things addon painting, because Oritech Things has no Fabric build.
+- An in-game config screen. Edit `config/oritech_extensions-common.toml` instead; the options are the same as on NeoForge.
+
 ## [0.4.0] - Beta
 
 ### Added

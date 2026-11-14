@@ -10,6 +10,7 @@ The 1.21.1 code is split by mod loader:
 |---|---|
 | `common/` | Everything shared: game logic, assets, data, the pipe mixin. Uses only Minecraft and Oritech, plus a small `platform/Platform` interface for the things each loader does differently (registration, addon paint storage, sending packets) |
 | `neoforge/` | NeoForge entry points and event wiring (`neoforge/`), the painted block model wrapper (`client/PaintableModel`), game tests (`test/`), and `neoforge.mods.toml` |
+| `fabric/` | Fabric entry points and event wiring (`fabric/`), mixins for the events Fabric API lacks (`fabric/mixin/`: block placed, drops, chunk sent), the painted block model wrapper using Fabric's rendering API (`client/FabricPaintableModel`), and `fabric.mod.json`. Its game tests are generated from the NeoForge ones at build time |
 
 Each loader jar compiles the `common` sources together with its own. Java packages under `io/github/keellam4/oritechextensions/`:
 
@@ -20,7 +21,7 @@ Each loader jar compiles the `common` sources together with its own. Java packag
 | `hangar/` | The Hangar Door Extension block and block entity |
 | `guide/` | The guide book item (opens this wiki in Oracle Index) |
 | `client/` | Renderers, painted textures, client setup (the model wrapper itself is per loader) |
-| `test/` | Game tests (NeoForge module) |
+| `test/` | Game tests (in the NeoForge module; the Fabric build runs copies of the same classes) |
 | `Config.java` | Config options (`config/oritech_extensions-common.toml`) |
 
 Other files:

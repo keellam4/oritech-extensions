@@ -4,7 +4,10 @@ name: Release
 #   Releases → Draft a new release → choose a tag → type v<version> → "Create new tag on publish" → Publish.
 # The tag must match mod_version in gradle.properties, and CHANGELOG.md needs a "## [<version>]" section.
 # Create the release from the branch for that Minecraft version ("Target" in the release form):
-#   main  -> Minecraft 1.21.1, tag like v0.3.0
+#   main  -> Minecraft 1.21.1, tag like v0.3.0: the NeoForge file, plus the Fabric file when
+#            fabric_mod_version equals mod_version
+#   main  -> Minecraft 1.21.1, tag like v0.4.1+fabric: only the Fabric file (version = fabric_mod_version),
+#            so a Fabric release doesn't touch the NeoForge files. Changelog section "## [0.4.1+fabric]".
 #   26.1  -> Minecraft 26.1,   tag like v0.3.0+mc26.1 (the changelog section can be "## [0.3.0]" or "## [0.3.0+mc26.1]")
 # Minecraft version, Java version and listed dependencies come from that branch's gradle.properties / build.gradle.
 #
@@ -38,7 +41,7 @@ jobs:
           ref: ${{ github.event.release.tag_name }}
 
       - name: Read the Java version from build.gradle
-        run: echo "JAVA=$(grep -ohP 'JavaLanguageVersion.of\(\K[0-9]+' build.gradle neoforge/build.gradle 2>/dev/null | head -1)" >> "$GITHUB_ENV"
+        run: echo "JAVA=$(grep -ohP 'JavaLanguageVersion.of\(\K[0-9]+' build.gradle neoforge/build.gradle fabric/build.gradle 2>/dev/null | head -1)" >> "$GITHUB_ENV"
 
       - uses: actions/setup-java@v6
         with:
@@ -47,25 +50,44 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
-      - name: Read version and check it matches the tag
+      - name: Read version and work out which loaders this tag releases
         run: |
-          version=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
-          type=$(grep '^release_type=' gradle.properties | cut -d= -f2)
-          minecraft=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)
-          game_versions=$(grep '^publish_game_versions=' gradle.properties | cut -d= -f2)
-          optional=$(grep '^publish_optional_dependencies=' gradle.properties | cut -d= -f2)
-          if [ "${TAG#v}" != "$version" ]; then
-            echo "::error::Release tag $TAG doesn't match mod_version=$version in gradle.properties. Merge the version bump first, or fix the tag."
+          prop() { grep "^$1=" gradle.properties | cut -d= -f2; }
+          neoforge_version=$(prop mod_version)
+          fabric_version=$(prop fabric_mod_version)
+          minecraft=$(prop minecraft_version)
+          type=$(prop release_type)
+          game_versions=$(prop publish_game_versions)
+          optional=$(prop publish_optional_dependencies)
+          tag="${TAG#v}"
+          neoforge=false; fabric=false
+          if [ -d fabric ] && [ -n "$fabric_version" ] && [ "$tag" = "$fabric_version+fabric" ]; then
+            fabric=true; version="$fabric_version"
+          elif [ "$tag" = "$neoforge_version" ]; then
+            neoforge=true; version="$neoforge_version"
+            if [ -d fabric ] && [ "$fabric_version" = "$neoforge_version" ]; then fabric=true; fi
+          else
+            echo "::error::Release tag $TAG matches neither mod_version=$neoforge_version (tag v$neoforge_version) nor fabric_mod_version=${fabric_version:-unset} (Fabric only, tag v$fabric_version+fabric). Merge the version bump first, or fix the tag."
             exit 1
           fi
-          echo "VERSION=$version" >> "$GITHUB_ENV"
-          echo "RELEASE_TYPE=${type:-beta}" >> "$GITHUB_ENV"
-          echo "MINECRAFT=$minecraft" >> "$GITHUB_ENV"
-          echo "JAR=neoforge/build/libs/oritech_extensions-neoforge-$minecraft-$version.jar" >> "$GITHUB_ENV"
+          echo "Releasing $version: NeoForge=$neoforge Fabric=$fabric"
           {
+            echo "VERSION=$version"
+            echo "NEOFORGE=$neoforge"
+            echo "FABRIC=$fabric"
+            echo "RELEASE_TYPE=${type:-beta}"
+            echo "MINECRAFT=$minecraft"
+            echo "NEOFORGE_JAR=neoforge/build/libs/oritech_extensions-neoforge-$minecraft-$version.jar"
+            echo "FABRIC_JAR=fabric/build/libs/oritech_extensions-fabric-$minecraft-$version.jar"
             echo "GAME_VERSIONS<<EOF"; echo "${game_versions:-$minecraft}" | tr ',' '\n' | sed 's/^ *//'; echo "EOF"
             echo "DEPENDENCIES<<EOF"; echo "oritech(required)"; echo "geckolib(required)"
             for dep in ${optional//,/ }; do echo "$dep(optional)"; done; echo "EOF"
+            # Oritech's Fabric build needs these too; Oritech Things has no Fabric build.
+            echo "FABRIC_DEPENDENCIES<<EOF"
+            echo "fabric-api(required)"; echo "oritech(required)"; echo "geckolib(required)"
+            echo "architectury-api(required)"; echo "forge-config-api-port(required)"
+            for dep in ${optional//,/ }; do [ "$dep" != "oritech-things" ] && echo "$dep(optional)"; done
+            echo "EOF"
           } >> "$GITHUB_ENV"
 
       - name: Release notes from CHANGELOG.md
@@ -86,15 +108,22 @@ jobs:
           PY
           cat release-notes.md
 
-      - name: Build
-        run: ./gradlew :neoforge:build --stacktrace
+      - name: Build and test (NeoForge)
+        if: env.NEOFORGE == 'true'
+        run: |
+          ./gradlew :neoforge:build --stacktrace
+          ./gradlew :neoforge:runGameTestServer --stacktrace
 
-      - name: Game tests
-        run: ./gradlew :neoforge:runGameTestServer --stacktrace
+      - name: Build and test (Fabric)
+        if: env.FABRIC == 'true'
+        run: |
+          ./gradlew :fabric:build --stacktrace
+          ./gradlew :fabric:runGameTestServer --stacktrace
 
       - name: Attach the jar to the GitHub release
         run: |
-          gh release upload "$TAG" "$JAR" --clobber
+          [ "$NEOFORGE" = true ] && gh release upload "$TAG" "$NEOFORGE_JAR" --clobber
+          [ "$FABRIC" = true ] && gh release upload "$TAG" "$FABRIC_JAR" --clobber
           # Keep notes you wrote (or generated) in the release form; otherwise use the changelog.
           if [ -z "$(gh release view "$TAG" --json body --jq .body | tr -d '[:space:]')" ]; then
             gh release edit "$TAG" --notes-file release-notes.md
@@ -103,8 +132,8 @@ jobs:
             gh release edit "$TAG" --prerelease
           fi
 
-      - name: Publish to Modrinth
-        if: vars.MODRINTH_PROJECT_ID != ''
+      - name: Publish NeoForge file to Modrinth
+        if: env.NEOFORGE == 'true' && vars.MODRINTH_PROJECT_ID != ''
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
@@ -113,15 +142,15 @@ jobs:
           version: ${{ env.VERSION }}
           version-type: ${{ env.RELEASE_TYPE }}
           changelog-file: release-notes.md
-          files: ${{ env.JAR }}
+          files: ${{ env.NEOFORGE_JAR }}
           loaders: neoforge
           game-versions: ${{ env.GAME_VERSIONS }}
           java: ${{ env.JAVA }}
           dependencies: ${{ env.DEPENDENCIES }}
 
-      - name: Publish to CurseForge
-        # Still runs when the Modrinth upload failed, so one platform's problem doesn't block the other.
-        if: ${{ !cancelled() && vars.CURSEFORGE_PROJECT_ID != '' }}
+      - name: Publish NeoForge file to CurseForge
+        # Still runs when another upload failed, so one platform's problem doesn't block the other.
+        if: ${{ !cancelled() && env.NEOFORGE == 'true' && vars.CURSEFORGE_PROJECT_ID != '' }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
@@ -130,17 +159,49 @@ jobs:
           version: ${{ env.VERSION }}
           version-type: ${{ env.RELEASE_TYPE }}
           changelog-file: release-notes.md
-          files: ${{ env.JAR }}
+          files: ${{ env.NEOFORGE_JAR }}
           loaders: neoforge
           game-versions: ${{ env.GAME_VERSIONS }}
           java: ${{ env.JAVA }}
           dependencies: ${{ env.DEPENDENCIES }}
 
+      - name: Publish Fabric file to Modrinth
+        if: ${{ !cancelled() && env.FABRIC == 'true' && vars.MODRINTH_PROJECT_ID != '' }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          name: Oritech Extensions ${{ env.VERSION }} (Fabric, MC ${{ env.MINECRAFT }})
+          version: ${{ env.VERSION }}+fabric
+          version-type: ${{ env.RELEASE_TYPE }}
+          changelog-file: release-notes.md
+          files: ${{ env.FABRIC_JAR }}
+          loaders: fabric
+          game-versions: ${{ env.GAME_VERSIONS }}
+          java: ${{ env.JAVA }}
+          dependencies: ${{ env.FABRIC_DEPENDENCIES }}
+
+      - name: Publish Fabric file to CurseForge
+        if: ${{ !cancelled() && env.FABRIC == 'true' && vars.CURSEFORGE_PROJECT_ID != '' }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          name: Oritech Extensions ${{ env.VERSION }} (Fabric, MC ${{ env.MINECRAFT }})
+          version: ${{ env.VERSION }}+fabric
+          version-type: ${{ env.RELEASE_TYPE }}
+          changelog-file: release-notes.md
+          files: ${{ env.FABRIC_JAR }}
+          loaders: fabric
+          game-versions: ${{ env.GAME_VERSIONS }}
+          java: ${{ env.JAVA }}
+          dependencies: ${{ env.FABRIC_DEPENDENCIES }}
+
       - name: Summary
         if: always()
         run: |
           {
-            echo "### Oritech Extensions ${VERSION:-?} (Minecraft ${MINECRAFT:-?})"
+            echo "### Oritech Extensions ${VERSION:-?} (Minecraft ${MINECRAFT:-?}; NeoForge: ${NEOFORGE:-?}, Fabric: ${FABRIC:-?})"
             echo "- GitHub release: ${{ github.event.release.html_url }}"
             echo "- Modrinth: ${{ vars.MODRINTH_PROJECT_ID != '' && 'published' || 'skipped (MODRINTH_PROJECT_ID not set)' }}"
             echo "- CurseForge: ${{ vars.CURSEFORGE_PROJECT_ID != '' && 'published' || 'skipped (CURSEFORGE_PROJECT_ID not set)' }}"

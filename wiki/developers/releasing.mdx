@@ -11,6 +11,15 @@ Pushing to `main` or `26.1` only builds and tests. Players get an update when a 
    For 26.1, set **Target** to the `26.1` branch and use a tag like `v0.3.0+mc26.1`. Its changelog section can be `## [0.3.0+mc26.1]` or share the `## [0.3.0]` section.
 3. **Done.** The Release workflow builds, tests, attaches the jar to the GitHub release, and uploads it to Modrinth and CurseForge. Beta and alpha versions are marked as pre-releases.
 
+## Fabric
+
+On `main`, the Fabric file has its own version, `fabric_mod_version` in `gradle.properties`.
+
+- **Both loaders at once:** when `fabric_mod_version` equals `mod_version`, a normal `v<version>` release publishes the NeoForge and the Fabric file.
+- **Fabric only:** use a tag like `v0.4.1+fabric` (the number is `fabric_mod_version`) and a changelog section `## [0.4.1+fabric]`. Only the Fabric file is built, tested and published, so the NeoForge files don't change.
+
+On Modrinth and CurseForge the Fabric file's version ends in `+fabric`, so the two loaders never share a version number.
+
 For each Minecraft version, release from its own branch (see [Minecraft Versions](versions)). The workflow reads the Minecraft version, Java version, listed game versions (`publish_game_versions`) and optional dependencies (`publish_optional_dependencies`) from that branch, so the same workflow file works on every branch.
 
 One-time setup in **Settings → Secrets and variables → Actions**:
@@ -24,7 +33,7 @@ A platform whose project ID variable isn't set is skipped.
 
 | Workflow | When | What |
 |---|---|---|
-| Build | Pull requests, pushes to `main` and `26.1` | Compile, game tests, headless client smoke test, upload the jar |
+| Build | Pull requests, pushes to `main` and `26.1` | Compile, game tests, headless client smoke test, upload the jar (NeoForge and Fabric on `main`) |
 | Changelog | Pull requests | Reminds you to update `CHANGELOG.md` (skip with the `skip-changelog` label) |
 | Docs | Wiki changes | Rebuilds this website |
 | Release | A GitHub Release is published | Build, test, publish to GitHub, Modrinth and CurseForge |

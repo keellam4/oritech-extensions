@@ -11,22 +11,28 @@ title: Building and Testing
 | `main` | 1.21.1 | 21 |
 | `26.1` | 26.1.x | 25 |
 
-Gradle downloads everything else (NeoForge, Oritech, GeckoLib) the first time you build.
+Gradle downloads everything else (NeoForge, Fabric, Oritech and its dependencies) the first time you build.
 
 ## Commands
 
+Each loader is its own Gradle project, so prefix tasks with `:neoforge:` or `:fabric:`.
+
 ```sh
-./gradlew build              # jar ends up in build/libs/
-./gradlew runGameTestServer  # game tests against the real Oritech, then exits (non-zero on failure)
-./gradlew runClient          # dev client
-./gradlew runClientSmokeTest # starts the client, checks painted textures load, quits at the title screen
+./gradlew :neoforge:build              # jar ends up in neoforge/build/libs/
+./gradlew :neoforge:runGameTestServer  # game tests against the real Oritech, then exits (non-zero on failure)
+./gradlew :neoforge:runClient          # dev client
+./gradlew :neoforge:runClientSmokeTest # starts the client, checks painted textures load, quits at the title screen
+
+./gradlew :fabric:build                # jar ends up in fabric/build/libs/
+./gradlew :fabric:runGameTestServer    # the same game tests on Fabric
+./gradlew :fabric:runClientSmokeTest   # the same smoke test on Fabric (runs in run-fabric/)
 ```
 
 On the 1.21.1 branch the dev client needs Oritech's connected-textures library: add `-Pathena_version_id=<Modrinth version id of Athena>`. To try the guide book with Oracle Index, add `-Poracle_index_version_id=<Modrinth version id>`.
 
 ## Tests
 
-Game tests live in `neoforge/src/main/java/.../test/`. They place real Oritech blocks in an empty test structure and check the result: painting groups, cartridge cost, inheriting colour, hangar door extensions following the door, the guide recipe accepting any nickel ingot.
+Game tests live in `neoforge/src/main/java/.../test/`; the Fabric build generates its copies from those files, so write each test once. They place real Oritech blocks in an empty test structure and check the result: painting groups, cartridge cost, inheriting colour, hangar door extensions following the door, the guide recipe accepting any nickel ingot.
 
 Add a test for every behaviour change. A test that needs an optional mod (Oritech Things, say) should skip itself when that mod isn't loaded.
 
@@ -34,7 +40,7 @@ Add a test for every behaviour change. A test that needs an optional mod (Oritec
 
 Every pull request runs, in GitHub Actions:
 
-1. **Build**: compile, game tests, then a headless client smoke test that checks the painted textures made it into the block atlas.
+1. **Build**: for NeoForge and for Fabric, compile, game tests, then a headless client smoke test that checks the painted textures made it into the block atlas.
 2. **Changelog**: reminds you to add a `CHANGELOG.md` line (maintainers add `skip-changelog` for docs and CI changes).
 3. **Docs**: rebuilds this website when wiki pages change.
 
