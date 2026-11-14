@@ -10,6 +10,7 @@ copyright: Oritech Extensions is MIT licensed. Not affiliated with Oritech.
 
 theme:
   name: material
+  custom_dir: overrides
   icon:
     logo: material/book-open-page-variant
   palette:
@@ -33,6 +34,10 @@ theme:
     - navigation.footer
     - content.tabs.link
     - search.highlight
+
+extra:
+  # Cloudflare Web Analytics site token (public; it ends up in every page). Set to empty to turn it off.
+  cloudflare_analytics_token: 174c7288a47144dca448ae6c2943aa04
 
 extra_css:
   - stylesheets/oritech.css

@@ -1,0 +1,11 @@
+{#- Theme overrides for the docs site. build_site.py copies this folder next to mkdocs.yml. -#}
+{% extends "base.html" %}
+
+{% block analytics %}
+  {{ super() }}
+  {#- Cloudflare Web Analytics: cookie-free, no consent banner needed. Token is public by design. -#}
+  {% if config.extra.cloudflare_analytics_token %}
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon='{"token": "{{ config.extra.cloudflare_analytics_token }}"}'></script>
+  {% endif %}
+{% endblock %}
