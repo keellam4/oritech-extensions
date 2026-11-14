@@ -1,0 +1,4 @@
+// Each mod loader is its own Gradle project (neoforge/, later fabric/); shared code lives in common/.
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
