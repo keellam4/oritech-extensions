@@ -6,7 +6,6 @@ import io.github.keellam4.oritechextensions.paint.PipePaint;
 import io.github.keellam4.oritechextensions.paint.PipePaintData;
 import io.github.keellam4.oritechextensions.paint.PipePaintEvents;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -14,44 +13,38 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 /** Painting standard Oritech item/fluid pipe networks (server side). */
-@GameTestHolder(OritechExtensions.MODID)
-@PrefixGameTestTemplate(false)
 public class PipePaintGameTests {
 
-    private static final String TEMPLATE = "empty_tall";
-
-    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    @ModGameTest(timeoutTicks = 100)
     public static void paintItemPipeNetwork(GameTestHelper helper) {
-        paintNetwork(helper, BlockContent.ITEM_PIPE);
+        paintNetwork(helper, BlockContent.ITEM_PIPE.get());
     }
 
-    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    @ModGameTest(timeoutTicks = 100)
     public static void paintFluidPipeNetwork(GameTestHelper helper) {
-        paintNetwork(helper, BlockContent.FLUID_PIPE);
+        paintNetwork(helper, BlockContent.FLUID_PIPE.get());
     }
 
-    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    @ModGameTest(timeoutTicks = 100)
     public static void paintTransparentItemPipeNetwork(GameTestHelper helper) {
-        paintNetwork(helper, BlockContent.TRANSPARENT_ITEM_PIPE);
+        paintNetwork(helper, BlockContent.TRANSPARENT_ITEM_PIPE.get());
     }
 
     /** Transparent and regular item pipes form one Oritech network, so they paint together. */
-    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    @ModGameTest(timeoutTicks = 100)
     public static void paintMixedItemPipeNetwork(GameTestHelper helper) {
         var level = helper.getLevel();
         var a = helper.absolutePos(new BlockPos(1, 1, 2));
         var b = helper.absolutePos(new BlockPos(2, 1, 2));
         var c = helper.absolutePos(new BlockPos(3, 1, 2));
-        level.setBlockAndUpdate(a, BlockContent.ITEM_PIPE.defaultBlockState());
-        level.setBlockAndUpdate(b, BlockContent.TRANSPARENT_ITEM_PIPE.defaultBlockState());
-        level.setBlockAndUpdate(c, BlockContent.ITEM_PIPE.defaultBlockState());
+        level.setBlockAndUpdate(a, BlockContent.ITEM_PIPE.get().defaultBlockState());
+        level.setBlockAndUpdate(b, BlockContent.TRANSPARENT_ITEM_PIPE.get().defaultBlockState());
+        level.setBlockAndUpdate(c, BlockContent.ITEM_PIPE.get().defaultBlockState());
 
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         var paint = new ItemStack(ItemContent.SCULK_PAINT, 4);
@@ -69,11 +62,11 @@ public class PipePaintGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = TEMPLATE)
+    @ModGameTest
     public static void ignoresFramedPipe(GameTestHelper helper) {
         var level = helper.getLevel();
         var pos = helper.absolutePos(new BlockPos(2, 1, 2));
-        level.setBlockAndUpdate(pos, BlockContent.FRAMED_ITEM_PIPE.defaultBlockState());
+        level.setBlockAndUpdate(pos, BlockContent.FRAMED_ITEM_PIPE.get().defaultBlockState());
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         var paint = new ItemStack(ItemContent.WHITE_PAINT, 4);
         player.setItemInHand(InteractionHand.MAIN_HAND, paint);
@@ -84,12 +77,12 @@ public class PipePaintGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    @ModGameTest(timeoutTicks = 100)
     public static void placeInheritsMatchingNeighbour(GameTestHelper helper) {
         var level = helper.getLevel();
         var a = helper.absolutePos(new BlockPos(1, 1, 2));
         var b = helper.absolutePos(new BlockPos(2, 1, 2));
-        var pipe = BlockContent.ITEM_PIPE;
+        var pipe = BlockContent.ITEM_PIPE.get();
         level.setBlockAndUpdate(a, pipe.defaultBlockState());
         PipePaintData.get(level).set(a, ColorVariant.WHITE);
 
@@ -101,13 +94,13 @@ public class PipePaintGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    @ModGameTest(timeoutTicks = 100)
     public static void placeBetweenConflictingColoursStaysUnpainted(GameTestHelper helper) {
         var level = helper.getLevel();
         var left = helper.absolutePos(new BlockPos(1, 1, 2));
         var mid = helper.absolutePos(new BlockPos(2, 1, 2));
         var right = helper.absolutePos(new BlockPos(3, 1, 2));
-        var pipe = BlockContent.ITEM_PIPE;
+        var pipe = BlockContent.ITEM_PIPE.get();
         level.setBlockAndUpdate(left, pipe.defaultBlockState());
         level.setBlockAndUpdate(right, pipe.defaultBlockState());
         PipePaintData.get(level).set(left, ColorVariant.WHITE);
@@ -119,11 +112,11 @@ public class PipePaintGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    @ModGameTest(timeoutTicks = 100)
     public static void breakClearsPaintAndDropsClean(GameTestHelper helper) {
         var level = helper.getLevel();
         var pos = helper.absolutePos(new BlockPos(2, 1, 2));
-        var pipe = BlockContent.ITEM_PIPE;
+        var pipe = BlockContent.ITEM_PIPE.get();
         level.setBlockAndUpdate(pos, pipe.defaultBlockState());
         PipePaintData.get(level).set(pos, ColorVariant.WHITE);
 

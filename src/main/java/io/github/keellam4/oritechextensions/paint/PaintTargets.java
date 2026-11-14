@@ -1,7 +1,6 @@
 package io.github.keellam4.oritechextensions.paint;
 
 import io.github.keellam4.oritechextensions.Config;
-import io.github.keellam4.oritechextensions.paint.targets.AddonTarget;
 import io.github.keellam4.oritechextensions.paint.targets.HangarDoorTarget;
 import io.github.keellam4.oritechextensions.paint.targets.WorldPaintTarget;
 import net.minecraft.core.BlockPos;
@@ -31,7 +30,9 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Everything this mod can paint, in one place. A Color Cartridge click is handled here for every
+ * Everything this mod can paint, in one place. (On Minecraft 26.1, Oritech 2.0 paints machine addons and extenders
+ * itself, so they aren't listed here.)
+ * A Color Cartridge click is handled here for every
  * {@link PaintTarget}; so are the rules for paint that lives in the world (new blocks take over their
  * neighbours' colour, broken blocks lose theirs, chunks are synced to players).
  * <p>
@@ -41,7 +42,6 @@ public final class PaintTargets {
 
     /** Checked in this order; the first target that matches a block paints it. */
     private static final List<PaintTarget> TARGETS = List.of(
-            AddonTarget.INSTANCE,
             WorldPaintTarget.PIPES,
             WorldPaintTarget.GLASS,
             WorldPaintTarget.REACTOR,

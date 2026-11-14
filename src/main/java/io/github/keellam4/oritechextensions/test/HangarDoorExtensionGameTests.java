@@ -6,7 +6,6 @@ import io.github.keellam4.oritechextensions.OritechExtensions;
 import io.github.keellam4.oritechextensions.hangar.HangarDoorExtensionBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -18,8 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.BlockContent;
 
@@ -31,14 +28,10 @@ import static rearth.oritech.block.blocks.decorative.HangarDoorBlock.SURFACE;
  * Server-side checks against the real Oritech hangar door. Run with {@code ./gradlew runGameTestServer}
  * (CI does this on every push). Only registered when game tests are enabled, so they never run in normal play.
  */
-@GameTestHolder(OritechExtensions.MODID)
-@PrefixGameTestTemplate(false)
 public class HangarDoorExtensionGameTests {
 
-    private static final String TEMPLATE = "empty_tall"; // 5 x 20 x 5 of air
-
     /** Floor-mounted door growing upwards to the configured maximum, then open, close and break it. */
-    @GameTest(template = TEMPLATE, timeoutTicks = 200)
+    @ModGameTest(timeoutTicks = 200)
     public static void floorDoorFullLength(GameTestHelper helper) {
         int max = Config.maxExtensions();
         var anchor = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -46,21 +39,21 @@ public class HangarDoorExtensionGameTests {
     }
 
     /** Ceiling-mounted door growing downwards, rotated 90 degrees, with a few extensions. */
-    @GameTest(template = TEMPLATE, timeoutTicks = 200)
+    @ModGameTest(timeoutTicks = 200)
     public static void ceilingDoorRotated(GameTestHelper helper) {
         var anchor = helper.absolutePos(new BlockPos(2, 18, 2));
         runFullCycle(helper, anchor, Direction.DOWN, true, 4);
     }
 
     /** Wall-mounted door (sticks out sideways). */
-    @GameTest(template = TEMPLATE, timeoutTicks = 200)
+    @ModGameTest(timeoutTicks = 200)
     public static void wallDoor(GameTestHelper helper) {
         var anchor = helper.absolutePos(new BlockPos(0, 3, 2));
         runFullCycle(helper, anchor, Direction.EAST, true, 1);
     }
 
     /** An extension needs a door tip; it must not attach to the side of a door or float in the air. */
-    @GameTest(template = TEMPLATE)
+    @ModGameTest
     public static void rejectsInvalidPlacement(GameTestHelper helper) {
         var level = helper.getLevel();
         var anchor = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -126,10 +119,10 @@ public class HangarDoorExtensionGameTests {
     }
 
     private static void placeDoor(ServerLevel level, BlockPos anchor, Direction surface, boolean rotated) {
-        var state = BlockContent.HANGAR_DOOR.defaultBlockState().setValue(SURFACE, surface).setValue(ROTATED, rotated);
+        var state = BlockContent.HANGAR_DOOR.get().defaultBlockState().setValue(SURFACE, surface).setValue(ROTATED, rotated);
         level.setBlock(anchor, state, 3);
         // Oritech creates its 2 helper blocks here
-        BlockContent.HANGAR_DOOR.setPlacedBy(level, anchor, state, null, ItemStack.EMPTY);
+        BlockContent.HANGAR_DOOR.get().setPlacedBy(level, anchor, state, null, ItemStack.EMPTY);
     }
 
     /** Simulates a player using the extension item on {@code face} of the block at {@code clicked}. */

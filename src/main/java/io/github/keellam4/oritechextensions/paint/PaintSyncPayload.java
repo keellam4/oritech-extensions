@@ -28,10 +28,6 @@ public record PaintSyncPayload(List<Entry> entries) implements CustomPacketPaylo
                 ByteBufCodecs.BOOL, Entry::world,
                 Entry::new);
 
-        public static Entry onBlockEntity(BlockPos pos, ColorVariant variant) {
-            return new Entry(pos, PaintColors.toId(variant), false);
-        }
-
         public static Entry inWorld(BlockPos pos, ColorVariant variant) {
             return new Entry(pos, PaintColors.toId(variant), true);
         }

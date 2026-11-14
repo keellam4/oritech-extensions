@@ -2,7 +2,6 @@ package io.github.keellam4.oritechextensions.test;
 
 import io.github.keellam4.oritechextensions.ModContent;
 import io.github.keellam4.oritechextensions.OritechExtensions;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -13,8 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import rearth.oritech.init.ItemContent;
 
 import java.util.List;
@@ -23,14 +20,12 @@ import java.util.List;
  * Checks the guide book can be crafted from a book and any nickel ingot (the {@code c:ingots/nickel} tag),
  * so it still works in packs like ATM10 that swap Oritech's nickel for AllTheOres'.
  */
-@GameTestHolder(OritechExtensions.MODID)
-@PrefixGameTestTemplate(false)
 public class GuideGameTests {
 
     private static final TagKey<Item> NICKEL_INGOTS =
             TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/nickel"));
 
-    @GameTest(template = "empty_tall")
+    @ModGameTest
     public static void guideRecipeAcceptsAnyNickelIngot(GameTestHelper helper) {
         var level = helper.getLevel();
         var nickel = BuiltInRegistries.ITEM.getTag(NICKEL_INGOTS).orElse(null);
@@ -45,7 +40,7 @@ public class GuideGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty_tall")
+    @ModGameTest
     public static void guideRecipe(GameTestHelper helper) {
         var level = helper.getLevel();
         var input = CraftingInput.of(2, 1, List.of(new ItemStack(Items.BOOK), new ItemStack(ItemContent.NICKEL_INGOT)));

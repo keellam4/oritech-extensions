@@ -8,7 +8,6 @@ import io.github.keellam4.oritechextensions.paint.PipePaintData;
 import io.github.keellam4.oritechextensions.paint.targets.WorldPaintTarget;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -19,8 +18,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.ColorableMachine;
@@ -30,17 +27,13 @@ import static rearth.oritech.block.blocks.decorative.HangarDoorBlock.ROTATED;
 import static rearth.oritech.block.blocks.decorative.HangarDoorBlock.SURFACE;
 
 /** Painting the blocks that go through the shared paint targets: Industrial Glass, reactors, accelerators, hangar doors. */
-@GameTestHolder(OritechExtensions.MODID)
-@PrefixGameTestTemplate(false)
 public class PaintTargetGameTests {
 
-    private static final String TEMPLATE = "empty_tall"; // 5 x 20 x 5 of air
-
     /** Touching glass is painted together; glass that doesn't touch is left alone. */
-    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    @ModGameTest(timeoutTicks = 100)
     public static void paintIndustrialGlass(GameTestHelper helper) {
         var level = helper.getLevel();
-        var glass = BlockContent.INDUSTRIAL_GLASS_BLOCK.defaultBlockState();
+        var glass = BlockContent.INDUSTRIAL_GLASS.get().defaultBlockState();
         var a = helper.absolutePos(new BlockPos(0, 1, 2));
         var b = helper.absolutePos(new BlockPos(1, 1, 2));
         var c = helper.absolutePos(new BlockPos(1, 2, 2));
@@ -64,7 +57,7 @@ public class PaintTargetGameTests {
     }
 
     /** One click paints the walls and everything built into the reactor, but not glass next to it. */
-    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    @ModGameTest(timeoutTicks = 100)
     public static void paintReactor(GameTestHelper helper) {
         var level = helper.getLevel();
         var wallA = helper.absolutePos(new BlockPos(1, 1, 2));
@@ -73,12 +66,12 @@ public class PaintTargetGameTests {
         var rod = helper.absolutePos(new BlockPos(2, 2, 2));
         var heatPipe = helper.absolutePos(new BlockPos(3, 1, 2));
         var glass = helper.absolutePos(new BlockPos(3, 2, 2));
-        level.setBlockAndUpdate(wallA, BlockContent.REACTOR_WALL.defaultBlockState());
-        level.setBlockAndUpdate(wallB, BlockContent.REACTOR_WALL.defaultBlockState());
-        level.setBlockAndUpdate(controller, BlockContent.REACTOR_CONTROLLER.defaultBlockState());
-        level.setBlockAndUpdate(rod, BlockContent.REACTOR_ROD.defaultBlockState());
-        level.setBlockAndUpdate(heatPipe, BlockContent.REACTOR_HEAT_PIPE.defaultBlockState());
-        level.setBlockAndUpdate(glass, BlockContent.INDUSTRIAL_GLASS_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(wallA, BlockContent.REACTOR_WALL.get().defaultBlockState());
+        level.setBlockAndUpdate(wallB, BlockContent.REACTOR_WALL.get().defaultBlockState());
+        level.setBlockAndUpdate(controller, BlockContent.NUCLEAR_REACTOR_CONTROLLER.get().defaultBlockState());
+        level.setBlockAndUpdate(rod, BlockContent.REACTOR_ROD.get().defaultBlockState());
+        level.setBlockAndUpdate(heatPipe, BlockContent.REACTOR_HEAT_PIPE.get().defaultBlockState());
+        level.setBlockAndUpdate(glass, BlockContent.INDUSTRIAL_GLASS.get().defaultBlockState());
 
         var player = playerWith(helper, ItemContent.WHITE_PAINT, 4);
         if (!paint(level, rod, player)) {
@@ -100,17 +93,17 @@ public class PaintTargetGameTests {
     }
 
     /** Accelerator parts are built with gaps; parts in line within reach are one group, parts further away aren't. */
-    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    @ModGameTest(timeoutTicks = 100)
     public static void paintAcceleratorAcrossGaps(GameTestHelper helper) {
         var level = helper.getLevel();
         var ring = helper.absolutePos(new BlockPos(0, 1, 2));
         var ringAcrossGap = helper.absolutePos(new BlockPos(3, 1, 2));
         var motor = helper.absolutePos(new BlockPos(3, 1, 4));
         var tooFar = helper.absolutePos(new BlockPos(0, 2 + WorldPaintTarget.ACCELERATOR_REACH, 2));
-        level.setBlockAndUpdate(ring, BlockContent.ACCELERATOR_RING.defaultBlockState());
-        level.setBlockAndUpdate(ringAcrossGap, BlockContent.ACCELERATOR_RING.defaultBlockState());
-        level.setBlockAndUpdate(motor, BlockContent.ACCELERATOR_MOTOR.defaultBlockState());
-        level.setBlockAndUpdate(tooFar, BlockContent.ACCELERATOR_RING.defaultBlockState());
+        level.setBlockAndUpdate(ring, BlockContent.ACCELERATOR_RING.get().defaultBlockState());
+        level.setBlockAndUpdate(ringAcrossGap, BlockContent.ACCELERATOR_RING.get().defaultBlockState());
+        level.setBlockAndUpdate(motor, BlockContent.ACCELERATOR_MOTOR.get().defaultBlockState());
+        level.setBlockAndUpdate(tooFar, BlockContent.ACCELERATOR_RING.get().defaultBlockState());
 
         var player = playerWith(helper, ItemContent.NETHERITE_PAINT, 4);
         if (!paint(level, ring, player)) {
@@ -125,14 +118,14 @@ public class PaintTargetGameTests {
     }
 
     /** Glass placed against painted glass takes over its colour, like pipes do. */
-    @GameTest(template = TEMPLATE)
+    @ModGameTest
     public static void newGlassInheritsColour(GameTestHelper helper) {
         var level = helper.getLevel();
         var painted = helper.absolutePos(new BlockPos(1, 1, 2));
         var placed = helper.absolutePos(new BlockPos(2, 1, 2));
-        level.setBlockAndUpdate(painted, BlockContent.INDUSTRIAL_GLASS_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(painted, BlockContent.INDUSTRIAL_GLASS.get().defaultBlockState());
         PipePaintData.get(level).set(painted, ColorVariant.FLUXITE);
-        level.setBlockAndUpdate(placed, BlockContent.INDUSTRIAL_GLASS_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(placed, BlockContent.INDUSTRIAL_GLASS.get().defaultBlockState());
 
         if (WorldPaintTarget.GLASS.inheritanceColor(level, placed) != ColorVariant.FLUXITE) helper.fail("new glass did not take over its neighbour's colour");
         if (WorldPaintTarget.REACTOR.inheritanceColor(level, placed) != null) helper.fail("glass was treated as a reactor block");
@@ -140,13 +133,13 @@ public class PaintTargetGameTests {
     }
 
     /** Painting a hangar door extension paints the Oritech door it hangs on. */
-    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    @ModGameTest(timeoutTicks = 100)
     public static void extensionPaintsDoor(GameTestHelper helper) {
         var level = helper.getLevel();
         var anchor = helper.absolutePos(new BlockPos(2, 1, 2));
-        var doorState = BlockContent.HANGAR_DOOR.defaultBlockState().setValue(SURFACE, Direction.UP).setValue(ROTATED, false);
+        var doorState = BlockContent.HANGAR_DOOR.get().defaultBlockState().setValue(SURFACE, Direction.UP).setValue(ROTATED, false);
         level.setBlock(anchor, doorState, 3);
-        BlockContent.HANGAR_DOOR.setPlacedBy(level, anchor, doorState, null, ItemStack.EMPTY); // Oritech adds its 2 helper blocks
+        BlockContent.HANGAR_DOOR.get().setPlacedBy(level, anchor, doorState, null, ItemStack.EMPTY); // Oritech adds its 2 helper blocks
 
         var tip = anchor.above(2);
         var hit = new BlockHitResult(Vec3.atCenterOf(tip).relative(Direction.UP, 0.5), Direction.UP, tip, false);
@@ -175,7 +168,7 @@ public class PaintTargetGameTests {
 
     // ---------------------------------------------------------------- helpers
 
-    private static Player playerWith(GameTestHelper helper, Item paint, int count) {
+    private static Player playerWith(GameTestHelper helper, net.minecraft.world.level.ItemLike paint, int count) {
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(paint, count));
         return player;

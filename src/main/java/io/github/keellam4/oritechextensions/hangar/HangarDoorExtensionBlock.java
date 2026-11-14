@@ -36,7 +36,6 @@ import rearth.oritech.block.blocks.decorative.HangarDoorHelperBlock;
 import rearth.oritech.init.BlockContent;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static rearth.oritech.block.blocks.decorative.HangarDoorBlock.OPENED;
 import static rearth.oritech.block.blocks.decorative.HangarDoorBlock.ROTATED;
@@ -160,9 +159,9 @@ public class HangarDoorExtensionBlock extends Block implements EntityBlock, Tool
 
         var player = ctx.getPlayer();
         if (player != null && level.isClientSide()) {
-            player.sendSystemMessage(hitLengthLimit
+            player.sendOverlayMessage(hitLengthLimit
                     ? Component.translatable("message.oritech_extensions.hangar_door_extension.too_long", Config.maxTotalLength())
-                    : Component.translatable("message.oritech_extensions.hangar_door_extension.no_door"), true);
+                    : Component.translatable("message.oritech_extensions.hangar_door_extension.no_door"));
         }
         return null;
     }

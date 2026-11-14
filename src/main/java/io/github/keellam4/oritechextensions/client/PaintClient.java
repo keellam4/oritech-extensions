@@ -1,13 +1,10 @@
 package io.github.keellam4.oritechextensions.client;
 
-import io.github.keellam4.oritechextensions.ModContent;
 import io.github.keellam4.oritechextensions.OritechExtensions;
 import io.github.keellam4.oritechextensions.paint.PaintColors;
-import io.github.keellam4.oritechextensions.paint.PaintEvents;
 import io.github.keellam4.oritechextensions.paint.PaintSyncPayload;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.Block;
@@ -17,15 +14,13 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.util.ColorableMachine.ColorVariant;
 import io.github.keellam4.oritechextensions.paint.PaintTargets;
 import io.github.keellam4.oritechextensions.paint.PipePaint;
-import io.github.keellam4.oritechextensions.paint.targets.AddonTarget;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +34,6 @@ public final class PaintClient {
     public static void register(IEventBus modBus, IEventBus gameBus) {
         modBus.addListener(PaintClient::wrapPaintableModels);
         modBus.addListener(PaintClient::checkPaintedTextures);
-        gameBus.addListener(PaintClient::addTooltip);
         gameBus.addListener(PaintClient::forgetWorldPaint);
         if (Boolean.getBoolean(SMOKE_TEST_PROPERTY)) gameBus.addListener(PaintClient::quitWhenLoaded);
     }
@@ -69,23 +63,28 @@ public final class PaintClient {
         // Loading is done once the resource-loading overlay is gone and a menu (title or first-launch screen) is open.
         if (minecraft.getOverlay() == null && minecraft.screen != null) {
             OritechExtensions.LOGGER.info("[smoke test] Title screen reached ({}), quitting", minecraft.screen.getClass().getSimpleName());
-            if (IconExporter.requested()) IconExporter.export(); // docs site icons (clientIconExport run)
             minecraft.stop();
         }
     }
 
+    /** The block atlas from the last resource reload (painted textures live there). */
+    @Nullable
+    private static volatile TextureAtlas blockAtlas;
+
+    @Nullable
+    static TextureAtlas blockAtlas() {
+        return blockAtlas;
+    }
+
     /** Logs whether the generated painted textures made it into the block atlas (one sample per mod). */
     private static void checkPaintedTextures(TextureAtlasStitchedEvent event) {
-        if (!event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) return;
+        if (!event.getAtlas().location().equals(TextureAtlas.LOCATION_BLOCKS)) return;
+        blockAtlas = event.getAtlas();
         for (var sample : new String[]{
-                "oritech:block/machine_speed_addon_on_paint_white",
-                "oritech:block/capacitor_ctm/horizontal_paint_netherite", // Capacitor Addon Extender (Athena connected textures)
-                "oritechthings:block/addon_block_speed_paint_sculk",
                 "oritech:block/item_pipe_paint_white",
                 "oritech:block/transparent_item_pipe_paint_redstone",
-                "oritech:block/machine_extender_paint_netherite", // extender trim accents (separate palette)
                 "oritech:block/fluid_pipe_paint_sculk",
-                "oritech:block/industrial_glass_block/center_paint_white", // glass frames + reactor/accelerator parts palette
+                "oritech:block/industrial_glass/center_paint_white", // glass frames + reactor/accelerator parts palette
                 "oritech:block/reactor_wall/horizontal_paint_sculk",
                 "oritech:block/reactor_rod_paint_netherite",
                 "oritech:block/reactor_heat_pipe_paint_camo",
@@ -105,20 +104,10 @@ public final class PaintClient {
             var pos = entry.pos();
             var variant = PaintColors.fromId(entry.color());
 
-            if (entry.world()) {
-                if (PaintColors.isPainted(variant)) {
-                    WORLD_PAINT.put(pos.immutable(), variant);
-                } else {
-                    WORLD_PAINT.remove(pos);
-                }
+            if (PaintColors.isPainted(variant)) {
+                WORLD_PAINT.put(pos.immutable(), variant);
             } else {
-                var blockEntity = level.getBlockEntity(pos);
-                if (!PaintEvents.isPaintable(blockEntity)) continue;
-                if (PaintColors.isPainted(variant)) {
-                    blockEntity.setData(ModContent.PAINT, variant);
-                } else {
-                    blockEntity.removeData(ModContent.PAINT);
-                }
+                WORLD_PAINT.remove(pos);
             }
 
             var state = level.getBlockState(pos);
@@ -131,9 +120,8 @@ public final class PaintClient {
      * covers, so painted blocks use painted textures.
      */
     private static void wrapPaintableModels(ModelEvent.ModifyBakingResult event) {
-        var models = event.getModels();
+        var models = event.getBakingResult().blockStateModels();
         var sprites = new PaintedSprites();
-        int addons = 0;
         int pipes = 0;
         int others = 0;
 
@@ -141,24 +129,16 @@ public final class PaintClient {
             var target = PaintTargets.findForModel(block);
             if (target == null) continue;
             for (var state : block.getStateDefinition().getPossibleStates()) {
-                var location = BlockModelShaper.stateToModelLocation(state);
-                var model = models.get(location);
+                var model = models.get(state);
                 if (model != null && !(model instanceof PaintableModel)) {
-                    models.put(location, new PaintableModel(model, sprites));
-                    if (target == AddonTarget.INSTANCE) addons++;
-                    else if (PipePaint.isPaintablePipe(block)) pipes++;
+                    models.put(state, new PaintableModel(model, sprites));
+                    if (PipePaint.isPaintablePipe(block)) pipes++;
                     else others++;
                 }
             }
         }
+        // "addon" count kept at 0 so CI's log check works on both branches (Oritech 2.0 paints addons itself).
         OritechExtensions.LOGGER.info("[paint] Made {} addon block models and {} pipe block models paintable, plus {} glass, reactor and accelerator block models",
-                addons, pipes, others);
-    }
-
-    private static void addTooltip(ItemTooltipEvent event) {
-        var paint = event.getItemStack().get(ModContent.PAINT_COMPONENT.get());
-        if (!PaintColors.isPainted(paint)) return;
-        event.getToolTip().add(Component.translatable("tooltip.oritech_extensions.painted",
-                Component.translatable(PaintColors.paintItemTranslationKey(paint))).withStyle(ChatFormatting.GRAY));
+                0, pipes, others);
     }
 }

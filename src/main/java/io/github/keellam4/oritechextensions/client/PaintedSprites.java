@@ -1,10 +1,9 @@
 package io.github.keellam4.oritechextensions.client;
 
 import io.github.keellam4.oritechextensions.paint.PaintColors;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.Optional;
@@ -25,14 +24,26 @@ final class PaintedSprites {
     private record Key(TextureAtlasSprite original, ColorVariant variant) {
     }
 
-    private final ConcurrentHashMap<Key, Optional<TextureAtlasSprite>> cache = new ConcurrentHashMap<>();
+    private record QuadKey(BakedQuad quad, ColorVariant variant) {
+    }
+
+    private final ConcurrentHashMap<Key, Optional<TextureAtlasSprite>> sprites = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<QuadKey, BakedQuad> quads = new ConcurrentHashMap<>();
 
     Optional<TextureAtlasSprite> find(TextureAtlasSprite original, ColorVariant variant) {
-        return cache.computeIfAbsent(new Key(original, variant), key -> {
-            var atlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
+        return sprites.computeIfAbsent(new Key(original, variant), key -> {
+            var atlas = PaintClient.blockAtlas();
+            if (atlas == null) return Optional.empty();
             var name = original.contents().name().withSuffix(PaintColors.spriteSuffix(variant));
             var sprite = atlas.getSprite(name);
             return sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation()) ? Optional.empty() : Optional.of(sprite);
         });
+    }
+
+    /** The quad redrawn with the painted texture, or the quad itself when its texture has no painted variant. */
+    BakedQuad repainted(BakedQuad quad, ColorVariant variant) {
+        return quads.computeIfAbsent(new QuadKey(quad, variant), key -> find(quad.materialInfo().sprite(), variant)
+                .map(sprite -> PaintableModel.repaint(quad, sprite))
+                .orElse(quad));
     }
 }
