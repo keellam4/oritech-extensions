@@ -29,6 +29,7 @@ import io.github.keellam4.oritechextensions.paint.targets.AddonTarget;
 
 import java.util.Map;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.util.RandomSource;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -165,7 +166,7 @@ public final class PaintClient {
      * with {@code paint_*} permutations in {@code assets/minecraft/atlases/blocks.json}) is made paintable.
      * The server still decides which blocks actually get paint; untagged blocks never receive a colour.
      */
-    private static void wrapResourcePackPaintables(Map<ResourceLocation, BakedModel> models, PaintedSprites sprites) {
+    private static void wrapResourcePackPaintables(Map<ModelResourceLocation, BakedModel> models, PaintedSprites sprites) {
         var textures = PackPaintables.texturesFromOtherPacks(Minecraft.getInstance().getResourceManager());
         if (textures.isEmpty()) return;
         var random = RandomSource.create(42);
