@@ -1,6 +1,6 @@
 # Contributing
 
-Bug reports, ideas and pull requests are welcome.
+Bug reports, ideas and pull requests are welcome. Everyone taking part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Reporting a bug
 Open a [bug report](https://github.com/keellam4/oritech-extensions/issues/new/choose) and include your mod, Oritech and NeoForge versions. For visual problems, a screenshot is the most useful thing you can send. For crashes, attach `logs/latest.log` or the crash report.
