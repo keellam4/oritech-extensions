@@ -36,13 +36,18 @@ ACCENTS = {
     'sculk': (38, 214, 224),       # sculk glow cyan
 }
 
-PIPE_TEXTURES = ['item_pipe', 'transparent_item_pipe']
+PIPE_TEXTURES = ['item_pipe', 'transparent_item_pipe', 'fluid_pipe']
 EXTENDER_TEXTURES = ['machine_extender', 'machine_extender_off', 'capacitor_ctm/center', 'capacitor_ctm/horizontal',
                      'capacitor_ctm/vertical', 'capacitor_ctm/particle']
-GLASS_TEXTURES = [f'industrial_glass_block/{part}' for part in ('center', 'empty', 'horizontal', 'vertical', 'particle')]
+# Texture names differ between Oritech 1.2 (Minecraft 1.21.1) and Oritech 2.0 (Minecraft 26.1); both are listed and
+# whichever exist in the given Oritech textures are used.
+GLASS_TEXTURES = [f'{folder}/{part}' for folder in ('industrial_glass_block', 'industrial_glass')
+                  for part in ('center', 'empty', 'horizontal', 'vertical', 'particle')]
 REACTOR_PART_TEXTURES = ['reactor_absorber_port', 'reactor_condenser', 'reactor_controller', 'reactor_energy_port',
+                         'nuclear_reactor_controller', 'reactor_coolant_absorber_port', 'reactor_heat_absorber',
+                         'reactor_heat_vent', 'reactor_neutron_reflector',
                          'reactor_fuel_port', 'reactor_redstone_port', 'reactor_reflector', 'reactor_rod', 'reactor_vent']
-ACCELERATOR_TEXTURES = ['accelerator_controller', 'accelerator_motor', 'accelerator_ring', 'accelerator_sensor',
+ACCELERATOR_TEXTURES = ['accelerator_controller', 'particle_accelerator', 'accelerator_motor', 'accelerator_ring', 'accelerator_sensor',
                         'particle_collector_block']
 # Heat pipes are yellow all over, so every shade of theirs follows the paint.
 REACTOR_HEAT_PIPE = 'reactor_heat_pipe'
@@ -51,10 +56,18 @@ ACCENT_SHADES = [(198, 60, 51), (181, 57, 98), (171, 65, 58)]
 
 
 def open_source(path):
+    """Loader for Oritech block textures by name; returns None for names this Oritech version doesn't have."""
     if path.endswith('.jar'):
         z = zipfile.ZipFile(path)
-        return lambda n: Image.open(io.BytesIO(z.read(f'assets/oritech/textures/block/{n}.png'))).convert('RGBA')
-    return lambda n: Image.open(os.path.join(path, f'{n}.png')).convert('RGBA')
+        names = set(z.namelist())
+        def load_jar(n):
+            entry = f'assets/oritech/textures/block/{n}.png'
+            return Image.open(io.BytesIO(z.read(entry))).convert('RGBA') if entry in names else None
+        return load_jar
+    def load_dir(n):
+        file = os.path.join(path, f'{n}.png')
+        return Image.open(file).convert('RGBA') if os.path.exists(file) else None
+    return load_dir
 
 
 def hls(c):
@@ -104,7 +117,10 @@ def strip(colours, path):
 def shades(load, names):
     out = set()
     for n in names:
-        for p in load(n).getdata():
+        image = load(n)
+        if image is None:
+            continue
+        for p in image.getdata():
             if p[3] > 0:
                 out.add(p[:3])
     return out
@@ -124,14 +140,15 @@ def main():
         strip([follow(s, k, paints[v][k]) for s in pipe_keys for k in [nearest(s, key)]],
               os.path.join(out, f'pipe_{v}.png'))
 
-    # Extenders: main palette + accent trim + leftover warm shades.
-    ext = shades(load, EXTENDER_TEXTURES)
+    # Extenders: main palette + accent trim + leftover warm shades. (Oritech 2.0 paints extenders itself.)
+    ext = shades(load, EXTENDER_TEXTURES) if os.environ.get('ORITECH2') != '1' else set()
     accents = sorted(s for s in ext if s in ACCENT_SHADES)
     extra = sorted(s for s in ext if warm(s) and s not in key and s not in ACCENT_SHADES)
     ext_keys = key + accents + extra
-    strip(ext_keys, os.path.join(out, 'extender_key.png'))
+    if ext:
+        strip(ext_keys, os.path.join(out, 'extender_key.png'))
     brightest = max(accents, key=lambda c: hls(c)[1]) if accents else None
-    for v in VARIANTS:
+    for v in VARIANTS if ext else []:
         row = [paints[v][k] for k in key]
         row += [follow(a, brightest, ACCENTS[v]) for a in accents]
         row += [follow(s, k, paints[v][k]) for s in extra for k in [nearest(s, key)]]
