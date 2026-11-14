@@ -14,6 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Shared helpers for blocks whose paint is stored by position in {@link PipePaintData} rather than on a block
@@ -34,6 +35,12 @@ public final class WorldPaint {
      * 1 means touching. Particle accelerator rings are built with gaps, so they use a longer reach.
      */
     public static List<BlockPos> discover(Level level, BlockPos origin, Function<Block, Object> family, int max, int reach) {
+        return discover(level, origin, family, max, reach, pos -> true);
+    }
+
+    /** Like {@link #discover(Level, BlockPos, Function, int, int)}, but only spreads to blocks {@code include} accepts. */
+    public static List<BlockPos> discover(Level level, BlockPos origin, Function<Block, Object> family, int max, int reach,
+                                          Predicate<BlockPos> include) {
         var originFamily = family.apply(level.getBlockState(origin).getBlock());
         if (originFamily == null || max <= 0) return List.of();
 
@@ -49,6 +56,7 @@ public final class WorldPaint {
                     var neighbor = pos.relative(direction, distance);
                     if (ordered.contains(neighbor)) continue;
                     if (!Objects.equals(family.apply(level.getBlockState(neighbor).getBlock()), originFamily)) continue;
+                    if (!include.test(neighbor)) continue;
                     var frozen = neighbor.immutable();
                     ordered.add(frozen);
                     queue.add(frozen);

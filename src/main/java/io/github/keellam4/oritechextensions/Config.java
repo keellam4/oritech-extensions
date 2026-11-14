@@ -37,9 +37,10 @@ public class Config {
             .defineInRange("maxPaintGroupSize", 4096, 16, 65536);
 
     public static final ModConfigSpec.BooleanValue PIPE_PAINT_ISOLATION = BUILDER
-            .comment("Reserved for a future release. When enabled, painted pipes will only connect to the same colour.",
-                    "Currently unused — paint is cosmetic only.")
-            .define("pipePaintIsolation", false);
+            .comment("Colour-isolated pipes: painted item and fluid pipes only connect to pipes of the same colour.",
+                    "Unpainted pipes still connect to every colour. Turning this on or off changes pipes the next time",
+                    "they are painted or placed.")
+            .define("pipePaintIsolation", true);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
@@ -55,6 +56,10 @@ public class Config {
 
     public static PipePaintCostMode pipePaintCostMode() {
         return SPEC.isLoaded() ? PIPE_PAINT_COST_MODE.get() : PIPE_PAINT_COST_MODE.getDefault();
+    }
+
+    public static boolean pipePaintIsolation() {
+        return SPEC.isLoaded() ? PIPE_PAINT_ISOLATION.get() : PIPE_PAINT_ISOLATION.getDefault();
     }
 
     public static int maxPaintGroupSize() {
