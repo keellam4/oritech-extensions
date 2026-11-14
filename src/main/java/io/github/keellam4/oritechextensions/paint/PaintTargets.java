@@ -46,10 +46,14 @@ public final class PaintTargets {
             WorldPaintTarget.GLASS,
             WorldPaintTarget.REACTOR,
             WorldPaintTarget.ACCELERATOR,
-            HangarDoorTarget.INSTANCE);
+            HangarDoorTarget.INSTANCE,
+            // Datapack tags last, so a tagged block never overrides one of the built-in targets above.
+            WorldPaintTarget.TAGGED,
+            WorldPaintTarget.TAGGED_CONNECTED);
 
     private static final List<WorldPaintTarget> WORLD_TARGETS =
-            List.of(WorldPaintTarget.PIPES, WorldPaintTarget.GLASS, WorldPaintTarget.REACTOR, WorldPaintTarget.ACCELERATOR);
+            List.of(WorldPaintTarget.PIPES, WorldPaintTarget.GLASS, WorldPaintTarget.REACTOR, WorldPaintTarget.ACCELERATOR,
+                    WorldPaintTarget.TAGGED, WorldPaintTarget.TAGGED_CONNECTED);
 
     private PaintTargets() {
     }

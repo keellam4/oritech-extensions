@@ -7,6 +7,11 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [0.4.0+mc26.1] - Beta (Minecraft 26.1.2)
 
 ### Added
+- **Paintable block tags for modpacks.** Add blocks to `oritech_extensions:paintable` (one block per click) or `oritech_extensions:paintable_connected` (touching blocks paint together) with a datapack, and list their textures in the painted-texture atlas with a resource pack. See "For Modpack Makers" on the website.
+
+## [0.4.0] - Beta
+
+### Added
 - **Colour-isolated pipes.** Painted item and fluid pipes only connect to pipes of the same colour, so two lines can run side by side without merging. Unpainted pipes still connect to every colour. Painting a line no longer spreads into touching pipes of another colour. Controlled by `pipePaintIsolation` (on by default for new configs; existing config files keep `false` until you change it).
 
 ## [0.3.0+mc26.1] - Beta (Minecraft 26.1.2)

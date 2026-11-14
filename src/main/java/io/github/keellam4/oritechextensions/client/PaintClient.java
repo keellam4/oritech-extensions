@@ -23,6 +23,9 @@ import io.github.keellam4.oritechextensions.paint.PaintTargets;
 import io.github.keellam4.oritechextensions.paint.PipePaint;
 
 import java.util.Map;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.util.RandomSource;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Client side of painting: receives colours, wraps paintable block models, item tooltip. */
@@ -153,5 +156,32 @@ public final class PaintClient {
         // "addon" count kept at 0 so CI's log check works on both branches (Oritech 2.0 paints addons itself).
         OritechExtensions.LOGGER.info("[paint] Made {} addon block models and {} pipe block models paintable, plus {} glass, reactor and accelerator block models",
                 0, pipes, others);
+        wrapResourcePackPaintables(models, sprites);
+    }
+
+    /**
+     * Blocks a modpack made paintable with the {@code oritech_extensions:paintable(_connected)} tags. Tags only
+     * reach the client after joining a world, long after models are baked, so instead any block whose model uses
+     * a texture that a resource pack added to the painted-texture atlas (a {@code paletted_permutations} source
+     * with {@code paint_*} permutations in {@code assets/minecraft/atlases/blocks.json}) is made paintable.
+     * The server still decides which blocks actually get paint; untagged blocks never receive a colour.
+     */
+    private static void wrapResourcePackPaintables(Map<BlockState, BlockStateModel> models, PaintedSprites sprites) {
+        var textures = PackPaintables.texturesFromOtherPacks(Minecraft.getInstance().getResourceManager());
+        if (textures.isEmpty()) return;
+        var random = RandomSource.create(42);
+        int wrapped = 0;
+        for (var block : BuiltInRegistries.BLOCK) {
+            if (PaintTargets.findForModel(block) != null) continue;
+            for (var state : block.getStateDefinition().getPossibleStates()) {
+                var model = models.get(state);
+                if (model == null || model instanceof PaintableModel) continue;
+                if (PackPaintables.usesAny(model, textures, random)) {
+                    models.put(state, new PaintableModel(model, sprites));
+                    wrapped++;
+                }
+            }
+        }
+        OritechExtensions.LOGGER.info("[paint] {} textures from resource packs; made {} more block models paintable", textures.size(), wrapped);
     }
 }
