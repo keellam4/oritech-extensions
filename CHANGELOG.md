@@ -5,6 +5,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
+- **Minecraft 26.1 build** (NeoForge 26.1.2, Oritech 2.0, GeckoLib 5), for packs like FTB Evolution 2. It has the hangar door extension, the guide, and paint for pipes, Industrial Glass, reactors and particle accelerators. Machine addon and extender paint isn't included there because Oritech 2.0 paints addons itself.
 - **Paintable Industrial Glass, reactors and particle accelerators.** Color Cartridges paint a whole wall of Industrial Glass, a whole nuclear reactor (walls, controller, rods, vents, heat pipes and ports) or a whole particle accelerator (controller, rings, motors, sensors, collectors) in one click. Status lights keep their colours. Like pipes, the colour is world-only and new blocks take the colour of the build they join. New config option `maxPaintGroupSize` (default 4096).
 
 ### Changed
