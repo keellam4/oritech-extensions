@@ -1,0 +1,39 @@
+---
+title: Paintable Glass, Reactors and Accelerators
+icon: oritech:industrial_glass_block
+related_items: ["oritech:industrial_glass_block", "oritech:reactor_wall", "oritech:reactor_controller", "oritech:accelerator_ring", "oritech:white_paint", "oritech:orange_paint"]
+---
+
+# Paintable Glass, Reactors and Accelerators
+
+Color Cartridges also paint **Industrial Glass**, the **nuclear reactor** and the **particle accelerator**. One click paints the whole build, so a reactor or accelerator matches the machines around it.
+
+## What gets painted together
+
+| Click on | Paints |
+|---|---|
+| Industrial Glass | All Industrial Glass touching it |
+| Any reactor block | The whole reactor: walls, controller, rods, vents, heat pipes, condensers, reflectors and every port |
+| Any accelerator block | The whole accelerator: controller, guide rings, motors, sensors and particle collectors. Parts up to 8 blocks apart in a straight line count as one accelerator, so gaps between rings are fine |
+
+**Orange** clears the colour again.
+
+## What changes colour
+
+- Industrial Glass: the frame. The glass itself stays clear.
+- Reactor walls: the coloured trim. Reactor parts: their coloured trim, and heat pipes all over.
+- Accelerator parts: the red-pink casing and orange trim.
+- Status lights don't change: redstone indicators, yellow markers and the cyan particle lights keep their colours, so a painted build reads the same.
+
+## Rules
+
+- Colour is **world-only**, like pipes. Broken blocks drop unpainted.
+- A new block takes the colour of the painted blocks it joins, if they all have the same colour.
+- One click paints at most 4096 blocks (`maxPaintGroupSize` in the config). Bigger builds take another click.
+
+## Config
+
+| Key | Default | Meaning |
+|---|---|---|
+| `pipePaintCostMode` | `NETWORK` | `NETWORK` = one cartridge per click, whatever the size; `PER_BLOCK` = one per block |
+| `maxPaintGroupSize` | `4096` | Most glass, reactor or accelerator blocks painted by one click |

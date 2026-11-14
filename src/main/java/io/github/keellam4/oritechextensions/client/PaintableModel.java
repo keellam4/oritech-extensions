@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wraps an addon block's model. When the block is painted, every quad whose texture has a painted variant is
+ * Wraps a paintable block's model. When the block is painted, every quad whose texture has a painted variant is
  * redrawn with that variant; everything else (e.g. textures without Oritech's orange) is left as is.
  */
 final class PaintableModel extends BakedModelWrapper<BakedModel> {
@@ -35,7 +35,7 @@ final class PaintableModel extends BakedModelWrapper<BakedModel> {
         this.sprites = sprites;
     }
 
-    /** Called when the chunk containing the block is (re)built: pick up addon BE paint or pipe-map paint. */
+    /** Called when the chunk containing the block is (re)built: pick up the block entity's paint or the world-stored paint. */
     @Override
     public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData modelData) {
         var data = super.getModelData(level, pos, state, modelData);
@@ -43,9 +43,9 @@ final class PaintableModel extends BakedModelWrapper<BakedModel> {
         if (blockEntity != null && blockEntity.hasData(ModContent.PAINT)) {
             return data.derive().with(PAINT, blockEntity.getData(ModContent.PAINT)).build();
         }
-        var pipePaint = PipePaintClient.get(pos);
-        if (PaintColors.isPainted(pipePaint)) {
-            return data.derive().with(PAINT, pipePaint).build();
+        var worldPaint = PaintClient.worldPaint(pos);
+        if (PaintColors.isPainted(worldPaint)) {
+            return data.derive().with(PAINT, worldPaint).build();
         }
         return data;
     }
