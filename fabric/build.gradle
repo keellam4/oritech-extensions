@@ -16,6 +16,7 @@ sourceSets.main.java.srcDir rootProject.file('common/src/main/java')
 sourceSets.main.resources.srcDir rootProject.file('common/src/main/resources')
 
 repositories {
+    mavenCentral()
     exclusiveContent {
         forRepository { maven { url = 'https://maven.parchmentmc.org' } }
         filter { includeGroup 'org.parchmentmc.data' }
@@ -77,6 +78,9 @@ dependencies {
     modLocalRuntime "maven.modrinth:athena-ctm:${athena_fabric_version_id}"
     // Oritech ships Team Reborn Energy inside its jar, but dev runs don't load jars nested in dependencies.
     modLocalRuntime("teamreborn:energy:4.1.0") { transitive = false }
+    // Same for the config library inside Forge Config API Port's jar.
+    localRuntime "com.electronwill.night-config:core:3.8.3"
+    localRuntime "com.electronwill.night-config:toml:3.8.3"
 }
 
 // Wiki pages under wiki/ ship as Oracle Index books, the same as in the NeoForge jar.
