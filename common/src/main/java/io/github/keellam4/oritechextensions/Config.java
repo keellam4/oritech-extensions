@@ -42,7 +42,7 @@ public class Config {
                     "they are painted or placed.")
             .define("pipePaintIsolation", true);
 
-    static final ModConfigSpec SPEC = BUILDER.build();
+    public static final ModConfigSpec SPEC = BUILDER.build();
 
     /** How many extension blocks may be attached to one door. Safe to call before the config has loaded. */
     public static int maxExtensions() {
