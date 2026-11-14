@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[2]
 WIKI = ROOT / "wiki"
 OUT = ROOT / "build" / "wiki-site"
 BASE_CONFIG = Path(__file__).with_name("mkdocs.base.yml")
-LANG = ROOT / "src/main/resources/assets/oritech_extensions/lang/en_us.json"
+LANG = ROOT / "common/src/main/resources/assets/oritech_extensions/lang/en_us.json"
 # "developers" is website-only: build.gradle leaves it out of the in-game (Oracle Index) book.
 SECTIONS = {"docs": "Guide", "content": "Items & Blocks", "developers": "Developers"}
 THREE_JS = ROOT / "build/npm/node_modules/three/build/three.module.min.js"  # npm install --prefix build/npm three@0.170.0
@@ -172,7 +172,7 @@ class Recorder:
 def load_recipes() -> dict[str, dict]:
     """Crafting recipes in this mod's data/, keyed by result id (used to check the docs match the game)."""
     out = {}
-    for f in sorted((ROOT / "src/main/resources/data").glob("*/recipe/**/*.json")):
+    for f in sorted((ROOT / "common/src/main/resources/data").glob("*/recipe/**/*.json")):
         try:
             data = json.loads(f.read_text(encoding="utf-8"))
         except json.JSONDecodeError:

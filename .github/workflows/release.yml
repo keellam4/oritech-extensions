@@ -38,7 +38,7 @@ jobs:
           ref: ${{ github.event.release.tag_name }}
 
       - name: Read the Java version from build.gradle
-        run: echo "JAVA=$(grep -oP 'JavaLanguageVersion.of\(\K[0-9]+' build.gradle)" >> "$GITHUB_ENV"
+        run: echo "JAVA=$(grep -ohP 'JavaLanguageVersion.of\(\K[0-9]+' build.gradle neoforge/build.gradle 2>/dev/null | head -1)" >> "$GITHUB_ENV"
 
       - uses: actions/setup-java@v6
         with:
@@ -61,7 +61,7 @@ jobs:
           echo "VERSION=$version" >> "$GITHUB_ENV"
           echo "RELEASE_TYPE=${type:-beta}" >> "$GITHUB_ENV"
           echo "MINECRAFT=$minecraft" >> "$GITHUB_ENV"
-          echo "JAR=build/libs/oritech_extensions-neoforge-$minecraft-$version.jar" >> "$GITHUB_ENV"
+          echo "JAR=neoforge/build/libs/oritech_extensions-neoforge-$minecraft-$version.jar" >> "$GITHUB_ENV"
           {
             echo "GAME_VERSIONS<<EOF"; echo "${game_versions:-$minecraft}" | tr ',' '\n' | sed 's/^ *//'; echo "EOF"
             echo "DEPENDENCIES<<EOF"; echo "oritech(required)"; echo "geckolib(required)"

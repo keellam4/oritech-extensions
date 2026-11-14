@@ -4,7 +4,14 @@ title: Project Layout
 
 # Project Layout
 
-Java code is under `src/main/java/io/github/keellam4/oritechextensions/`.
+The 1.21.1 code is split by mod loader:
+
+| Module | What's there |
+|---|---|
+| `common/` | Everything shared: game logic, assets, data, the pipe mixin. Uses only Minecraft and Oritech, plus a small `platform/Platform` interface for the things each loader does differently (registration, addon paint storage, sending packets) |
+| `neoforge/` | NeoForge entry points and event wiring (`neoforge/`), the painted block model wrapper (`client/PaintableModel`), game tests (`test/`), and `neoforge.mods.toml` |
+
+Each loader jar compiles the `common` sources together with its own. Java packages under `io/github/keellam4/oritechextensions/`:
 
 | Path | What's there |
 |---|---|
@@ -12,16 +19,16 @@ Java code is under `src/main/java/io/github/keellam4/oritechextensions/`.
 | `paint/targets/` | One class per kind of paintable thing: addons, pipe networks, glass, reactors, accelerators, hangar doors |
 | `hangar/` | The Hangar Door Extension block and block entity |
 | `guide/` | The guide book item (opens this wiki in Oracle Index) |
-| `client/` | Renderers, the paintable block model wrapper, client setup |
-| `test/` | Game tests |
+| `client/` | Renderers, painted textures, client setup (the model wrapper itself is per loader) |
+| `test/` | Game tests (NeoForge module) |
 | `Config.java` | Config options (`config/oritech_extensions-common.toml`) |
 
 Other files:
 
 | Path | What's there |
 |---|---|
-| `src/main/resources/assets/minecraft/atlases/blocks.json` | Which Oritech textures get painted versions |
-| `src/main/resources/assets/oritech_extensions/textures/colormap/paint/` | The paint palettes |
+| `common/src/main/resources/assets/minecraft/atlases/blocks.json` | Which Oritech textures get painted versions |
+| `common/src/main/resources/assets/oritech_extensions/textures/colormap/paint/` | The paint palettes |
 | `tools/paint/derive_palettes.py` | Builds the palettes from Oritech's textures |
 | `wiki/` | This documentation (in-game guide and website) |
 | `tools/wiki/` | Builds the website from `wiki/`, including the 3D paint viewer and the animated hangar door |
