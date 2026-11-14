@@ -1,0 +1,39 @@
+name: API probe (26.1, temporary)
+
+# Prints Minecraft / NeoForge / dependency sources listed in probe/classes.txt, for porting work
+# done where the Minecraft sources can't be downloaded. Remove once the 26.1 port is done.
+on:
+  push:
+    branches: ['26.1']
+    paths: ['probe/**', '.github/workflows/api-probe.yml']
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Decompile Minecraft + NeoForge
+        run: ./gradlew createMinecraftArtifacts printCompileClasspath --stacktrace | tee gradle-out.txt
+      - name: Print requested sources
+        run: |
+          src=$(find build/moddev -name "*-sources.jar" | head -1)
+          echo "sources: $src"
+          mkdir -p /tmp/src && (cd /tmp/src && unzip -q "$GITHUB_WORKSPACE/$src")
+          cp=$(grep '^CP ' gradle-out.txt | cut -c4- | paste -sd: -)
+          while IFS= read -r line; do
+            case "$line" in ''|'#'*) continue;; esac
+            kind=${line%%:*}; arg=${line#*:}
+            echo "################ $line"
+            case "$kind" in
+              ls)   (cd /tmp/src && find "$arg" -name '*.java' 2>/dev/null | sort) ;;
+              find) (cd /tmp/src && find . -name "$arg.java" | while read -r f; do echo "==== $f"; cat "$f"; done) ;;
+              grep) (cd /tmp/src && grep -rEn "$arg" --include=*.java . | head -60) ;;
+              javap) javap -cp "$cp" -public "$arg" 2>&1 | head -200 ;;
+            esac
+          done < probe/classes.txt

@@ -42,7 +42,7 @@ Small add-ons for Oritech:
 [[dependencies.${mod_id}]]
     modId="geckolib"
     type="required"
-    versionRange="[4.6,5)"
+    versionRange="[5.5,6)"
     ordering="AFTER"
     side="BOTH"
 
