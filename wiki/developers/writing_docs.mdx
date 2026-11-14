@@ -1,0 +1,21 @@
+---
+title: Writing Docs
+---
+
+# Writing Docs
+
+The docs live in `wiki/` and are written once for three places: the in-game guide (Oracle Index), this website, and GitHub.
+
+| Folder | Section | Shown in-game? |
+|---|---|---|
+| `wiki/docs/` | Guide: how things work | Yes |
+| `wiki/content/` | Items & Blocks: one page per item or block | Yes |
+| `wiki/developers/` | Developers (this section) | No, website only |
+
+Keep player pages short and free of code. Anything about building, code or internals belongs here in `developers/`.
+
+The full authoring guide (frontmatter, recipes, icons, the 3D viewers) is in [`wiki/README.md`](https://github.com/keellam4/oritech-extensions/blob/main/wiki/README.md). Check your changes with:
+
+```sh
+python3 tools/wiki/build_site.py --check
+```

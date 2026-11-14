@@ -31,7 +31,8 @@ public final class GameTests {
             GuideGameTests.class,
             HangarDoorExtensionGameTests.class,
             PipePaintGameTests.class,
-            PaintTargetGameTests.class);
+            PaintTargetGameTests.class,
+            PipeIsolationGameTests.class);
 
     private static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
             DeferredRegister.create(Registries.TEST_FUNCTION, OritechExtensions.MODID);

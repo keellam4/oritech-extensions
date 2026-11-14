@@ -158,6 +158,7 @@ public final class PaintTargets {
         if (target == null) return;
 
         var data = PipePaintData.get(level);
+        var before = data.getOrDefault(pos);
         var inherited = target.inheritanceColor(level, pos);
         if (inherited != null) {
             data.set(pos, inherited);
@@ -166,6 +167,12 @@ public final class PaintTargets {
             // Left over from a block that was removed without being broken by hand (an explosion, a piston).
             data.remove(pos);
             syncWorld(level, List.of(pos), ColorVariant.ORANGE);
+        }
+        if (target.isolated() && data.getOrDefault(pos) != ColorVariant.ORANGE) {
+            // The pipe connected to its neighbours while still unpainted; drop the links its colour doesn't allow.
+            PipeIsolation.onPaintChanged(level, java.util.Map.of(pos.immutable(), ColorVariant.ORANGE));
+        } else if (target.isolated() && before != ColorVariant.ORANGE) {
+            PipeIsolation.onPaintChanged(level, java.util.Map.of(pos.immutable(), before));
         }
     }
 

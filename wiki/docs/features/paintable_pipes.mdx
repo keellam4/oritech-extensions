@@ -12,8 +12,19 @@ Color Cartridges can paint **standard item pipes**, **transparent item pipes**, 
 ## How it works
 
 1. Right-click a standard pipe with a Color Cartridge.
-2. The whole connected network of that type is painted.
-3. **Orange** clears the network back to the default look.
+2. The connected pipes of that type that share its current colour are painted.
+3. **Orange** clears them back to the default look.
+
+## Colour-isolated pipes
+
+Painted pipes only connect to pipes of the **same colour**, so you can run two item (or fluid) lines right next to each other without them merging. Paint one line white and the other one sculk, and items stay on their own line.
+
+- **Unpainted pipes connect to every colour.** Use one as a bridge on purpose, or paint it to split two lines.
+- Painting only spreads through pipes that currently share the clicked pipe's colour, so repainting one line never bleeds into the line next to it.
+- Repainting a line to match its neighbour joins them again.
+- Item and fluid pipes never connect to each other, painted or not.
+
+Turn this off with `pipePaintIsolation = false` if you only want paint as decoration.
 
 ## Rules
 
@@ -26,7 +37,7 @@ Color Cartridges can paint **standard item pipes**, **transparent item pipes**, 
 | Key | Default | Meaning |
 |---|---|---|
 | `pipePaintCostMode` | `NETWORK` | `NETWORK` = one cartridge for the whole network; `PER_BLOCK` = one per block. Also used for glass, reactors and accelerators |
-| `pipePaintIsolation` | `false` | Reserved for a future same-colour connection mode |
+| `pipePaintIsolation` | `true` | Painted pipes only connect to the same colour (unpainted connects to all). Changes apply to pipes the next time they're painted or placed |
 
 ## Not yet supported
 

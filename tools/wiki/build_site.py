@@ -29,7 +29,8 @@ WIKI = ROOT / "wiki"
 OUT = ROOT / "build" / "wiki-site"
 BASE_CONFIG = Path(__file__).with_name("mkdocs.base.yml")
 LANG = ROOT / "src/main/resources/assets/oritech_extensions/lang/en_us.json"
-SECTIONS = {"docs": "Guide", "content": "Items & Blocks"}
+# "developers" is website-only: build.gradle leaves it out of the in-game (Oracle Index) book.
+SECTIONS = {"docs": "Guide", "content": "Items & Blocks", "developers": "Developers"}
 THREE_JS = ROOT / "build/npm/node_modules/three/build/three.module.min.js"  # npm install --prefix build/npm three@0.170.0
 
 ADMONITION = {"note": "note", "info": "info", "default": "note", "tip": "tip", "important": "important",
@@ -39,7 +40,7 @@ ADMONITION = {"note": "note", "info": "info", "default": "note", "tip": "tip", "
 @dataclass
 class Page:
     src: Path                     # wiki/docs/intro.mdx
-    section: str                  # "docs" or "content"
+    section: str                  # "docs", "content" or "developers"
     rel: str                      # path inside the section without extension: "intro", "pipes/paint"
     meta: dict = field(default_factory=dict)
     body: str = ""
@@ -205,6 +206,7 @@ class Converter:
         self.by_id = {p.meta["id"]: p for p in pages if p.meta.get("id")}
         self.by_ref = {p.meta["ref"]: p for p in pages if p.meta.get("ref")}
         self.by_slug = {p.rel: p for p in pages if p.section == "docs"}
+        self.pages = pages
 
     def link_to(self, page: Page, target: Page) -> str:
         here = Path(page.out).parent
@@ -342,8 +344,7 @@ class Converter:
             resolved = (Path(page.section) / Path(page.rel).parent / path).as_posix()
             resolved = re.sub(r"[^/]+/\.\./", "", resolved).removesuffix(".mdx")
             section, _, slug = resolved.partition("/")
-            found = next((p for p in self.by_slug.values() if p.section == section and p.rel == slug), None) \
-                or next((p for p in self.by_id.values() if p.section == section and p.rel == slug), None)
+            found = next((p for p in self.pages if p.section == section and p.rel == slug), None)
             if found and anchor:
                 return f"[{label or found.title}]({self.link_to(page, found)}#{anchor})"
         if not found:
