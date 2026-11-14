@@ -2,7 +2,7 @@
 # Prints the requests in probe/classes.txt. Run by the API probe workflow after ./gradlew createMinecraftArtifacts printCompileClasspath.
 set -u
 src=$(find build ~/.gradle/caches -name '*-sources.jar' 2>/dev/null | grep -i neoforge | head -1)
-bin=$(find build/moddev -name 'minecraft-patched-*.jar' 2>/dev/null | head -1)
+bin=$(find "$PWD/build/moddev" -name "minecraft-patched-*.jar" 2>/dev/null | head -1)
 echo "sources: $src"; echo "binary: $bin"
 mkdir -p /tmp/src
 [ -n "$src" ] && (cd /tmp/src && unzip -qo "$src")
