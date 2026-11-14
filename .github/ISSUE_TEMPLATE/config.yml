@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Discord
+    url: https://discord.gg/dudwew9JuZ
+    about: Questions, help and chat with other players
   - name: Modrinth page
     url: https://modrinth.com/mod/oritech-extensions
     about: Downloads and version history

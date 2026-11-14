@@ -4,6 +4,7 @@
 [![26.1 build](https://img.shields.io/github/actions/workflow/status/keellam4/oritech-extensions/build.yml?branch=26.1&label=26.1%20build)](https://github.com/keellam4/oritech-extensions/actions/workflows/build.yml?query=branch%3A26.1)
 [![Modrinth](https://img.shields.io/badge/Modrinth-oritech--extensions-1bd96a)](https://modrinth.com/mod/oritech-extensions)
 [![CurseForge](https://img.shields.io/badge/CurseForge-oritech--extensions-f16436)](https://www.curseforge.com/minecraft/mc-mods/oritech-extensions)
+[![Discord](https://img.shields.io/badge/Discord-join-5865f2?logo=discord&logoColor=white)](https://discord.gg/dudwew9JuZ)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Small add-ons for [Oritech](https://github.com/Rearth/Oritech) on NeoForge. Built for All the Mods 10, and works with plain Oritech.
@@ -34,7 +35,7 @@ Optional on 1.21.1: Oritech Things (its addons become paintable), Oracle Index (
 
 ## Contributing
 
-Found a bug or have an idea? [Open an issue](https://github.com/keellam4/oritech-extensions/issues/new/choose). Want to help? See [CONTRIBUTING.md](CONTRIBUTING.md) and the [developer docs](https://keellam4.github.io/oritech-extensions/developers/overview/).
+Questions, screenshots or just want to chat? Join the [Discord](https://discord.gg/dudwew9JuZ). Found a bug or have an idea? [Open an issue](https://github.com/keellam4/oritech-extensions/issues/new/choose). Want to help? See [CONTRIBUTING.md](CONTRIBUTING.md) and the [developer docs](https://keellam4.github.io/oritech-extensions/developers/overview/).
 
 ## License
 
