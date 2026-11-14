@@ -28,6 +28,10 @@ repositories {
         forRepository { maven { url = 'https://api.modrinth.com/maven' } }
         filter { includeGroup 'maven.modrinth' }
     }
+    exclusiveContent {
+        forRepository { maven { url = 'https://modmaven.dev' } }
+        filter { includeGroup 'teamreborn' }
+    }
 }
 
 loom {
@@ -71,6 +75,8 @@ dependencies {
     modLocalRuntime "maven.modrinth:architectury-api:${architectury_fabric_version_id}"
     modLocalRuntime "maven.modrinth:forge-config-api-port:${forge_config_api_port_fabric_version_id}"
     modLocalRuntime "maven.modrinth:athena-ctm:${athena_fabric_version_id}"
+    // Oritech ships Team Reborn Energy inside its jar, but dev runs don't load jars nested in dependencies.
+    modLocalRuntime("teamreborn:energy:4.1.0") { transitive = false }
 }
 
 // Wiki pages under wiki/ ship as Oracle Index books, the same as in the NeoForge jar.
