@@ -114,7 +114,8 @@ def oracleWikiOut = layout.buildDirectory.dir('generated/oracleWiki')
 tasks.register('syncOracleWiki', Copy) {
     from('wiki') {
         into 'assets/oracle_index/books/oritech_extensions'
-        exclude 'README.md' // contributor notes for GitHub, not a wiki page
+        exclude 'README.md'     // contributor notes for GitHub, not a wiki page
+        exclude 'developers/**' // developer docs are website-only
     }
     into oracleWikiOut
 }
