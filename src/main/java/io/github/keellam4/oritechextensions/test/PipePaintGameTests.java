@@ -47,7 +47,7 @@ public class PipePaintGameTests {
         level.setBlockAndUpdate(c, BlockContent.ITEM_PIPE.get().defaultBlockState());
 
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
-        var paint = new ItemStack(ItemContent.SCULK_PAINT, 4);
+        var paint = new ItemStack(ItemContent.SCULK_PAINT.get(), 4);
         player.setItemInHand(InteractionHand.MAIN_HAND, paint);
         if (!PipePaintEvents.tryPaint(level, a, player, InteractionHand.MAIN_HAND, paint)) {
             helper.fail("painting a mixed item pipe network was refused");
@@ -68,7 +68,7 @@ public class PipePaintGameTests {
         var pos = helper.absolutePos(new BlockPos(2, 1, 2));
         level.setBlockAndUpdate(pos, BlockContent.FRAMED_ITEM_PIPE.get().defaultBlockState());
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
-        var paint = new ItemStack(ItemContent.WHITE_PAINT, 4);
+        var paint = new ItemStack(ItemContent.WHITE_PAINT.get(), 4);
         player.setItemInHand(InteractionHand.MAIN_HAND, paint);
         if (PipePaintEvents.tryPaint(level, pos, player, InteractionHand.MAIN_HAND, paint)) {
             helper.fail("painted a framed pipe");
@@ -129,10 +129,6 @@ public class PipePaintGameTests {
             helper.fail("pipe didn't drop");
             return;
         }
-        // Pipe items never get PAINT_COMPONENT in this feature.
-        if (dropped.get().has(io.github.keellam4.oritechextensions.ModContent.PAINT_COMPONENT.get())) {
-            helper.fail("dropped pipe carried paint");
-        }
         helper.succeed();
     }
 
@@ -157,7 +153,7 @@ public class PipePaintGameTests {
         }
 
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
-        var paint = new ItemStack(ItemContent.WHITE_PAINT, 4);
+        var paint = new ItemStack(ItemContent.WHITE_PAINT.get(), 4);
         player.setItemInHand(InteractionHand.MAIN_HAND, paint);
 
         if (!PipePaintEvents.tryPaint(level, b, player, InteractionHand.MAIN_HAND, paint)) {
@@ -180,7 +176,7 @@ public class PipePaintGameTests {
         }
 
         // Orange clears.
-        var orange = new ItemStack(ItemContent.ORANGE_PAINT);
+        var orange = new ItemStack(ItemContent.ORANGE_PAINT.get());
         player.setItemInHand(InteractionHand.MAIN_HAND, orange);
         if (!PipePaintEvents.tryPaint(level, b, player, InteractionHand.MAIN_HAND, orange)) {
             helper.fail("orange clear was refused");

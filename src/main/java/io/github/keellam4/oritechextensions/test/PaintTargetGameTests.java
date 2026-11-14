@@ -40,7 +40,7 @@ public class PaintTargetGameTests {
         var apart = helper.absolutePos(new BlockPos(3, 1, 2));
         for (var pos : new BlockPos[]{a, b, c, apart}) level.setBlockAndUpdate(pos, glass);
 
-        var player = playerWith(helper, ItemContent.SCULK_PAINT, 4);
+        var player = playerWith(helper, ItemContent.SCULK_PAINT.get(), 4);
         if (!paint(level, a, player)) {
             helper.fail("painting Industrial Glass was refused");
             return;
@@ -73,7 +73,7 @@ public class PaintTargetGameTests {
         level.setBlockAndUpdate(heatPipe, BlockContent.REACTOR_HEAT_PIPE.get().defaultBlockState());
         level.setBlockAndUpdate(glass, BlockContent.INDUSTRIAL_GLASS.get().defaultBlockState());
 
-        var player = playerWith(helper, ItemContent.WHITE_PAINT, 4);
+        var player = playerWith(helper, ItemContent.WHITE_PAINT.get(), 4);
         if (!paint(level, rod, player)) {
             helper.fail("painting a reactor rod was refused");
             return;
@@ -84,7 +84,7 @@ public class PaintTargetGameTests {
         if (PipePaintData.get(level).has(glass)) helper.fail("glass next to the reactor was painted with it");
 
         // Orange clears the whole reactor again.
-        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ItemContent.ORANGE_PAINT));
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ItemContent.ORANGE_PAINT.get()));
         if (!paint(level, wallA, player)) helper.fail("orange paint was refused");
         for (var pos : new BlockPos[]{wallA, wallB, controller, rod, heatPipe}) {
             if (PipePaintData.get(level).has(pos)) helper.fail("orange should clear the reactor block at " + pos);
@@ -105,7 +105,7 @@ public class PaintTargetGameTests {
         level.setBlockAndUpdate(motor, BlockContent.ACCELERATOR_MOTOR.get().defaultBlockState());
         level.setBlockAndUpdate(tooFar, BlockContent.ACCELERATOR_RING.get().defaultBlockState());
 
-        var player = playerWith(helper, ItemContent.NETHERITE_PAINT, 4);
+        var player = playerWith(helper, ItemContent.NETHERITE_PAINT.get(), 4);
         if (!paint(level, ring, player)) {
             helper.fail("painting an accelerator ring was refused");
             return;
@@ -152,7 +152,7 @@ public class PaintTargetGameTests {
         var extension = tip.above();
         level.setBlock(extension, extensionState, 3);
 
-        var player = playerWith(helper, ItemContent.WHITE_PAINT, 4);
+        var player = playerWith(helper, ItemContent.WHITE_PAINT.get(), 4);
         if (!paint(level, extension, player)) {
             helper.fail("painting the extension was refused");
             return;

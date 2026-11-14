@@ -28,11 +28,11 @@ public class GuideGameTests {
     @ModGameTest
     public static void guideRecipeAcceptsAnyNickelIngot(GameTestHelper helper) {
         var level = helper.getLevel();
-        var nickel = BuiltInRegistries.ITEM.getTag(NICKEL_INGOTS).orElse(null);
+        var nickel = BuiltInRegistries.ITEM.get(NICKEL_INGOTS).orElse(null);
         helper.assertTrue(nickel != null && nickel.size() > 0, "c:ingots/nickel is empty");
         for (var holder : nickel) {
             var input = CraftingInput.of(2, 1, List.of(new ItemStack(Items.BOOK), new ItemStack(holder.value())));
-            var match = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
+            var match = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
             helper.assertTrue(match.isPresent()
                             && match.get().value().assemble(input, level.registryAccess()).is(ModContent.GUIDE.get()),
                     "Book + " + BuiltInRegistries.ITEM.getKey(holder.value()) + " doesn't make the guide");
@@ -43,8 +43,8 @@ public class GuideGameTests {
     @ModGameTest
     public static void guideRecipe(GameTestHelper helper) {
         var level = helper.getLevel();
-        var input = CraftingInput.of(2, 1, List.of(new ItemStack(Items.BOOK), new ItemStack(ItemContent.NICKEL_INGOT)));
-        var match = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
+        var input = CraftingInput.of(2, 1, List.of(new ItemStack(Items.BOOK), new ItemStack(ItemContent.NICKEL_INGOT.get())));
+        var match = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
         helper.assertTrue(match.isPresent(), "No crafting recipe for book + nickel ingot");
         ItemStack result = match.get().value().assemble(input, level.registryAccess());
         helper.assertTrue(result.is(ModContent.GUIDE.get()), "Book + nickel ingot made " + result + ", expected the guide");
