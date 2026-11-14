@@ -20,6 +20,8 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.BlockContent;
 
+import rearth.oritech.block.blocks.decorative.HangarDoorBlock;
+
 import static rearth.oritech.block.blocks.decorative.HangarDoorBlock.OPENED;
 import static rearth.oritech.block.blocks.decorative.HangarDoorBlock.ROTATED;
 import static rearth.oritech.block.blocks.decorative.HangarDoorBlock.SURFACE;
@@ -103,6 +105,8 @@ public class HangarDoorExtensionGameTests {
                 assertAllOpen(helper, anchor, surface, extensions, false);
 
                 // Breaking Oritech's anchor must take every extension with it, dropping them as items.
+                // Oritech 2.0 only clears its helper blocks when a player breaks the door, so do what that path does.
+                HangarDoorBlock.removeHelpers(level, anchor, level.getBlockState(anchor));
                 level.destroyBlock(anchor, true);
 
                 helper.runAfterDelay(3, () -> {

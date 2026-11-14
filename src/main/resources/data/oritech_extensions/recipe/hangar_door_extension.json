@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "redstone",
   "ingredients": [
-    { "item": "oritech:hangar_door" }
+    "oritech:hangar_door"
   ],
   "result": {
     "id": "oritech_extensions:hangar_door_extension",
