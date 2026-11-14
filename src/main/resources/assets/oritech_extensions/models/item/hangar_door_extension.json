@@ -1,8 +1,8 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "door": "oritech:block/models/hangar_door",
-    "particle": "oritech:block/models/hangar_door"
+    "door": "oritech:models/hangar_door",
+    "particle": "oritech:models/hangar_door"
   },
   "elements": [
     {

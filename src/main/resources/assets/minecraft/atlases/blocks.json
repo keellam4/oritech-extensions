@@ -74,6 +74,10 @@
         "paint_redstone": "oritech_extensions:colormap/paint/structure_redstone",
         "paint_sculk": "oritech_extensions:colormap/paint/structure_sculk"
       }
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech:models/hangar_door"
     }
   ]
 }

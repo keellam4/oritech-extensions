@@ -62,8 +62,20 @@ public final class PaintClient {
         var minecraft = Minecraft.getInstance();
         // Loading is done once the resource-loading overlay is gone and a menu (title or first-launch screen) is open.
         if (minecraft.getOverlay() == null && minecraft.screen != null) {
+            checkItemModels(minecraft);
             OritechExtensions.LOGGER.info("[smoke test] Title screen reached ({}), quitting", minecraft.screen.getClass().getSimpleName());
             minecraft.stop();
+        }
+    }
+
+    /** Logs whether each of this mod's items has a client item model (items/<name>.json) instead of the missing-texture cube. */
+    private static void checkItemModels(Minecraft minecraft) {
+        var models = minecraft.getModelManager();
+        var missing = models.getItemModel(OritechExtensions.id("__no_such_item__"));
+        for (var id : BuiltInRegistries.ITEM.keySet()) {
+            if (!id.getNamespace().equals(OritechExtensions.MODID)) continue;
+            boolean found = models.getItemModel(id) != missing;
+            OritechExtensions.LOGGER.info("[smoke test] Item model {}: {}", id, found ? "present" : "MISSING");
         }
     }
 
@@ -81,6 +93,7 @@ public final class PaintClient {
         if (!event.getAtlas().location().equals(TextureAtlas.LOCATION_BLOCKS)) return;
         blockAtlas = event.getAtlas();
         for (var sample : new String[]{
+                "oritech:models/hangar_door", // hangar door extension item model + break particles (pulled into the block atlas)
                 "oritech:block/item_pipe_paint_white",
                 "oritech:block/transparent_item_pipe_paint_redstone",
                 "oritech:block/fluid_pipe_paint_sculk",
