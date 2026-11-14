@@ -3,6 +3,10 @@ name: Release
 # Publishes a version when you publish a GitHub Release:
 #   Releases → Draft a new release → choose a tag → type v<version> → "Create new tag on publish" → Publish.
 # The tag must match mod_version in gradle.properties, and CHANGELOG.md needs a "## [<version>]" section.
+# Create the release from the branch for that Minecraft version ("Target" in the release form):
+#   main  -> Minecraft 1.21.1, tag like v0.3.0
+#   26.1  -> Minecraft 26.1,   tag like v0.3.0+mc26.1 (the changelog section can be "## [0.3.0]" or "## [0.3.0+mc26.1]")
+# Minecraft version, Java version and listed dependencies come from that branch's gradle.properties / build.gradle.
 #
 # The workflow builds and tests the jar, attaches it to the GitHub release, fills in empty release notes
 # from CHANGELOG.md, and uploads it to Modrinth and CurseForge.
@@ -33,9 +37,12 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name }}
 
+      - name: Read the Java version from build.gradle
+        run: echo "JAVA=$(grep -oP 'JavaLanguageVersion.of\(\K[0-9]+' build.gradle)" >> "$GITHUB_ENV"
+
       - uses: actions/setup-java@v6
         with:
-          java-version: '21'
+          java-version: ${{ env.JAVA }}
           distribution: 'temurin'
 
       - uses: gradle/actions/setup-gradle@v6
@@ -44,13 +51,22 @@ jobs:
         run: |
           version=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
           type=$(grep '^release_type=' gradle.properties | cut -d= -f2)
+          minecraft=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)
+          game_versions=$(grep '^publish_game_versions=' gradle.properties | cut -d= -f2)
+          optional=$(grep '^publish_optional_dependencies=' gradle.properties | cut -d= -f2)
           if [ "${TAG#v}" != "$version" ]; then
             echo "::error::Release tag $TAG doesn't match mod_version=$version in gradle.properties. Merge the version bump first, or fix the tag."
             exit 1
           fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
           echo "RELEASE_TYPE=${type:-beta}" >> "$GITHUB_ENV"
-          echo "JAR=build/libs/oritech_extensions-neoforge-1.21.1-$version.jar" >> "$GITHUB_ENV"
+          echo "MINECRAFT=$minecraft" >> "$GITHUB_ENV"
+          echo "JAR=build/libs/oritech_extensions-neoforge-$minecraft-$version.jar" >> "$GITHUB_ENV"
+          {
+            echo "GAME_VERSIONS<<EOF"; echo "${game_versions:-$minecraft}" | tr ',' '\n' | sed 's/^ *//'; echo "EOF"
+            echo "DEPENDENCIES<<EOF"; echo "oritech(required)"; echo "geckolib(required)"
+            for dep in ${optional//,/ }; do echo "$dep(optional)"; done; echo "EOF"
+          } >> "$GITHUB_ENV"
 
       - name: Release notes from CHANGELOG.md
         run: |
@@ -58,7 +74,12 @@ jobs:
           import os, re
           version = os.environ["VERSION"]
           text = open("CHANGELOG.md", encoding="utf-8").read()
-          match = re.search(rf"^## \[{re.escape(version)}\][^\n]*\n(.*?)(?=^## |\Z)", text, re.S | re.M)
+          match = None
+          # "0.3.0+mc26.1" may use its own section or share the "0.3.0" one.
+          for candidate in dict.fromkeys([version, version.split("+")[0]]):
+              match = re.search(rf"^## \[{re.escape(candidate)}\][^\n]*\n(.*?)(?=^## |\Z)", text, re.S | re.M)
+              if match:
+                  break
           if not match:
               raise SystemExit(f"::error::CHANGELOG.md has no '## [{version}]' section. Rename [Unreleased] to [{version}] in the release PR.")
           open("release-notes.md", "w", encoding="utf-8").write(match.group(1).strip() + "\n")
@@ -88,19 +109,15 @@ jobs:
         with:
           modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          name: Oritech Extensions ${{ env.VERSION }}
+          name: Oritech Extensions ${{ env.VERSION }} (MC ${{ env.MINECRAFT }})
           version: ${{ env.VERSION }}
           version-type: ${{ env.RELEASE_TYPE }}
           changelog-file: release-notes.md
           files: ${{ env.JAR }}
           loaders: neoforge
-          game-versions: 1.21.1
-          java: 21
-          dependencies: |
-            oritech(required)
-            geckolib(required)
-            oritech-things(optional)
-            oracle-index(optional)
+          game-versions: ${{ env.GAME_VERSIONS }}
+          java: ${{ env.JAVA }}
+          dependencies: ${{ env.DEPENDENCIES }}
 
       - name: Publish to CurseForge
         if: vars.CURSEFORGE_PROJECT_ID != ''
@@ -108,25 +125,21 @@ jobs:
         with:
           curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          name: Oritech Extensions ${{ env.VERSION }}
+          name: Oritech Extensions ${{ env.VERSION }} (MC ${{ env.MINECRAFT }})
           version: ${{ env.VERSION }}
           version-type: ${{ env.RELEASE_TYPE }}
           changelog-file: release-notes.md
           files: ${{ env.JAR }}
           loaders: neoforge
-          game-versions: 1.21.1
-          java: 21
-          dependencies: |
-            oritech(required)
-            geckolib(required)
-            oritech-things(optional)
-            oracle-index(optional)
+          game-versions: ${{ env.GAME_VERSIONS }}
+          java: ${{ env.JAVA }}
+          dependencies: ${{ env.DEPENDENCIES }}
 
       - name: Summary
         if: always()
         run: |
           {
-            echo "### Oritech Extensions ${VERSION:-?}"
+            echo "### Oritech Extensions ${VERSION:-?} (Minecraft ${MINECRAFT:-?})"
             echo "- GitHub release: ${{ github.event.release.html_url }}"
             echo "- Modrinth: ${{ vars.MODRINTH_PROJECT_ID != '' && 'published' || 'skipped (MODRINTH_PROJECT_ID not set)' }}"
             echo "- CurseForge: ${{ vars.CURSEFORGE_PROJECT_ID != '' && 'published' || 'skipped (CURSEFORGE_PROJECT_ID not set)' }}"
