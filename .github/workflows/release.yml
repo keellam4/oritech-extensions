@@ -120,7 +120,8 @@ jobs:
           dependencies: ${{ env.DEPENDENCIES }}
 
       - name: Publish to CurseForge
-        if: vars.CURSEFORGE_PROJECT_ID != ''
+        # Still runs when the Modrinth upload failed, so one platform's problem doesn't block the other.
+        if: ${{ !cancelled() && vars.CURSEFORGE_PROJECT_ID != '' }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
