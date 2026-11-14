@@ -27,10 +27,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build
-        run: ./gradlew build --stacktrace
+        run: ./gradlew :neoforge:build --stacktrace
 
       - name: Game tests (real Oritech, headless server)
-        run: ./gradlew runGameTestServer --stacktrace
+        run: ./gradlew :neoforge:runGameTestServer --stacktrace
 
       - name: Client smoke test (headless, software OpenGL)
         run: |
@@ -39,7 +39,7 @@ jobs:
           athena=$(curl -sfG "https://api.modrinth.com/v2/project/athena-ctm/version" \
                      --data-urlencode 'loaders=["neoforge"]' --data-urlencode 'game_versions=["1.21.1"]' | jq -r '.[0].id')
           echo "Athena version id: $athena"
-          timeout 600 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClientSmokeTest -Pathena_version_id="$athena" --stacktrace || echo "client exited with $?"
+          timeout 600 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew :neoforge:runClientSmokeTest -Pathena_version_id="$athena" --stacktrace || echo "client exited with $?"
           log=run/logs/latest.log
           if grep -q "Missing or unsupported mandatory dependencies" "$log"; then grep -A5 "Missing or unsupported" "$log"; echo "::error::mod loading failed"; exit 1; fi
           grep -E "\[paint\]|\[smoke test\]|Unable to find texture|Failed to load|paletted" "$log" | tee smoke-summary.txt || true
@@ -52,4 +52,44 @@ jobs:
         with:
           name: oritech-extensions-jar
           path: neoforge/build/libs/*.jar
+          if-no-files-found: error
+
+  fabric:
+    name: fabric
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v6
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build
+        run: ./gradlew :fabric:build --stacktrace
+
+      - name: Game tests (real Oritech, headless server)
+        run: ./gradlew :fabric:runGameTestServer --stacktrace
+
+      - name: Client smoke test (headless, software OpenGL)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb libgl1-mesa-dri mesa-utils > /dev/null
+          export LIBGL_ALWAYS_SOFTWARE=1
+          timeout 600 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew :fabric:runClientSmokeTest --stacktrace || echo "client exited with $?"
+          log=run-fabric/logs/latest.log
+          if grep -qE "Incompatible mods found|Mod resolution failed" "$log"; then grep -A15 -E "Incompatible mods found|Mod resolution failed" "$log"; echo "::error::mod loading failed"; exit 1; fi
+          grep -E "\[paint\]|\[smoke test\]|Unable to find texture|Failed to load|paletted" "$log" | tee smoke-summary.txt || true
+          grep -q "\[smoke test\] Title screen reached" "$log" || { echo "::error::client did not reach the title screen"; tail -150 "$log"; exit 1; }
+          grep -qE "Made [1-9][0-9]* addon block models and [1-9][0-9]* pipe block models paintable" "$log" || { echo "::error::addon/pipe models were not wrapped"; exit 1; }
+          if grep -q "Painted texture .*: MISSING" "$log"; then echo "::error::painted textures missing from the block atlas"; exit 1; fi
+
+      - name: Upload mod jar
+        uses: actions/upload-artifact@v7
+        with:
+          name: oritech-extensions-fabric-jar
+          path: fabric/build/libs/*.jar
           if-no-files-found: error

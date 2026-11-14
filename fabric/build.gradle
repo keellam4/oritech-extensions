@@ -1,0 +1,116 @@
+plugins {
+    id 'fabric-loom' version '1.13-SNAPSHOT'
+}
+
+version = fabric_mod_version
+group = mod_group_id
+
+base {
+    archivesName = "${mod_id}-fabric-${minecraft_version}"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+// Shared code and assets live in ../common and are compiled into this jar, the same way the NeoForge jar does it.
+sourceSets.main.java.srcDir rootProject.file('common/src/main/java')
+sourceSets.main.resources.srcDir rootProject.file('common/src/main/resources')
+
+repositories {
+    mavenCentral()
+    exclusiveContent {
+        forRepository { maven { url = 'https://maven.parchmentmc.org' } }
+        filter { includeGroup 'org.parchmentmc.data' }
+    }
+    exclusiveContent {
+        forRepository { maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' } }
+        filter { includeGroup 'software.bernie.geckolib' }
+    }
+    exclusiveContent {
+        forRepository { maven { url = 'https://api.modrinth.com/maven' } }
+        filter { includeGroup 'maven.modrinth' }
+    }
+    exclusiveContent {
+        forRepository { maven { url = 'https://modmaven.dev' } }
+        filter { includeGroup 'teamreborn' }
+    }
+}
+
+loom {
+    runs {
+        configureEach {
+            runDir = '../run-fabric'
+            ideConfigGenerated = false
+        }
+        // Starts the real client headless, loads all textures/models, logs paint checks, quits at the title screen.
+        clientSmokeTest {
+            client()
+            property 'oritech_extensions.smokeTest', 'true'
+        }
+        // Runs every Fabric game test in this mod against the real Oritech, then exits (non-zero on failure).
+        gameTestServer {
+            server()
+            property 'fabric-api.gametest'
+            property 'fabric-api.gametest.report-file', "${rootProject.projectDir}/run-fabric/gametest-report.xml"
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${parchment_minecraft_version}:${parchment_mappings_version}@zip")
+    }
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+
+    // Compile against Oritech and the libraries its public classes reference. Players install these themselves.
+    modCompileOnly "maven.modrinth:oritech:${oritech_fabric_version_id}"
+    modCompileOnly "software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}"
+    modCompileOnly "maven.modrinth:architectury-api:${architectury_fabric_version_id}"
+    modCompileOnly "maven.modrinth:forge-config-api-port:${forge_config_api_port_fabric_version_id}"
+
+    // Present when running the game from this project (smoke test, game tests), not shipped.
+    modLocalRuntime "maven.modrinth:oritech:${oritech_fabric_version_id}"
+    modLocalRuntime "software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}"
+    modLocalRuntime "maven.modrinth:architectury-api:${architectury_fabric_version_id}"
+    modLocalRuntime "maven.modrinth:forge-config-api-port:${forge_config_api_port_fabric_version_id}"
+    modLocalRuntime "maven.modrinth:athena-ctm:${athena_fabric_version_id}"
+    // Oritech ships Team Reborn Energy inside its jar, but dev runs don't load jars nested in dependencies.
+    modLocalRuntime("teamreborn:energy:4.1.0") { transitive = false }
+    // Same for the config library inside Forge Config API Port's jar.
+    localRuntime "com.electronwill.night-config:core:3.8.3"
+    localRuntime "com.electronwill.night-config:toml:3.8.3"
+}
+
+// Wiki pages under wiki/ ship as Oracle Index books, the same as in the NeoForge jar.
+def oracleWikiOut = layout.buildDirectory.dir('generated/oracleWiki')
+tasks.register('syncOracleWiki', Copy) {
+    from(rootProject.file('wiki')) {
+        into 'assets/oracle_index/books/oritech_extensions'
+        exclude 'README.md'
+        exclude 'developers/**'
+    }
+    into oracleWikiOut
+}
+sourceSets.main.resources.srcDir oracleWikiOut
+
+tasks.named('processResources', ProcessResources).configure {
+    dependsOn('syncOracleWiki')
+    var replaceProperties = [
+            version          : project.version,
+            mod_id           : mod_id,
+            mod_name         : mod_name,
+            mod_license      : mod_license,
+            mod_authors      : mod_authors,
+            minecraft_version: minecraft_version,
+    ]
+    inputs.properties replaceProperties
+    filesMatching('fabric.mod.json') {
+        expand replaceProperties
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

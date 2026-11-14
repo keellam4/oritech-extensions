@@ -65,7 +65,7 @@ jobs:
           export LIBGL_ALWAYS_SOFTWARE=1
           athena=$(curl -sfG "https://api.modrinth.com/v2/project/athena-ctm/version" \
                      --data-urlencode 'loaders=["neoforge"]' --data-urlencode 'game_versions=["1.21.1"]' | jq -r '.[0].id')
-          timeout 600 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClientIconExport -Pathena_version_id="$athena" || true
+          timeout 600 xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew :neoforge:runClientIconExport -Pathena_version_id="$athena" || true
           grep "\[icons\]" run/logs/latest.log || { echo "::warning::item icons were not rendered"; tail -60 run/logs/latest.log; }
 
       - name: Check wiki/ and generate the site source

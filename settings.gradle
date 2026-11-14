@@ -1,6 +1,7 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        maven { url = 'https://maven.fabricmc.net/' } // Fabric Loom
     }
 }
 
@@ -10,3 +11,4 @@ plugins {
 
 rootProject.name = 'oritech-extensions'
 include 'neoforge'
+include 'fabric'

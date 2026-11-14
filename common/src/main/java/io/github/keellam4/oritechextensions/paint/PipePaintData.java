@@ -37,7 +37,7 @@ public final class PipePaintData extends SavedData {
 
     public static PipePaintData get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(
-                new SavedData.Factory<>(PipePaintData::new, PipePaintData::load),
+                new SavedData.Factory<>(PipePaintData::new, PipePaintData::load, null), // no data fixer (vanilla constructor; NeoForge also has a 2-arg one)
                 DATA_NAME);
     }
 

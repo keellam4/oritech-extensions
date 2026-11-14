@@ -87,10 +87,10 @@ jobs:
           cat release-notes.md
 
       - name: Build
-        run: ./gradlew build --stacktrace
+        run: ./gradlew :neoforge:build --stacktrace
 
       - name: Game tests
-        run: ./gradlew runGameTestServer --stacktrace
+        run: ./gradlew :neoforge:runGameTestServer --stacktrace
 
       - name: Attach the jar to the GitHub release
         run: |
