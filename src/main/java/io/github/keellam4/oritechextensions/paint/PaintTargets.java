@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.level.ChunkWatchEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
@@ -100,7 +101,7 @@ public final class PaintTargets {
         }
 
         event.setCanceled(true);
-        event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide()));
+        event.setCancellationResult(InteractionResult.SUCCESS);
     }
 
     /**
@@ -134,7 +135,7 @@ public final class PaintTargets {
         level.playSound(null, pos, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 1f, 0.6f);
         var at = pos.getCenter();
         level.sendParticles(ParticleTypes.GUST, at.x, at.y, at.z, 1,
-                level.random.nextFloat(), level.random.nextFloat(), level.random.nextFloat(), 0.15f);
+                level.getRandom().nextFloat(), level.getRandom().nextFloat(), level.getRandom().nextFloat(), 0.15f);
         return true;
     }
 
@@ -168,7 +169,7 @@ public final class PaintTargets {
         }
     }
 
-    private static void onBlockBreak(BlockEvent.BreakEvent event) {
+    private static void onBlockBreak(BreakBlockEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         var pos = event.getPos();
         var data = PipePaintData.get(level);
@@ -202,8 +203,8 @@ public final class PaintTargets {
         // Once per affected chunk; a player tracking several of them gets the list more than once, which is harmless.
         var sent = new HashSet<Long>();
         for (var pos : positions) {
-            if (sent.add(ChunkPos.asLong(pos))) {
-                PacketDistributor.sendToPlayersTrackingChunk(level, new ChunkPos(pos), payload);
+            if (sent.add(ChunkPos.containing(pos).pack())) {
+                PacketDistributor.sendToPlayersTrackingChunk(level, ChunkPos.containing(pos), payload);
             }
         }
     }

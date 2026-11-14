@@ -44,19 +44,19 @@ public class ModContent {
 
     /** Opens this mod's wiki in Oracle Index (or posts a link to the website). Crafted from a book + nickel ingot. */
     public static final DeferredItem<GuideBookItem> GUIDE = ITEMS.registerItem(
-            "guide", GuideBookItem::new, new Item.Properties().stacksTo(1));
+            "guide", GuideBookItem::new, props -> props.stacksTo(1));
 
     @SuppressWarnings("DataFlowIssue")
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HangarDoorExtensionBlockEntity>> HANGAR_DOOR_EXTENSION_ENTITY =
             BLOCK_ENTITY_TYPES.register("hangar_door_extension",
-                    () -> BlockEntityType.Builder.of(HangarDoorExtensionBlockEntity::new, HANGAR_DOOR_EXTENSION.get()).build(null));
+                    () -> new BlockEntityType<>(HangarDoorExtensionBlockEntity::new, HANGAR_DOOR_EXTENSION.get()));
 
     /**
      * Paint colour stored on a block entity that Oritech itself can't paint (e.g. machine addons).
      * Saved with the block; absent means unpainted (Oritech's default orange).
      */
     public static final Supplier<AttachmentType<ColorableMachine.ColorVariant>> PAINT = ATTACHMENT_TYPES.register(
-            "paint", () -> AttachmentType.builder(() -> ColorableMachine.ColorVariant.ORANGE).serialize(PaintColors.CODEC).build());
+            "paint", () -> AttachmentType.builder(() -> ColorableMachine.ColorVariant.ORANGE).serialize(PaintColors.CODEC.fieldOf("paint")).build());
 
     /** Paint colour carried by a dropped block item, so a painted addon keeps its colour when moved. */
     public static final Supplier<DataComponentType<ColorableMachine.ColorVariant>> PAINT_COMPONENT = DATA_COMPONENTS.register(

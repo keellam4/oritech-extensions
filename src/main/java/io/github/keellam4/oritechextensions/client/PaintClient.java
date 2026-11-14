@@ -16,7 +16,7 @@ import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.minecraft.core.BlockPos;
@@ -90,7 +90,7 @@ public final class PaintClient {
                 "oritech:block/reactor_rod_paint_netherite",
                 "oritech:block/reactor_heat_pipe_paint_camo",
                 "oritech:block/accelerator_ring_paint_diamond"}) {
-            var sprite = event.getAtlas().getSprite(ResourceLocation.parse(sample));
+            var sprite = event.getAtlas().getSprite(Identifier.parse(sample));
             boolean found = !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation());
             OritechExtensions.LOGGER.info("[paint] Painted texture {}: {}", sample, found ? "present" : "MISSING");
         }

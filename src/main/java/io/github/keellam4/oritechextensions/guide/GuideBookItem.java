@@ -3,7 +3,8 @@ package io.github.keellam4.oritechextensions.guide;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -12,7 +13,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The Oritech Extensions guide. Right-click opens this mod's wiki in Oracle Index (the in-game wiki viewer
@@ -26,17 +27,16 @@ public class GuideBookItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         // Only the client has a screen to open. GuideBookClient is never loaded on a dedicated server.
-        if (level.isClientSide && FMLEnvironment.dist == Dist.CLIENT) {
+        if (level.isClientSide() && FMLEnvironment.getDist() == Dist.CLIENT) {
             GuideBookClient.open(player);
         }
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("tooltip.oritech_extensions.guide").withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+        tooltip.accept(Component.translatable("tooltip.oritech_extensions.guide").withStyle(ChatFormatting.GRAY));
     }
 }

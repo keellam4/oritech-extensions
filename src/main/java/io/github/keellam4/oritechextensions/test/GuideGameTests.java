@@ -5,7 +5,7 @@ import io.github.keellam4.oritechextensions.OritechExtensions;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
@@ -28,7 +28,7 @@ import java.util.List;
 public class GuideGameTests {
 
     private static final TagKey<Item> NICKEL_INGOTS =
-            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ingots/nickel"));
+            TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/nickel"));
 
     @GameTest(template = "empty_tall")
     public static void guideRecipeAcceptsAnyNickelIngot(GameTestHelper helper) {

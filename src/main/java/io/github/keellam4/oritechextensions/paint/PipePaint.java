@@ -32,11 +32,11 @@ public final class PipePaint {
 
     @Nullable
     public static Family familyOf(Block block) {
-        if (block == BlockContent.ITEM_PIPE || block == BlockContent.ITEM_PIPE_CONNECTION
-                || block == BlockContent.TRANSPARENT_ITEM_PIPE || block == BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION) {
+        if (block == BlockContent.ITEM_PIPE.get() || block == BlockContent.ITEM_PIPE_CONNECTION.get()
+                || block == BlockContent.TRANSPARENT_ITEM_PIPE.get() || block == BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION.get()) {
             return Family.ITEM;
         }
-        if (block == BlockContent.FLUID_PIPE || block == BlockContent.FLUID_PIPE_CONNECTION) {
+        if (block == BlockContent.FLUID_PIPE.get() || block == BlockContent.FLUID_PIPE_CONNECTION.get()) {
             return Family.FLUID;
         }
         return null;

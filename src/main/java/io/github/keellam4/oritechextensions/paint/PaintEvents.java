@@ -67,7 +67,7 @@ public final class PaintEvents {
         blockEntity.setChanged();
 
         var pos = blockEntity.getBlockPos();
-        PacketDistributor.sendToPlayersTrackingChunk(level, new ChunkPos(pos),
+        PacketDistributor.sendToPlayersTrackingChunk(level, ChunkPos.containing(pos),
                 new PaintSyncPayload(List.of(PaintSyncPayload.Entry.onBlockEntity(pos, variant))));
     }
 

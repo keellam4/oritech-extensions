@@ -7,7 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +42,7 @@ public class PaintGameTests {
             helper.succeed(); // only meaningful when Oritech Things is present (it is in CI)
             return;
         }
-        var id = ResourceLocation.fromNamespaceAndPath("oritechthings", "addon_block_speed_tier_5");
+        var id = Identifier.fromNamespaceAndPath("oritechthings", "addon_block_speed_tier_5");
         if (!BuiltInRegistries.BLOCK.containsKey(id)) {
             helper.fail("Oritech Things is loaded but " + id + " doesn't exist");
             return;

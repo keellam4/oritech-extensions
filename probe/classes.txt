@@ -4,32 +4,23 @@
 #   src:<dotted.Class>   print one class by full name (decompiled)
 #   grep:<regex>         grep the NeoForge sources
 #   javap:<class>        public + protected signatures of a class
-ls:net/minecraft/client/renderer/block/dispatch/
-ls:net/minecraft/gametest/framework/
 src:net.minecraft.client.renderer.block.dispatch.BlockStateModel
 src:net.minecraft.client.renderer.block.dispatch.BlockStateModelPart
-find:BakedQuad
-find:SimpleModelWrapper
+src:net.minecraft.client.resources.model.geometry.BakedQuad
+src:net.minecraft.client.resources.model.SimpleModelWrapper
 src:net.minecraft.client.resources.model.sprite.Material
-find:SavedDataType
-src:net.minecraft.world.level.saveddata.SavedData
-javap:net.minecraft.world.level.storage.DimensionDataStorage
+src:net.minecraft.client.resources.model.sprite.Material$Baked
 src:net.minecraft.gametest.framework.FunctionGameTestInstance
 src:net.minecraft.gametest.framework.TestData
-javap:net.minecraft.gametest.framework.GameTestHelper
-javap:net.minecraft.world.level.ChunkPos
-javap:net.minecraft.world.InteractionResult
-javap:net.minecraft.world.level.block.state.BlockBehaviour
-javap:net.minecraft.world.level.block.Block
-javap:net.minecraft.world.level.block.entity.BlockEntity
-javap:net.minecraft.world.item.Item$TooltipContext
-javap:net.minecraft.core.registries.Registries
-grep:BreakEvent|BreakBlockEvent|class .*Break.*Event
-grep:class (TestEnvironment|GameTest)[A-Za-z]* 
-grep:TEST_FUNCTION|TEST_INSTANCE
-grep:Identifier\.fromNamespaceAndPath\(
-grep:public static .* (defineEnum|defineInRange)\(
-grep:class ConfigurationScreen|IConfigScreenFactory
-javap:net.minecraft.world.level.saveddata.SavedDataType
-javap:net.minecraft.client.renderer.texture.TextureAtlas
-javap:net.minecraft.client.Minecraft
+src:net.minecraft.gametest.framework.GameTestInstance
+src:net.minecraft.gametest.framework.BuiltinTestFunctions
+find:GameTestHelperExtension
+find:BlockStateModelHooks
+javap:net.minecraft.client.resources.model.ModelManager
+javap:net.minecraft.client.resources.model.ModelBakery$BakingResult
+javap:net.minecraft.world.level.saveddata.SavedData
+javap:net.minecraft.server.level.ServerLevel
+javap:net.minecraft.world.entity.player.Player
+grep:class ClientChunkEvent|class .*LoggingOut|class LevelEvent
+grep:public static .* sendToPlayersTrackingChunk
+grep:register.*GameTest|enabledGameTestNamespaces|gametest

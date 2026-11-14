@@ -12,7 +12,13 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.world.item.component.TooltipProvider;
+import java.util.function.Consumer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
@@ -46,7 +52,7 @@ import static rearth.oritech.block.blocks.decorative.HangarDoorBlock.SURFACE;
  * updates its helpers with regular block updates, every state change ripples down the chain without
  * any changes to Oritech itself.
  */
-public class HangarDoorExtensionBlock extends Block implements EntityBlock {
+public class HangarDoorExtensionBlock extends Block implements EntityBlock, TooltipProvider {
 
     public static final MapCodec<HangarDoorExtensionBlock> CODEC = simpleCodec(HangarDoorExtensionBlock::new);
 
@@ -154,7 +160,7 @@ public class HangarDoorExtensionBlock extends Block implements EntityBlock {
 
         var player = ctx.getPlayer();
         if (player != null && level.isClientSide()) {
-            player.displayClientMessage(hitLengthLimit
+            player.sendSystemMessage(hitLengthLimit
                     ? Component.translatable("message.oritech_extensions.hangar_door_extension.too_long", Config.maxTotalLength())
                     : Component.translatable("message.oritech_extensions.hangar_door_extension.no_door"), true);
         }
@@ -168,7 +174,7 @@ public class HangarDoorExtensionBlock extends Block implements EntityBlock {
      * which cascades down the rest of the chain. When the parent opens or closes we copy its state.
      */
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         if (direction == segmentDirection(state).getOpposite()) {
             if (!isValidParent(state, neighborState)) return Blocks.AIR.defaultBlockState();
 
@@ -180,8 +186,8 @@ public class HangarDoorExtensionBlock extends Block implements EntityBlock {
 
     /** Safety net in case a state change arrives as a plain neighbour update instead of a shape update. */
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
-        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
         if (level.isClientSide()) return;
 
         var parentState = level.getBlockState(parentPos(pos, state));
@@ -226,8 +232,8 @@ public class HangarDoorExtensionBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("tooltip.oritech_extensions.hangar_door_extension.1").withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("tooltip.oritech_extensions.hangar_door_extension.2", Config.maxTotalLength()).withStyle(ChatFormatting.GRAY));
+    public void addToTooltip(Item.TooltipContext context, Consumer<Component> tooltip, TooltipFlag flag, DataComponentGetter components) {
+        tooltip.accept(Component.translatable("tooltip.oritech_extensions.hangar_door_extension.1").withStyle(ChatFormatting.GRAY));
+        tooltip.accept(Component.translatable("tooltip.oritech_extensions.hangar_door_extension.2", Config.maxTotalLength()).withStyle(ChatFormatting.GRAY));
     }
 }

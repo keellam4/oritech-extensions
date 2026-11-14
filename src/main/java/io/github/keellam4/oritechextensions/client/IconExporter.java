@@ -9,7 +9,7 @@ import io.github.keellam4.oritechextensions.OritechExtensions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
 
@@ -68,7 +68,7 @@ final class IconExporter {
         var graphics = new GuiGraphics(mc, mc.renderBuffers().bufferSource());
         try {
             for (String id : ids) {
-                var key = ResourceLocation.tryParse(id);
+                var key = Identifier.tryParse(id);
                 var item = key == null ? null : BuiltInRegistries.ITEM.getOptional(key).orElse(null);
                 if (item == null) {
                     missing.add(id);

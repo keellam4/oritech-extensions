@@ -33,14 +33,14 @@ public final class WorldPaintTarget implements PaintTarget {
 
     /** Industrial Glass: touching glass blocks are a group. */
     public static final WorldPaintTarget GLASS = new WorldPaintTarget(
-            block -> block == BlockContent.INDUSTRIAL_GLASS_BLOCK ? "glass" : null, Config::maxPaintGroupSize, 1);
+            block -> block == BlockContent.INDUSTRIAL_GLASS.get() ? "glass" : null, Config::maxPaintGroupSize, 1);
 
     /** Reactor walls and everything built into a reactor (controller, rods, vents, ports, ...): one reactor is a group. */
     public static final WorldPaintTarget REACTOR = new WorldPaintTarget(
             block -> block instanceof BaseReactorBlock ? "reactor" : null, Config::maxPaintGroupSize, 1);
 
     /**
-     * Particle accelerator: controller, guide rings, motors, sensors and particle collectors. Rings are built
+     * Particle accelerator: the accelerator block, guide rings, motors and sensors. Rings are built
      * with gaps between them, so parts up to {@link #ACCELERATOR_REACH} blocks apart in a straight line still
      * count as one accelerator.
      */
@@ -58,9 +58,8 @@ public final class WorldPaintTarget implements PaintTarget {
     }
 
     private static boolean isAcceleratorPart(Block block) {
-        return block == BlockContent.ACCELERATOR_CONTROLLER || block == BlockContent.ACCELERATOR_RING
-                || block == BlockContent.ACCELERATOR_MOTOR || block == BlockContent.ACCELERATOR_SENSOR
-                || block == BlockContent.PARTICLE_COLLECTOR_BLOCK;
+        return block == BlockContent.PARTICLE_ACCELERATOR.get() || block == BlockContent.ACCELERATOR_RING.get()
+                || block == BlockContent.ACCELERATOR_MOTOR.get() || block == BlockContent.ACCELERATOR_SENSOR.get();
     }
 
     @Override

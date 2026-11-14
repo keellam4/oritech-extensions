@@ -6,18 +6,16 @@ bin=$(find build/moddev -name 'minecraft-patched-*.jar' 2>/dev/null | head -1)
 echo "sources: $src"; echo "binary: $bin"
 mkdir -p /tmp/src
 [ -n "$src" ] && (cd /tmp/src && unzip -qo "$src")
-curl -sSL -o /tmp/vf.jar https://repo.maven.apache.org/maven2/org/vineflower/vineflower/1.11.1/vineflower-1.11.1.jar
+curl -sSL -o /tmp/cfr.jar https://repo.maven.apache.org/maven2/org/benf/cfr/0.152/cfr-0.152.jar
 cp="$bin:$(grep '^CP ' gradle-out.txt | cut -c4- | paste -sd: -)"
 jars=$(echo "$cp" | tr ':' ' ')
 
 decompile() { # $1 = class file path inside a jar, e.g. net/minecraft/Foo.class
   for jar in $jars; do
     if unzip -l "$jar" "$1" >/dev/null 2>&1; then
-      rm -rf /tmp/one /tmp/oneout; mkdir -p /tmp/one /tmp/oneout
-      base=${1%.class}
-      (cd /tmp/one && unzip -qo "$jar" "$base.class" "$base\$*.class" 2>/dev/null)
-      java -jar /tmp/vf.jar -din=0 -rsy=1 -log=ERROR /tmp/one /tmp/oneout >/dev/null 2>&1
-      find /tmp/oneout -name "$(basename "$base").java" -exec cat {} \;
+      rm -rf /tmp/one; mkdir -p /tmp/one
+      (cd /tmp/one && unzip -qo "$jar" "$1")
+      java -jar /tmp/cfr.jar --extraclasspath "$cp" --comments false --silent true "/tmp/one/$1" 2>&1
       return
     fi
   done
