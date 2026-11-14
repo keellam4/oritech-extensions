@@ -1,13 +1,13 @@
 # One request per line. Results are printed in the "API probe" workflow log.
-#   ls:<path prefix>     list source files under a package path (Minecraft + NeoForge sources)
-#   find:<ClassName>     print every source file named <ClassName>.java
-#   grep:<regex>         grep all Minecraft + NeoForge sources (first 60 matches)
-#   javap:<class>        public signatures of a class from a dependency jar (Oritech, GeckoLib)
+#   ls:<path prefix>     list classes under a package path
+#   find:<ClassName>     print every class with that simple name (decompiled when no sources jar exists)
+#   src:<dotted.Class>   print one class by full name
+#   grep:<regex>         grep all Minecraft + NeoForge sources (only when a sources jar exists)
+#   javap:<class>        public signatures of a class
 ls:net/minecraft/client/renderer/block/
 ls:net/neoforged/neoforge/client/model/
 ls:net/minecraft/gametest/framework/
 ls:net/neoforged/neoforge/gametest/
-ls:net/minecraft/client/renderer/blockentity/
 find:BlockStateModel
 find:BlockModelPart
 find:BlockStateModelPart
@@ -16,21 +16,22 @@ find:DelegateBlockStateModel
 find:IBlockStateModelExtension
 find:ModelEvent
 find:TextureAtlasStitchedEvent
-find:SimpleModelWrapper
-find:GameTestHolder
-find:RegisterGameTestsEvent
 find:GameTestHelper
 find:SavedDataType
 find:SavedData
-find:Item
 find:ItemTooltipEvent
 find:PlayerInteractEvent
 find:BlockDropsEvent
+find:BlockEvent
 find:ChunkWatchEvent
 find:ClientPlayerNetworkEvent
-find:ConfigurationScreen
-grep:public .* (saveAdditional|loadAdditional)\(
-grep:paletted_permutations|PalettedPermutations
-javap:software.bernie.geckolib.renderer.GeoBlockRenderer
-javap:software.bernie.geckolib.model.DefaultedBlockGeoModel
-javap:software.bernie.geckolib.renderer.base.GeoRenderState
+find:InteractionResult
+find:GameTestInstance
+find:FunctionGameTestInstance
+find:RegisterGameTestsEvent
+javap:net.minecraft.world.item.Item
+javap:net.minecraft.world.level.block.Block
+javap:net.minecraft.world.level.block.state.BlockBehaviour
+javap:net.minecraft.world.level.block.entity.BlockEntity
+javap:net.minecraft.client.renderer.texture.TextureAtlasSprite
+javap:net.minecraft.client.renderer.block.BlockModelShaper

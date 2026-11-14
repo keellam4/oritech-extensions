@@ -1,16 +1,24 @@
 package io.github.keellam4.oritechextensions.client;
 
+import com.geckolib.constant.dataticket.DataTicket;
+import com.geckolib.renderer.GeoBlockRenderer;
+import com.geckolib.renderer.base.GeoRenderState;
+import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import io.github.keellam4.oritechextensions.hangar.HangarDoorExtensionBlock;
 import io.github.keellam4.oritechextensions.hangar.HangarDoorExtensionBlockEntity;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.decorative.HangarDoorBlock;
-import software.bernie.geckolib.renderer.GeoBlockRenderer;
+import rearth.oritech.util.AnimatedBlockRotation;
+import rearth.oritech.util.ColorableMachine;
 
 /**
  * Draws one extension segment in the coordinate frame of the door's anchor block, so it lines up exactly
@@ -19,10 +27,13 @@ import software.bernie.geckolib.renderer.GeoBlockRenderer;
  * <p>
  * Opening/closing is animated in code rather than with a GeckoLib animation file, because the travel
  * distance depends on how far the segment is from the door. Timings and easings are copied from Oritech's
- * hangar_door.animation.json ("top" bone) so the extensions move together with the original door:
- * when opening, every segment slides back into the door housing; when closing, they slide back out.
+ * hangar_door.animation.json ("top" bone) so the extensions move together with the original door.
+ * <p>
+ * GeckoLib 5 renders from a snapshot ("render state"): everything the drawing needs is worked out in
+ * {@link #addRenderData} and read back from the snapshot when drawing.
  */
-public class HangarDoorExtensionRenderer extends GeoBlockRenderer<HangarDoorExtensionBlockEntity> {
+public class HangarDoorExtensionRenderer<R extends BlockEntityRenderState & GeoRenderState>
+        extends GeoBlockRenderer<HangarDoorExtensionBlockEntity, R> {
 
     // Oritech "retract": top bone moves over 0 -> 1.6667s, easeInOutSine
     private static final double OPEN_DURATION = 1.6667;
@@ -33,75 +44,64 @@ public class HangarDoorExtensionRenderer extends GeoBlockRenderer<HangarDoorExte
     private static final float ORITECH_DOOR_HEIGHT_PX = 48f;
     private static final float SEGMENT_PX = 16f;
 
-    private float currentPartialTick;
+    static final DataTicket<ColorableMachine.ColorVariant> DOOR_COLOR = DataTicket.create("oritech_extensions_door_color", ColorableMachine.ColorVariant.class);
+    private static final DataTicket<BlockPos> ANCHOR_OFFSET = DataTicket.create("oritech_extensions_anchor_offset", BlockPos.class);
+    private static final DataTicket<Direction> SURFACE = DataTicket.create("oritech_extensions_surface", Direction.class);
+    private static final DataTicket<Boolean> ROTATED = DataTicket.create("oritech_extensions_rotated", Boolean.class);
+    private static final DataTicket<Float> OFFSET_PX = DataTicket.create("oritech_extensions_offset_px", Float.class);
+    private static final DataTicket<Boolean> HIDDEN = DataTicket.create("oritech_extensions_hidden", Boolean.class);
 
     public HangarDoorExtensionRenderer(BlockEntityRendererProvider.Context context) {
-        super(new HangarDoorExtensionModel());
+        super(context, new HangarDoorExtensionModel());
     }
 
     @Override
-    public void render(HangarDoorExtensionBlockEntity extension, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        if (extension.getLevel() == null) return;
+    public void addRenderData(HangarDoorExtensionBlockEntity extension, @Nullable Void relatedObject, R renderState, float partialTick) {
+        super.addRenderData(extension, relatedObject, renderState, partialTick);
+        var level = extension.getLevel();
+        if (level == null) return;
 
-        currentPartialTick = partialTick;
-        updateAnimationClock(extension, partialTick);
-
-        // Once fully retracted the segment is tucked inside the door housing; skip drawing it.
-        if (extension.clientLastOpened && secondsSinceChange(extension, partialTick) >= OPEN_DURATION) return;
-
-        super.render(extension, partialTick, poseStack, bufferSource, packedLight, packedOverlay);
-    }
-
-    @Override
-    protected void rotateBlock(Direction facing, PoseStack poseStack) {
-        var extension = this.animatable;
         var state = extension.getBlockState();
         var pos = extension.getBlockPos();
         var anchor = HangarDoorExtensionBlock.anchorPos(pos, state);
 
-        // Move into the anchor block's frame (GeoBlockRenderer has already centred us on X/Z).
-        poseStack.translate(anchor.getX() - pos.getX(), anchor.getY() - pos.getY(), anchor.getZ() - pos.getZ());
-
-        applyOritechHangarDoorRotation(state.getValue(HangarDoorBlock.SURFACE), state.getValue(HangarDoorBlock.ROTATED), poseStack);
+        updateAnimationClock(extension, partialTick);
+        float retracted = retractedFraction(extension, partialTick);
 
         int index = state.getValue(HangarDoorExtensionBlock.INDEX);
         float restY = ORITECH_DOOR_HEIGHT_PX + SEGMENT_PX * (index - 1);
         float travel = SEGMENT_PX * index + 32f; // ends inside the housing, where Oritech's top segment ends up
-        float offset = -travel * retractedFraction(extension, currentPartialTick);
 
-        poseStack.translate(0, (restY + offset) / 16f, 0);
+        renderState.addGeckolibData(ANCHOR_OFFSET, anchor.subtract(pos));
+        renderState.addGeckolibData(SURFACE, state.getValue(HangarDoorBlock.SURFACE));
+        renderState.addGeckolibData(ROTATED, state.getValue(HangarDoorBlock.ROTATED));
+        renderState.addGeckolibData(OFFSET_PX, restY - travel * retracted);
+        // Once fully retracted the segment is tucked inside the door housing; skip drawing it.
+        renderState.addGeckolibData(HIDDEN, extension.clientLastOpened && secondsSinceChange(extension, partialTick) >= OPEN_DURATION);
+
+        if (level.getBlockEntity(anchor) instanceof ColorableMachine door && door.supportRecoloring()) {
+            renderState.addGeckolibData(DOOR_COLOR, door.getCurrentColor());
+        }
     }
 
-    /** Exact copy of rearth.oritech.client.renderers.HangarDoorRenderer#rotateBlock (Oritech 1.2.x). */
-    private static void applyOritechHangarDoorRotation(Direction surface, boolean rotated, PoseStack poseStack) {
-        if (rotated && surface.getAxis().isVertical()) {
-            poseStack.translate(0, 0, -1);
-            poseStack.translate(0.5, 0, 0.5);
-            poseStack.mulPose(Axis.YP.rotationDegrees(90));
-            poseStack.translate(-0.5, 0, -0.5);
-        }
+    @Override
+    public void submit(R renderState, PoseStack poseStack, SubmitNodeCollector renderTasks, CameraRenderState cameraRenderState) {
+        if (Boolean.TRUE.equals(renderState.getGeckolibData(HIDDEN))) return;
+        super.submit(renderState, poseStack, renderTasks, cameraRenderState);
+    }
 
-        if (surface == Direction.DOWN) {
-            poseStack.translate(0, 1, 0);
-            poseStack.mulPose(Axis.XP.rotationDegrees(180));
-        } else if (surface == Direction.WEST) {
-            poseStack.translate(0.5, 0.5, 0);
-            poseStack.mulPose(Axis.XN.rotationDegrees(90));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(90));
-        } else if (surface == Direction.EAST) {
-            poseStack.translate(-0.5, 0.5, 0);
-            poseStack.mulPose(Axis.XN.rotationDegrees(90));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(270));
-        } else if (surface == Direction.SOUTH) {
-            poseStack.translate(0, 0.5, -0.5);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-        } else if (surface == Direction.NORTH) {
-            poseStack.translate(0, 0.5, 0.5);
-            poseStack.mulPose(Axis.XN.rotationDegrees(90));
-        }
+    @Override
+    protected void tryRotateByBlockstate(RenderPassInfo<R> renderPassInfo, PoseStack poseStack) {
+        var anchorOffset = renderPassInfo.getOrDefaultGeckolibData(ANCHOR_OFFSET, BlockPos.ZERO);
+        var surface = renderPassInfo.getOrDefaultGeckolibData(SURFACE, Direction.UP);
+        boolean rotated = renderPassInfo.getOrDefaultGeckolibData(ROTATED, false);
+        float offsetPx = renderPassInfo.getOrDefaultGeckolibData(OFFSET_PX, ORITECH_DOOR_HEIGHT_PX);
 
-        if (rotated && surface.getAxis().isHorizontal())
-            poseStack.mulPose(Axis.YP.rotationDegrees(90));
+        // Move into the anchor block's frame (GeoBlockRenderer has already centred us on X/Z),
+        // then turn exactly like Oritech's own hangar door model.
+        poseStack.translate(anchorOffset.getX(), anchorOffset.getY(), anchorOffset.getZ());
+        poseStack.mulPose(AnimatedBlockRotation.getModelRotation(surface, true, rotated));
+        poseStack.translate(0, offsetPx / 16f, 0);
     }
 
     // ---------------------------------------------------------------- animation clock
