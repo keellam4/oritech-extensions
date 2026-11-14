@@ -57,4 +57,4 @@ for i, (x0, x1) in enumerate([(25, 30), (26, 29), (27, 28)]):
 
 big = im.resize((512, 512), Image.NEAREST)
 big.save('icon_512.png')  # upload this one to CurseForge / Modrinth
-im.resize((128, 128), Image.NEAREST).save('icon_128.png')  # = src/main/resources/icon.png (in-game mod list)
+im.resize((128, 128), Image.NEAREST).save('icon_128.png')  # = common/src/main/resources/icon.png (in-game mod list)

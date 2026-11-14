@@ -6,7 +6,7 @@ For each block a page lists in its ``paint_viewer`` frontmatter, this writes:
 
 Painted textures are made exactly like the game does it: the palette swaps listed in this mod's
 assets/minecraft/atlases/blocks.json (paletted_permutations), applied to the original textures.
-Models and textures come from src/main/resources and the jars in build/wiki-cache (fetch_assets.py).
+Models and textures come from common/src/main/resources and the jars in build/wiki-cache (fetch_assets.py).
 """
 from __future__ import annotations
 
@@ -18,8 +18,8 @@ from PIL import Image
 
 from icons import ROOT, Sources, split
 
-ATLAS = ROOT / "src/main/resources/assets/minecraft/atlases/blocks.json"
-PALETTES = ROOT / "src/main/resources/assets/oritech_extensions/textures"
+ATLAS = ROOT / "common/src/main/resources/assets/minecraft/atlases/blocks.json"
+PALETTES = ROOT / "common/src/main/resources/assets/oritech_extensions/textures"
 FACES = ("north", "south", "east", "west", "up", "down")
 SWATCH_SHADE = (195, 108, 43)  # a mid orange from Oritech's machines; its painted colour is the swatch colour
 

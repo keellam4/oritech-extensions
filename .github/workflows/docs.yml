@@ -7,9 +7,9 @@ name: Docs
 on:
   push:
     branches: [main]
-    paths: [wiki/**, tools/wiki/**, src/main/resources/assets/**, src/main/resources/data/**, src/main/java/**/client/IconExporter.java, gradle.properties, .github/workflows/docs.yml]
+    paths: [wiki/**, tools/wiki/**, common/src/main/resources/assets/**, common/src/main/resources/data/**, common/src/main/java/**/client/IconExporter.java, gradle.properties, .github/workflows/docs.yml]
   pull_request:
-    paths: [wiki/**, tools/wiki/**, src/main/resources/data/**/recipe/**, src/main/java/**/client/IconExporter.java, .github/workflows/docs.yml]
+    paths: [wiki/**, tools/wiki/**, common/src/main/resources/data/**/recipe/**, common/src/main/java/**/client/IconExporter.java, .github/workflows/docs.yml]
   workflow_dispatch:
 
 permissions:

@@ -9,7 +9,7 @@ Lookup order for an item id like ``oritech:nickel_ingot``:
      * full blocks (anything built on ``block/cube``): an isometric cube like the inventory icon.
   Anything else (custom/GeckoLib models) has no icon, and recipes show its name instead.
 
-Sources searched for models and textures: src/main/resources, then every jar in build/wiki-cache
+Sources searched for models and textures: common/src/main/resources, then every jar in build/wiki-cache
 (Oritech, vanilla). Run tools/wiki/fetch_assets.py to download those.
 """
 from __future__ import annotations
@@ -31,7 +31,7 @@ CUBE_SIZE = 128  # px; rendered big and shown scaled down with crisp pixels
 
 class Sources:
     def __init__(self):
-        self.dirs = [ROOT / "src/main/resources"]
+        self.dirs = [ROOT / "common/src/main/resources"]
         self.jars = []
         if CACHE.exists():
             # Mods before vanilla, so a mod's resources win over vanilla ones with the same path.
