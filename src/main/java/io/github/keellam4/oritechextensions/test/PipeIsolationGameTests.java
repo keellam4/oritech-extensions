@@ -32,6 +32,12 @@ public class PipeIsolationGameTests {
         PipeIsolation.onPaintChanged(level, Map.of(pos, before));
     }
 
+    /** Place a pipe the way a player does (connections worked out like Oritech's placement). */
+    private static void place(ServerLevel level, BlockPos pos, net.minecraft.world.level.block.Block block) {
+        var pipe = (AbstractPipeBlock) block;
+        level.setBlockAndUpdate(pos, pipe.addConnectionStates(block.defaultBlockState(), level, pos, true));
+    }
+
     private static boolean connected(ServerLevel level, BlockPos pos, Direction direction) {
         var state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof GenericPipeBlock pipe)) return false;
@@ -49,7 +55,7 @@ public class PipeIsolationGameTests {
         var a = helper.absolutePos(new BlockPos(1, 1, 2));
         var b = helper.absolutePos(new BlockPos(2, 1, 2));
         var c = helper.absolutePos(new BlockPos(3, 1, 2));
-        for (var pos : new BlockPos[]{a, b, c}) level.setBlockAndUpdate(pos, BlockContent.ITEM_PIPE.defaultBlockState());
+        for (var pos : new BlockPos[]{a, b, c}) place(level, pos, BlockContent.ITEM_PIPE);
 
         helper.runAfterDelay(2, () -> {
             if (!connected(level, b, Direction.EAST) || !connected(level, c, Direction.WEST)) {
@@ -92,7 +98,7 @@ public class PipeIsolationGameTests {
         var a = helper.absolutePos(new BlockPos(1, 1, 2));
         var b = helper.absolutePos(new BlockPos(2, 1, 2));
         var c = helper.absolutePos(new BlockPos(3, 1, 2));
-        for (var pos : new BlockPos[]{a, b, c}) level.setBlockAndUpdate(pos, BlockContent.FLUID_PIPE.defaultBlockState());
+        for (var pos : new BlockPos[]{a, b, c}) place(level, pos, BlockContent.FLUID_PIPE);
 
         helper.runAfterDelay(2, () -> {
             paint(level, a, ColorVariant.WHITE);
