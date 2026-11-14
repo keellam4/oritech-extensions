@@ -34,7 +34,7 @@ public class GuideGameTests {
             var input = CraftingInput.of(2, 1, List.of(new ItemStack(Items.BOOK), new ItemStack(holder.value())));
             var match = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
             helper.assertTrue(match.isPresent()
-                            && match.get().value().assemble(input, level.registryAccess()).is(ModContent.GUIDE.get()),
+                            && match.get().value().assemble(input).is(ModContent.GUIDE.get()),
                     "Book + " + BuiltInRegistries.ITEM.getKey(holder.value()) + " doesn't make the guide");
         }
         helper.succeed();
@@ -46,7 +46,7 @@ public class GuideGameTests {
         var input = CraftingInput.of(2, 1, List.of(new ItemStack(Items.BOOK), new ItemStack(ItemContent.NICKEL_INGOT.get())));
         var match = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
         helper.assertTrue(match.isPresent(), "No crafting recipe for book + nickel ingot");
-        ItemStack result = match.get().value().assemble(input, level.registryAccess());
+        ItemStack result = match.get().value().assemble(input);
         helper.assertTrue(result.is(ModContent.GUIDE.get()), "Book + nickel ingot made " + result + ", expected the guide");
         helper.assertTrue(result.getMaxStackSize() == 1, "Guide should not stack");
         helper.succeed();
