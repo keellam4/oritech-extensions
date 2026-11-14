@@ -30,9 +30,10 @@ public class ModContent {
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, OritechExtensions.MODID);
 
     // Same material properties as Oritech's hangar door blocks.
-    public static final DeferredBlock<HangarDoorExtensionBlock> HANGAR_DOOR_EXTENSION = BLOCKS.register(
+    public static final DeferredBlock<HangarDoorExtensionBlock> HANGAR_DOOR_EXTENSION = BLOCKS.registerBlock(
             "hangar_door_extension",
-            () -> new HangarDoorExtensionBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).strength(8f).forceSolidOn()));
+            HangarDoorExtensionBlock::new,
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).strength(8f).forceSolidOn());
 
     public static final DeferredItem<BlockItem> HANGAR_DOOR_EXTENSION_ITEM =
             ITEMS.registerSimpleBlockItem("hangar_door_extension", HANGAR_DOOR_EXTENSION);
