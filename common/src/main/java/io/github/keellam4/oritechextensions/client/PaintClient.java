@@ -82,7 +82,13 @@ public final class PaintClient {
                 "oritech:block/reactor_rod_paint_netherite",
                 "oritech:block/reactor_heat_pipe_paint_camo",
                 "oritech:block/accelerator_ring_paint_diamond"}) {
-            var sprite = atlas.getSprite(ResourceLocation.parse(sample));
+            var id = ResourceLocation.parse(sample);
+            if (!Platform.INSTANCE.isModLoaded(id.getNamespace())) {
+                // e.g. Oritech Things, which has no Fabric build
+                OritechExtensions.LOGGER.info("[paint] Painted texture {}: skipped, {} isn't installed", sample, id.getNamespace());
+                continue;
+            }
+            var sprite = atlas.getSprite(id);
             boolean found = !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation());
             OritechExtensions.LOGGER.info("[paint] Painted texture {}: {}", sample, found ? "present" : "MISSING");
         }
