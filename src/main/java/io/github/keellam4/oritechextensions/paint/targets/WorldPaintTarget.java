@@ -1,5 +1,9 @@
 package io.github.keellam4.oritechextensions.paint.targets;
 
+import io.github.keellam4.oritechextensions.paint.PipeIsolation;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+
 import io.github.keellam4.oritechextensions.Config;
 import io.github.keellam4.oritechextensions.paint.PaintTarget;
 import io.github.keellam4.oritechextensions.paint.PaintTargets;
@@ -29,7 +33,7 @@ public final class WorldPaintTarget implements PaintTarget {
     public static final int ACCELERATOR_REACH = 8;
 
     /** Standard item pipes (with transparent ones) and standard fluid pipes: each connected network is a group. */
-    public static final WorldPaintTarget PIPES = new WorldPaintTarget(PipePaint::familyOf, () -> Integer.MAX_VALUE, 1);
+    public static final WorldPaintTarget PIPES = new WorldPaintTarget(PipePaint::familyOf, () -> Integer.MAX_VALUE, 1, true);
 
     /** Industrial Glass: touching glass blocks are a group. */
     public static final WorldPaintTarget GLASS = new WorldPaintTarget(
@@ -51,10 +55,18 @@ public final class WorldPaintTarget implements PaintTarget {
     private final IntSupplier maxGroupSize;
     private final int reach;
 
+    /** Pipes with colour isolation on: a group is the connected pipes that currently share one colour. */
+    private final boolean isolated;
+
     private WorldPaintTarget(Function<Block, Object> family, IntSupplier maxGroupSize, int reach) {
+        this(family, maxGroupSize, reach, false);
+    }
+
+    private WorldPaintTarget(Function<Block, Object> family, IntSupplier maxGroupSize, int reach, boolean isolated) {
         this.family = family;
         this.maxGroupSize = maxGroupSize;
         this.reach = reach;
+        this.isolated = isolated;
     }
 
     private static boolean isAcceleratorPart(Block block) {
@@ -70,6 +82,12 @@ public final class WorldPaintTarget implements PaintTarget {
 
     @Override
     public List<BlockPos> group(Level level, BlockPos pos) {
+        if (isolated && level instanceof ServerLevel server && PipeIsolation.enabled()) {
+            // Repainting one colour doesn't spill into neighbouring pipes of other colours (or unpainted ones).
+            var data = PipePaintData.get(server);
+            var colour = data.getOrDefault(pos);
+            return WorldPaint.discover(level, pos, family, maxGroupSize.getAsInt(), reach, other -> data.getOrDefault(other) == colour);
+        }
         return WorldPaint.discover(level, pos, family, maxGroupSize.getAsInt(), reach);
     }
 
@@ -80,9 +98,23 @@ public final class WorldPaintTarget implements PaintTarget {
 
     @Override
     public List<BlockPos> apply(ServerLevel level, List<BlockPos> group, ColorVariant variant, int budget) {
+        var data = PipePaintData.get(level);
+        var before = new LinkedHashMap<BlockPos, ColorVariant>();
+        if (isolated) {
+            for (var pos : group) before.put(pos, data.getOrDefault(pos));
+        }
         var changed = WorldPaint.apply(level, group, variant, budget);
         PaintTargets.syncWorld(level, changed, variant);
+        if (isolated && !changed.isEmpty()) {
+            before.keySet().retainAll(new HashSet<>(changed));
+            PipeIsolation.onPaintChanged(level, before);
+        }
         return changed;
+    }
+
+    /** Whether this target's colours decide which blocks connect (pipes with colour isolation). */
+    public boolean isolated() {
+        return isolated;
     }
 
     /** The colour a block just placed at {@code pos} takes over from its neighbours, or null. */

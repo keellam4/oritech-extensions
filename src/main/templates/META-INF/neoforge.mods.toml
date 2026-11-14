@@ -18,6 +18,9 @@ Small add-ons for Oritech:
  - Paintable standard item and fluid pipes: Color Cartridges paint whole connected pipe networks.
 '''
 
+[[mixins]]
+config = "${mod_id}.mixins.json"
+
 [[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"
