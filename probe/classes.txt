@@ -1,37 +1,35 @@
 # One request per line. Results are printed in the "API probe" workflow log.
 #   ls:<path prefix>     list classes under a package path
-#   find:<ClassName>     print every class with that simple name (decompiled when no sources jar exists)
-#   src:<dotted.Class>   print one class by full name
-#   grep:<regex>         grep all Minecraft + NeoForge sources (only when a sources jar exists)
-#   javap:<class>        public signatures of a class
-ls:net/minecraft/client/renderer/block/
-ls:net/neoforged/neoforge/client/model/
+#   find:<ClassName>     print every class with that simple name (NeoForge sources, else decompiled)
+#   src:<dotted.Class>   print one class by full name (decompiled)
+#   grep:<regex>         grep the NeoForge sources
+#   javap:<class>        public + protected signatures of a class
+ls:net/minecraft/client/renderer/block/dispatch/
 ls:net/minecraft/gametest/framework/
-ls:net/neoforged/neoforge/gametest/
-find:BlockStateModel
-find:BlockModelPart
-find:BlockStateModelPart
+src:net.minecraft.client.renderer.block.dispatch.BlockStateModel
+src:net.minecraft.client.renderer.block.dispatch.BlockStateModelPart
 find:BakedQuad
-find:DelegateBlockStateModel
-find:IBlockStateModelExtension
-find:ModelEvent
-find:TextureAtlasStitchedEvent
-find:GameTestHelper
+find:SimpleModelWrapper
+src:net.minecraft.client.resources.model.sprite.Material
 find:SavedDataType
-find:SavedData
-find:ItemTooltipEvent
-find:PlayerInteractEvent
-find:BlockDropsEvent
-find:BlockEvent
-find:ChunkWatchEvent
-find:ClientPlayerNetworkEvent
-find:InteractionResult
-find:GameTestInstance
-find:FunctionGameTestInstance
-find:RegisterGameTestsEvent
-javap:net.minecraft.world.item.Item
-javap:net.minecraft.world.level.block.Block
+src:net.minecraft.world.level.saveddata.SavedData
+javap:net.minecraft.world.level.storage.DimensionDataStorage
+src:net.minecraft.gametest.framework.FunctionGameTestInstance
+src:net.minecraft.gametest.framework.TestData
+javap:net.minecraft.gametest.framework.GameTestHelper
+javap:net.minecraft.world.level.ChunkPos
+javap:net.minecraft.world.InteractionResult
 javap:net.minecraft.world.level.block.state.BlockBehaviour
+javap:net.minecraft.world.level.block.Block
 javap:net.minecraft.world.level.block.entity.BlockEntity
-javap:net.minecraft.client.renderer.texture.TextureAtlasSprite
-javap:net.minecraft.client.renderer.block.BlockModelShaper
+javap:net.minecraft.world.item.Item$TooltipContext
+javap:net.minecraft.core.registries.Registries
+grep:BreakEvent|BreakBlockEvent|class .*Break.*Event
+grep:class (TestEnvironment|GameTest)[A-Za-z]* 
+grep:TEST_FUNCTION|TEST_INSTANCE
+grep:Identifier\.fromNamespaceAndPath\(
+grep:public static .* (defineEnum|defineInRange)\(
+grep:class ConfigurationScreen|IConfigScreenFactory
+javap:net.minecraft.world.level.saveddata.SavedDataType
+javap:net.minecraft.client.renderer.texture.TextureAtlas
+javap:net.minecraft.client.Minecraft
