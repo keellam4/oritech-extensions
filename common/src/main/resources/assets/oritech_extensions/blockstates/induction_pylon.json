@@ -1,10 +1,22 @@
 {
   "variants": {
-    "half=lower": {
+    "half=lower,power=0": {
+      "model": "oritech_extensions:block/induction_pylon_bottom_off"
+    },
+    "half=lower,power=1": {
       "model": "oritech_extensions:block/induction_pylon_bottom"
     },
-    "half=upper": {
+    "half=lower,power=2": {
+      "model": "oritech_extensions:block/induction_pylon_bottom_active"
+    },
+    "half=upper,power=0": {
+      "model": "oritech_extensions:block/induction_pylon_top_off"
+    },
+    "half=upper,power=1": {
       "model": "oritech_extensions:block/induction_pylon_top"
+    },
+    "half=upper,power=2": {
+      "model": "oritech_extensions:block/induction_pylon_top_active"
     }
   }
 }

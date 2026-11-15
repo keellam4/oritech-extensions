@@ -69,4 +69,20 @@ public class InductionPylonGameTests {
         helper.destroyBlock(pos.above());
         helper.succeedWhen(() -> helper.assertBlockNotPresent(ModContent.INDUCTION_PYLON.get(), pos));
     }
+
+    /** The pylon shows whether it has power (for its animation and light), and paints as one block. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void powerStateAndPaint(GameTestHelper helper) {
+        var pos = new BlockPos(2, 1, 2);
+        var pylon = place(helper, pos);
+        pylon.chargeNearby();
+        helper.assertBlockProperty(pos, InductionPylonBlock.POWER, 0);
+        pylon.receive(1000, false);
+        pylon.chargeNearby();
+        helper.assertBlockProperty(pos, InductionPylonBlock.POWER, 1);
+        helper.assertBlockProperty(pos.above(), InductionPylonBlock.POWER, 1);
+        var group = io.github.keellam4.oritechextensions.paint.targets.WorldPaintTarget.PYLON.group(helper.getLevel(), helper.absolutePos(pos));
+        if (group.size() != 2) helper.fail("painting should cover both halves, covers " + group.size());
+        helper.succeed();
+    }
 }

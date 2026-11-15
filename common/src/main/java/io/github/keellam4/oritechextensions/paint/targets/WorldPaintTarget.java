@@ -72,6 +72,10 @@ public final class WorldPaintTarget implements PaintTarget {
                     || block instanceof io.github.keellam4.oritechextensions.storage.SiloControllerBlock ? "fluid_silo" : null,
             Config::maxPaintGroupSize, 1);
 
+    /** Induction Pylons: both halves of one pylon paint together. */
+    public static final WorldPaintTarget PYLON = new WorldPaintTarget(
+            block -> block instanceof io.github.keellam4.oritechextensions.wireless.InductionPylonBlock ? "induction_pylon" : null, () -> 2, 1, false, false);
+
     /** Pipe Boosters: one block per click, and a new booster doesn't take over its neighbours' colour. */
     public static final WorldPaintTarget PIPE_BOOSTER = new WorldPaintTarget(
             block -> block == BlockContent.PIPE_BOOSTER_BLOCK ? "pipe_booster" : null, () -> 1, 1, false, false);

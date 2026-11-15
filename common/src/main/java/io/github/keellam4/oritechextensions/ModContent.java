@@ -170,7 +170,7 @@ public final class ModContent {
     private static Supplier<io.github.keellam4.oritechextensions.wireless.InductionPylonBlock> pylon(String name, io.github.keellam4.oritechextensions.wireless.PylonStyle style) {
         return PLATFORM.register(BuiltInRegistries.BLOCK, name, () -> new io.github.keellam4.oritechextensions.wireless.InductionPylonBlock(style,
                 BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f).sound(SoundType.METAL).noOcclusion()
-                        .lightLevel(state -> 7)));
+                        .lightLevel(state -> new int[]{0, 7, 12}[state.getValue(io.github.keellam4.oritechextensions.wireless.InductionPylonBlock.POWER)])));
     }
 
     public static final Supplier<io.github.keellam4.oritechextensions.wireless.InductionPylonBlock> INDUCTION_PYLON =
