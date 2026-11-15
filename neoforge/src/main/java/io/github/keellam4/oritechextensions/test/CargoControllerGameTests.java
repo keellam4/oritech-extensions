@@ -103,4 +103,29 @@ public class CargoControllerGameTests {
         if (controller.network().contents().get(0).count() != 16) helper.fail("the total should be 16");
         helper.succeed();
     }
+
+    /** Crafting Terminal: shift-clicking the result crafts until the network runs out, refilling the grid each time. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void craftingTerminalRefills(GameTestHelper helper) {
+        var terminal = place(helper, 1, 2, ModContent.CRAFTING_TERMINAL.get(), CargoControllerBlockEntity.class);
+        var vault = place(helper, 2, 2, ModContent.CARGO_VAULT.get(), CargoVaultBlockEntity.class);
+        vault.insert(new ItemStack(Items.OAK_PLANKS, 10), false);
+        terminal.invalidate();
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var menu = new io.github.keellam4.oritechextensions.storage.TerminalMenu(1, player.getInventory(), terminal, true);
+        // grid slots start at 1: top-middle and centre make sticks
+        menu.getSlot(1 + 1).set(new ItemStack(Items.OAK_PLANKS));
+        menu.getSlot(1 + 4).set(new ItemStack(Items.OAK_PLANKS));
+        if (!menu.getSlot(0).getItem().is(Items.STICK)) helper.fail("two planks should show sticks as the result");
+        menu.clicked(0, 0, net.minecraft.world.inventory.ClickType.QUICK_MOVE, player);
+        int sticks = player.getInventory().countItem(Items.STICK);
+        if (sticks != 24) helper.fail("12 planks should make 24 sticks, made " + sticks);
+        if (vault.count() != 0) helper.fail("the vault should be out of planks, has " + vault.count());
+
+        vault.insert(new ItemStack(Items.OAK_PLANKS, 5), false);
+        menu.getSlot(1).set(new ItemStack(Items.OAK_PLANKS, 3));
+        menu.removed(player);
+        if (vault.count() != 8) helper.fail("closing should return the grid to the network, vault has " + vault.count());
+        helper.succeed();
+    }
 }

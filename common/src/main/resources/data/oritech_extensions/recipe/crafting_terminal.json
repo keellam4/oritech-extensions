@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "CTC",
+    "SMS"
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "P": {
+      "item": "oritech:processing_unit"
+    },
+    "C": {
+      "item": "minecraft:crafting_table"
+    },
+    "T": {
+      "item": "oritech_extensions:cargo_controller"
+    },
+    "M": {
+      "item": "oritech:magnetic_coil"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:crafting_terminal",
+    "count": 1
+  }
+}

@@ -16,6 +16,10 @@ import java.util.List;
  * The Cargo Controller's terminal: the player's inventory, plus a list of everything in the network that the
  * server sends while the screen is open ({@link TerminalSyncPayload}). Grid clicks come back as
  * {@link TerminalActionPayload}; shift-clicking an inventory slot puts it into the network.
+ * <p>
+ * The Crafting Terminal adds a 3 × 3 crafting grid: taking the result refills the grid from the network, so
+ * shift-clicking the result crafts as many as the network has ingredients for. Whatever is left in the grid goes
+ * back into the network when the screen closes.
  */
 public class TerminalMenu extends AbstractContainerMenu {
 
@@ -27,27 +31,117 @@ public class TerminalMenu extends AbstractContainerMenu {
     /** Fluid entry clicked: fill the empty bucket on the cursor, or empty a full one into the network. */
     public static final int BUCKET = 5;
 
+    /** Crafting Terminal: put the crafting grid back into the network. */
+    public static final int CLEAR_GRID = 6;
+
     public static final int INVENTORY_X = 8;
-    public static final int INVENTORY_Y = 125;
+    /** Item grid rows: the plain terminal has room for more. */
+    public static final int ROWS = 8;
+    public static final int CRAFTING_ROWS = 5;
+    public static final int CRAFT_X = 30;
+    public static final int CRAFT_Y = 120;
+    public static final int RESULT_X = 124;
+    public static final int RESULT_Y = 138;
 
     @Nullable
     private final CargoControllerBlockEntity controller;
     private final Player player;
+    private final boolean crafting;
+    private final net.minecraft.world.inventory.TransientCraftingContainer craftSlots;
+    private final net.minecraft.world.inventory.ResultContainer resultSlots = new net.minecraft.world.inventory.ResultContainer();
+    private final int inventoryStart;
     private List<CargoNetwork.Entry> lastSent;
     private int ticks;
 
+    /** Client side of the plain terminal. */
     public TerminalMenu(int id, Inventory inventory) {
-        this(id, inventory, null);
+        this(id, inventory, null, false);
     }
 
-    public TerminalMenu(int id, Inventory inventory, @Nullable CargoControllerBlockEntity controller) {
-        super(ModContent.TERMINAL_MENU.get(), id);
+    /** Client side of the Crafting Terminal. */
+    public static TerminalMenu crafting(int id, Inventory inventory) {
+        return new TerminalMenu(id, inventory, null, true);
+    }
+
+    public TerminalMenu(int id, Inventory inventory, @Nullable CargoControllerBlockEntity controller, boolean crafting) {
+        super(crafting ? ModContent.CRAFTING_TERMINAL_MENU.get() : ModContent.TERMINAL_MENU.get(), id);
         this.controller = controller;
         this.player = inventory.player;
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9, INVENTORY_X + col * 18, INVENTORY_Y + row * 18));
+        this.crafting = crafting;
+        this.craftSlots = new net.minecraft.world.inventory.TransientCraftingContainer(this, 3, 3);
+        if (crafting) {
+            addSlot(new TerminalResultSlot(inventory.player, RESULT_X, RESULT_Y));
+            for (int row = 0; row < 3; row++) {
+                for (int col = 0; col < 3; col++) addSlot(new Slot(craftSlots, col + row * 3, CRAFT_X + col * 18, CRAFT_Y + row * 18));
+            }
         }
-        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, INVENTORY_X + col * 18, INVENTORY_Y + 58));
+        inventoryStart = slots.size();
+        int y = inventoryY(crafting);
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9, INVENTORY_X + col * 18, y + row * 18));
+        }
+        for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, INVENTORY_X + col * 18, y + 58));
+    }
+
+    public static int inventoryY(boolean crafting) {
+        return crafting ? 195 : 183;
+    }
+
+    public boolean isCrafting() {
+        return crafting;
+    }
+
+    // ---------------------------------------------------------------- crafting
+
+    @Override
+    public void slotsChanged(net.minecraft.world.Container container) {
+        super.slotsChanged(container);
+        if (container != craftSlots || !(player.level() instanceof net.minecraft.server.level.ServerLevel level)) return;
+        var input = craftSlots.asCraftInput();
+        var recipe = level.getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.CRAFTING, input, level);
+        var result = recipe.map(holder -> holder.value().assemble(input, level.registryAccess())).orElse(ItemStack.EMPTY);
+        resultSlots.setRecipeUsed(recipe.orElse(null));
+        resultSlots.setItem(0, result);
+    }
+
+    /** The crafting result: taking it uses one of each ingredient, then refills the grid from the network. */
+    private final class TerminalResultSlot extends net.minecraft.world.inventory.ResultSlot {
+
+        TerminalResultSlot(Player player, int x, int y) {
+            super(player, craftSlots, resultSlots, 0, x, y);
+        }
+
+        @Override
+        public void onTake(Player taker, ItemStack stack) {
+            var before = new ItemStack[craftSlots.getContainerSize()];
+            for (int i = 0; i < before.length; i++) before[i] = craftSlots.getItem(i).copyWithCount(1);
+            super.onTake(taker, stack);
+            if (controller == null) return;
+            var network = controller.network();
+            for (int i = 0; i < before.length; i++) {
+                if (before[i].isEmpty() || !craftSlots.getItem(i).isEmpty()) continue;
+                var refill = network.extract(before[i], 1, false);
+                if (!refill.isEmpty()) craftSlots.setItem(i, refill);
+            }
+            lastSent = null;
+        }
+    }
+
+    private void clearGrid() {
+        for (int i = 0; i < craftSlots.getContainerSize(); i++) {
+            var stack = craftSlots.removeItemNoUpdate(i);
+            if (stack.isEmpty()) continue;
+            if (controller != null) stack.shrink(controller.network().insert(stack, false));
+            if (!stack.isEmpty() && !player.getInventory().add(stack)) player.drop(stack, false);
+        }
+        slotsChanged(craftSlots);
+        lastSent = null;
+    }
+
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        if (crafting && !player.level().isClientSide()) clearGrid();
     }
 
     @Override
@@ -69,6 +163,7 @@ public class TerminalMenu extends AbstractContainerMenu {
         var carried = getCarried();
         switch (action) {
             case BUCKET -> bucket(network, fluid);
+            case CLEAR_GRID -> clearGrid();
             case TAKE_STACK, TAKE_ONE, TAKE_TO_INVENTORY -> {
                 if (item.isEmpty()) return;
                 if (action == TAKE_TO_INVENTORY) {
@@ -137,8 +232,29 @@ public class TerminalMenu extends AbstractContainerMenu {
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         var slot = slots.get(index);
-        if (controller == null || !slot.hasItem()) return ItemStack.EMPTY;
+        if (!slot.hasItem()) return ItemStack.EMPTY;
         var stack = slot.getItem();
+        if (crafting && index == 0) {
+            // The result: into the inventory; vanilla repeats this while the result stays the same.
+            var copy = stack.copy();
+            stack.getItem().onCraftedBy(stack, player.level(), player);
+            if (!moveItemStackTo(stack, inventoryStart, slots.size(), true)) return ItemStack.EMPTY;
+            slot.onQuickCraft(stack, copy);
+            if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
+            else slot.setChanged();
+            if (stack.getCount() == copy.getCount()) return ItemStack.EMPTY;
+            slot.onTake(player, stack);
+            return copy;
+        }
+        if (index < inventoryStart) {
+            // A crafting grid slot: back into the network, or the inventory.
+            if (controller != null) stack.shrink(controller.network().insert(stack, false));
+            if (!stack.isEmpty() && !moveItemStackTo(stack, inventoryStart, slots.size(), false)) return ItemStack.EMPTY;
+            slot.setChanged();
+            lastSent = null;
+            return ItemStack.EMPTY;
+        }
+        if (controller == null) return ItemStack.EMPTY;
         int moved = controller.network().insert(stack, false);
         if (moved <= 0) return ItemStack.EMPTY;
         stack.shrink(moved);

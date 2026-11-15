@@ -55,8 +55,9 @@ public class CargoControllerBlock extends HorizontalDirectionalBlock implements 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof CargoControllerBlockEntity controller) {
-            player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new TerminalMenu(id, inventory, controller),
-                    Component.translatable("block.oritech_extensions.cargo_controller")));
+            boolean crafting = state.getBlock() instanceof CraftingTerminalBlock;
+            player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new TerminalMenu(id, inventory, controller, crafting),
+                    state.getBlock().getName()));
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
