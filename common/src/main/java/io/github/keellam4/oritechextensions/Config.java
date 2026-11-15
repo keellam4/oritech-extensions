@@ -55,6 +55,18 @@ public class Config {
             .comment("How many buckets one Fluid Vault holds before capacity upgrades.")
             .defineInRange("fluidVaultBuckets", 256, 1, 100000);
 
+    public static final ModConfigSpec.IntValue PYLON_RANGE = BUILDER
+            .comment("How far an Induction Pylon reaches, in blocks.")
+            .defineInRange("pylonRange", 8, 1, 64);
+
+    public static final ModConfigSpec.IntValue PYLON_RATE = BUILDER
+            .comment("How much energy (RF) per tick an Induction Pylon can hand out, shared by everyone it charges.")
+            .defineInRange("pylonRate", 2000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue PYLON_BUFFER = BUILDER
+            .comment("How much energy (RF) an Induction Pylon stores.")
+            .defineInRange("pylonBuffer", 1_000_000, 1000, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue SILO_BUCKETS_PER_BLOCK = BUILDER
             .comment("How many buckets a Fluid Silo holds per block of its size (a 3 x 3 x 5 silo is 45 blocks).")
             .defineInRange("siloBucketsPerBlock", 1000, 1, 100000);
@@ -97,5 +109,17 @@ public class Config {
 
     public static int siloBucketsPerBlock() {
         return SPEC.isLoaded() ? SILO_BUCKETS_PER_BLOCK.get() : SILO_BUCKETS_PER_BLOCK.getDefault();
+    }
+
+    public static int pylonRange() {
+        return SPEC.isLoaded() ? PYLON_RANGE.get() : PYLON_RANGE.getDefault();
+    }
+
+    public static int pylonRate() {
+        return SPEC.isLoaded() ? PYLON_RATE.get() : PYLON_RATE.getDefault();
+    }
+
+    public static int pylonBuffer() {
+        return SPEC.isLoaded() ? PYLON_BUFFER.get() : PYLON_BUFFER.getDefault();
     }
 }

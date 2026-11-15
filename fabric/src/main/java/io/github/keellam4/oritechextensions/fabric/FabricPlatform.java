@@ -166,4 +166,29 @@ public final class FabricPlatform implements Platform {
     public boolean isPhysicalClient() {
         return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     }
+
+    @Override
+    public long chargeInventorySlot(net.minecraft.world.entity.player.Player player, int slot, long max) {
+        if (max <= 0 || player.getInventory().getItem(slot).isEmpty()) return 0;
+        var storage = net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage.of(player);
+        var context = net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext.ofPlayerSlot(player, storage.getSlots().get(slot));
+        var energy = context.find(team.reborn.energy.api.EnergyStorage.ITEM);
+        if (energy == null || !energy.supportsInsertion()) return 0;
+        try (var transaction = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+            long moved = energy.insert(max, transaction);
+            transaction.commit();
+            return moved;
+        }
+    }
+
+    @Override
+    public long chargeAccessories(net.minecraft.world.entity.player.Player player, long max) {
+        return 0; // Trinkets / Accessories support comes later.
+    }
+
+    @Override
+    public long itemEnergy(net.minecraft.world.item.ItemStack stack) {
+        var energy = net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext.withConstant(stack).find(team.reborn.energy.api.EnergyStorage.ITEM);
+        return energy == null ? -1 : energy.getAmount();
+    }
 }

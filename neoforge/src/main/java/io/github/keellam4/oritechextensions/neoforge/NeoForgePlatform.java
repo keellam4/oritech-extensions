@@ -159,4 +159,28 @@ public final class NeoForgePlatform implements Platform {
     public boolean isPhysicalClient() {
         return FMLEnvironment.dist.isClient();
     }
+
+    @Override
+    public long chargeInventorySlot(net.minecraft.world.entity.player.Player player, int slot, long max) {
+        return chargeStack(player.getInventory().getItem(slot), max);
+    }
+
+    /** Charges an item stack through its energy capability (the stack keeps its energy in a data component). */
+    static long chargeStack(net.minecraft.world.item.ItemStack stack, long max) {
+        if (stack.isEmpty() || max <= 0) return 0;
+        var energy = stack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.ITEM);
+        if (energy == null || !energy.canReceive()) return 0;
+        return energy.receiveEnergy((int) Math.min(max, Integer.MAX_VALUE), false);
+    }
+
+    @Override
+    public long chargeAccessories(net.minecraft.world.entity.player.Player player, long max) {
+        return ModList.get().isLoaded("curios") ? CuriosCharging.charge(player, max) : 0;
+    }
+
+    @Override
+    public long itemEnergy(net.minecraft.world.item.ItemStack stack) {
+        var energy = stack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.ITEM);
+        return energy == null ? -1 : energy.getEnergyStored();
+    }
 }

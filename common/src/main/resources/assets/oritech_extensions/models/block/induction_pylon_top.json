@@ -1,0 +1,147 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "ambientocclusion": false,
+  "textures": {
+    "tex": "oritech_extensions:block/induction_pylon_top",
+    "particle": "oritech_extensions:block/induction_pylon_bottom"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        12,
+        10,
+        12
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            6,
+            12,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "south": {
+          "uv": [
+            4,
+            6,
+            12,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "east": {
+          "uv": [
+            4,
+            6,
+            12,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "west": {
+          "uv": [
+            4,
+            6,
+            12,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "up": {
+          "uv": [
+            4,
+            6,
+            12,
+            14
+          ],
+          "texture": "#tex"
+        },
+        "down": {
+          "uv": [
+            4,
+            6,
+            12,
+            14
+          ],
+          "texture": "#tex"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        10,
+        4
+      ],
+      "to": [
+        12,
+        16,
+        12
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            12,
+            6
+          ],
+          "texture": "#tex"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            12,
+            6
+          ],
+          "texture": "#tex"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            12,
+            6
+          ],
+          "texture": "#tex"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            12,
+            6
+          ],
+          "texture": "#tex"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            12,
+            8
+          ],
+          "texture": "#tex"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            12,
+            8
+          ],
+          "texture": "#tex"
+        }
+      }
+    }
+  ]
+}

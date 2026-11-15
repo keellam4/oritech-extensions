@@ -145,5 +145,12 @@
   "message.oritech_extensions.silo.status": "Fluid Silo 3×3×%s · %s · %s / %s B",
   "message.oritech_extensions.silo.empty": "Empty",
   "tooltip.oritech_extensions.silo.holds": "Holds %s: %s B",
-  "tooltip.oritech_extensions.silo.help": "Put it in the bottom layer of a 3 × 3 silo of Silo Casing and Glass, 3 to 9 tall."
+  "tooltip.oritech_extensions.silo.help": "Put it in the bottom layer of a 3 × 3 silo of Silo Casing and Glass, 3 to 9 tall.",
+  "block.oritech_extensions.induction_pylon": "Induction Pylon (Tesla Spire)",
+  "block.oritech_extensions.induction_pylon_obelisk": "Induction Pylon (Coil Obelisk)",
+  "block.oritech_extensions.induction_pylon_rings": "Induction Pylon (Ring Pylon)",
+  "message.oritech_extensions.pylon.status": "Induction Pylon · %s / %s RF · charges %s",
+  "message.oritech_extensions.pylon.access.owner": "only its owner",
+  "message.oritech_extensions.pylon.access.team": "its owner and team",
+  "message.oritech_extensions.pylon.access.everyone": "everyone"
 }

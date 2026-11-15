@@ -78,6 +78,7 @@ dependencies {
     modLocalRuntime "maven.modrinth:athena-ctm:${athena_fabric_version_id}"
     // Oritech ships Team Reborn Energy inside its jar, but dev runs don't load jars nested in dependencies.
     modLocalRuntime("teamreborn:energy:4.1.0") { transitive = false }
+    modCompileOnly("teamreborn:energy:4.1.0") { transitive = false }
     // Same for the config library inside Forge Config API Port's jar.
     localRuntime "com.electronwill.night-config:core:3.8.3"
     localRuntime "com.electronwill.night-config:toml:3.8.3"

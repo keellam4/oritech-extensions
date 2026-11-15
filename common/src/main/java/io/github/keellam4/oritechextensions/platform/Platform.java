@@ -72,6 +72,15 @@ public interface Platform {
 
     boolean isModLoaded(String modId);
 
+    /** Charges the energy item in a slot of the player's inventory (0-35 main, 36-39 armour, 40 offhand). Returns RF given. */
+    long chargeInventorySlot(net.minecraft.world.entity.player.Player player, int slot, long max);
+
+    /** Charges energy items in accessory slots (Curios), when that mod is installed. Returns RF given. */
+    long chargeAccessories(net.minecraft.world.entity.player.Player player, long max);
+
+    /** The energy an item holds, or -1 if it doesn't hold energy. */
+    long itemEnergy(net.minecraft.world.item.ItemStack stack);
+
     /** True on the game client (also while it hosts a singleplayer world), false on a dedicated server. */
     boolean isPhysicalClient();
 }
