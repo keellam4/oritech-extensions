@@ -35,7 +35,7 @@ public final class WorldPaintTarget implements PaintTarget {
     /** How far apart two accelerator parts may be, in a straight line, and still be painted together. */
     public static final int ACCELERATOR_REACH = 8;
 
-    /** Standard item pipes (with transparent ones) and standard fluid pipes: each connected network is a group. */
+    /** Item, fluid and energy pipes and superconductors, with their transparent, framed and duct versions: each connected network is a group. */
     public static final WorldPaintTarget PIPES = new WorldPaintTarget(PipePaint::familyOf, () -> Integer.MAX_VALUE, 1, true);
 
     /** Industrial Glass: touching glass blocks are a group. */
@@ -53,6 +53,15 @@ public final class WorldPaintTarget implements PaintTarget {
      */
     public static final WorldPaintTarget ACCELERATOR = new WorldPaintTarget(
             block -> isAcceleratorPart(block) ? "accelerator" : null, Config::maxPaintGroupSize, ACCELERATOR_REACH);
+
+    /** Metal Beams and Metal Girders: touching beams and girders are one support structure. */
+    public static final WorldPaintTarget SUPPORTS = new WorldPaintTarget(
+            block -> block == BlockContent.METAL_BEAM_BLOCK || block == BlockContent.METAL_GIRDER_BLOCK ? "supports" : null,
+            Config::maxPaintGroupSize, 1);
+
+    /** Pipe Boosters: one block per click, and a new booster doesn't take over its neighbours' colour. */
+    public static final WorldPaintTarget PIPE_BOOSTER = new WorldPaintTarget(
+            block -> block == BlockContent.PIPE_BOOSTER_BLOCK ? "pipe_booster" : null, () -> 1, 1, false, false);
 
     /** Datapack tag: blocks in it are painted one at a time. */
     public static final TagKey<Block> PAINTABLE_TAG = TagKey.create(Registries.BLOCK, OritechExtensions.id("paintable"));

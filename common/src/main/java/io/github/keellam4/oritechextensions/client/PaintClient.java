@@ -81,7 +81,13 @@ public final class PaintClient {
                 "oritech:block/reactor_wall/horizontal_paint_sculk",
                 "oritech:block/reactor_rod_paint_netherite",
                 "oritech:block/reactor_heat_pipe_paint_camo",
-                "oritech:block/accelerator_ring_paint_diamond"}) {
+                "oritech:block/accelerator_ring_paint_diamond",
+                "oritech:block/metal_girder_block_paint_redstone", // supports (structure palette)
+                "oritech:block/item_pipe_duct_block_paint_white",
+                "oritech:block/energy_pipe_paint_sculk", // energy palette
+                "oritech:block/energy_pipe_duct_block_paint_fluxite",
+                "oritech:block/superconductor_paint_industrial", // superconductor palette
+                "oritech:block/superconductor_duct_block_paint_camo"}) {
             var id = ResourceLocation.parse(sample);
             if (!Platform.INSTANCE.isModLoaded(id.getNamespace())) {
                 // e.g. Oritech Things, which has no Fabric build

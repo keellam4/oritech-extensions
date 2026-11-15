@@ -63,6 +63,51 @@ public class PaintTargetGameTests {
         helper.succeed();
     }
 
+    /** A column of Metal Beams and the Metal Girders resting on it are one support structure. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    public static void paintSupports(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var beamA = helper.absolutePos(new BlockPos(1, 1, 2));
+        var beamB = helper.absolutePos(new BlockPos(1, 2, 2));
+        var girderA = helper.absolutePos(new BlockPos(2, 2, 2));
+        var girderB = helper.absolutePos(new BlockPos(3, 2, 2));
+        var apart = helper.absolutePos(new BlockPos(1, 4, 2));
+        level.setBlockAndUpdate(beamA, BlockContent.METAL_BEAM_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(beamB, BlockContent.METAL_BEAM_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(girderA, BlockContent.METAL_GIRDER_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(girderB, BlockContent.METAL_GIRDER_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(apart, BlockContent.METAL_BEAM_BLOCK.defaultBlockState());
+
+        var player = playerWith(helper, ItemContent.NETHERITE_PAINT, 4);
+        if (!paint(level, beamA, player)) {
+            helper.fail("painting a Metal Beam was refused");
+            return;
+        }
+        for (var pos : new BlockPos[]{beamA, beamB, girderA, girderB}) {
+            if (colour(level, pos) != ColorVariant.NETHERITE) helper.fail(level.getBlockState(pos).getBlock() + " at " + pos + " isn't netherite");
+        }
+        if (PipePaintData.get(level).has(apart)) helper.fail("a beam that doesn't touch the structure was painted");
+        helper.succeed();
+    }
+
+    /** Pipe Boosters are painted one at a time, even when they touch. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    public static void paintPipeBoosterAlone(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var a = helper.absolutePos(new BlockPos(1, 1, 2));
+        var b = helper.absolutePos(new BlockPos(2, 1, 2));
+        level.setBlockAndUpdate(a, BlockContent.PIPE_BOOSTER_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(b, BlockContent.PIPE_BOOSTER_BLOCK.defaultBlockState());
+        var player = playerWith(helper, ItemContent.FLUXITE_PAINT, 4);
+        if (!paint(level, a, player)) {
+            helper.fail("painting a Pipe Booster was refused");
+            return;
+        }
+        if (colour(level, a) != ColorVariant.FLUXITE) helper.fail("booster isn't fluxite");
+        if (PipePaintData.get(level).has(b)) helper.fail("painting one booster also painted the one next to it");
+        helper.succeed();
+    }
+
     /** One click paints the walls and everything built into the reactor, but not glass next to it. */
     @GameTest(template = TEMPLATE, timeoutTicks = 100)
     public static void paintReactor(GameTestHelper helper) {

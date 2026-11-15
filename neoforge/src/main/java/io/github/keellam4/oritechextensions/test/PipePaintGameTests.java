@@ -20,7 +20,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.ColorableMachine.ColorVariant;
 
-/** Painting standard Oritech item/fluid pipe networks (server side). */
+/** Painting Oritech pipe networks: item, fluid, energy and superconductor, with framed and duct versions (server side). */
 @GameTestHolder(OritechExtensions.MODID)
 @PrefixGameTestTemplate(false)
 public class PipePaintGameTests {
@@ -69,18 +69,56 @@ public class PipePaintGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = TEMPLATE)
-    public static void ignoresFramedPipe(GameTestHelper helper) {
+    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    public static void paintEnergyPipeNetwork(GameTestHelper helper) {
+        paintNetwork(helper, BlockContent.ENERGY_PIPE);
+    }
+
+    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    public static void paintSuperconductorNetwork(GameTestHelper helper) {
+        paintNetwork(helper, BlockContent.SUPERCONDUCTOR);
+    }
+
+    /** Framed item pipes and item pipe ducts are part of the item pipe network, so they paint with it. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    public static void paintFramedAndDuctWithItemPipes(GameTestHelper helper) {
         var level = helper.getLevel();
-        var pos = helper.absolutePos(new BlockPos(2, 1, 2));
-        level.setBlockAndUpdate(pos, BlockContent.FRAMED_ITEM_PIPE.defaultBlockState());
+        var blocks = new Block[]{BlockContent.ITEM_PIPE, BlockContent.FRAMED_ITEM_PIPE, BlockContent.ITEM_PIPE_DUCT_BLOCK, BlockContent.ITEM_PIPE};
+        var positions = new BlockPos[blocks.length];
+        for (int i = 0; i < blocks.length; i++) {
+            positions[i] = helper.absolutePos(new BlockPos(i, 1, 2));
+            level.setBlockAndUpdate(positions[i], blocks[i].defaultBlockState());
+        }
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var paint = new ItemStack(ItemContent.REDSTONE_PAINT, 4);
+        player.setItemInHand(InteractionHand.MAIN_HAND, paint);
+        if (!PipePaintEvents.tryPaint(level, positions[0], player, InteractionHand.MAIN_HAND, paint)) {
+            helper.fail("painting an item pipe line with a framed pipe and a duct was refused");
+            return;
+        }
+        for (var pos : positions) {
+            if (PipePaint.getPaint(level, pos) != ColorVariant.REDSTONE) {
+                helper.fail(level.getBlockState(pos).getBlock() + " at " + pos + " isn't redstone");
+                return;
+            }
+        }
+        helper.succeed();
+    }
+
+    /** Energy pipes are their own network: painting item pipes next to them leaves the energy pipes alone. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    public static void energyPipesDontJoinItemPipes(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var item = helper.absolutePos(new BlockPos(1, 1, 2));
+        var energy = helper.absolutePos(new BlockPos(2, 1, 2));
+        level.setBlockAndUpdate(item, BlockContent.ITEM_PIPE.defaultBlockState());
+        level.setBlockAndUpdate(energy, BlockContent.ENERGY_PIPE.defaultBlockState());
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         var paint = new ItemStack(ItemContent.WHITE_PAINT, 4);
         player.setItemInHand(InteractionHand.MAIN_HAND, paint);
-        if (PipePaintEvents.tryPaint(level, pos, player, InteractionHand.MAIN_HAND, paint)) {
-            helper.fail("painted a framed pipe");
-        }
-        if (paint.getCount() != 4) helper.fail("used paint on a framed pipe");
+        PipePaintEvents.tryPaint(level, item, player, InteractionHand.MAIN_HAND, paint);
+        if (PipePaint.getPaint(level, item) != ColorVariant.WHITE) helper.fail("item pipe wasn't painted");
+        if (PipePaintData.get(level).has(energy)) helper.fail("painting the item pipe spread into the energy pipe");
         helper.succeed();
     }
 

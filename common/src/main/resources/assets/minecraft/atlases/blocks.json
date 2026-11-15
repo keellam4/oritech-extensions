@@ -85,7 +85,9 @@
       "type": "minecraft:paletted_permutations",
       "textures": [
         "oritech:block/item_pipe",
-        "oritech:block/transparent_item_pipe"
+        "oritech:block/transparent_item_pipe",
+        "oritech:block/item_pipe_duct_block",
+        "oritech:block/fluid_pipe_duct_block"
       ],
       "palette_key": "oritech_extensions:colormap/paint/pipe_key",
       "permutations": {
@@ -121,7 +123,9 @@
         "oritech:block/accelerator_motor",
         "oritech:block/accelerator_ring",
         "oritech:block/accelerator_sensor",
-        "oritech:block/particle_collector_block"
+        "oritech:block/particle_collector_block",
+        "oritech:block/metal_beam_block",
+        "oritech:block/metal_girder_block"
       ],
       "palette_key": "oritech_extensions:colormap/paint/structure_key",
       "permutations": {
@@ -133,6 +137,42 @@
         "paint_netherite": "oritech_extensions:colormap/paint/structure_netherite",
         "paint_redstone": "oritech_extensions:colormap/paint/structure_redstone",
         "paint_sculk": "oritech_extensions:colormap/paint/structure_sculk"
+      }
+    },
+    {
+      "type": "minecraft:paletted_permutations",
+      "textures": [
+        "oritech:block/energy_pipe",
+        "oritech:block/energy_pipe_duct_block"
+      ],
+      "palette_key": "oritech_extensions:colormap/paint/energy_key",
+      "permutations": {
+        "paint_camo": "oritech_extensions:colormap/paint/energy_camo",
+        "paint_diamond": "oritech_extensions:colormap/paint/energy_diamond",
+        "paint_fluxite": "oritech_extensions:colormap/paint/energy_fluxite",
+        "paint_white": "oritech_extensions:colormap/paint/energy_white",
+        "paint_industrial": "oritech_extensions:colormap/paint/energy_industrial",
+        "paint_netherite": "oritech_extensions:colormap/paint/energy_netherite",
+        "paint_redstone": "oritech_extensions:colormap/paint/energy_redstone",
+        "paint_sculk": "oritech_extensions:colormap/paint/energy_sculk"
+      }
+    },
+    {
+      "type": "minecraft:paletted_permutations",
+      "textures": [
+        "oritech:block/superconductor",
+        "oritech:block/superconductor_duct_block"
+      ],
+      "palette_key": "oritech_extensions:colormap/paint/superconductor_key",
+      "permutations": {
+        "paint_camo": "oritech_extensions:colormap/paint/superconductor_camo",
+        "paint_diamond": "oritech_extensions:colormap/paint/superconductor_diamond",
+        "paint_fluxite": "oritech_extensions:colormap/paint/superconductor_fluxite",
+        "paint_white": "oritech_extensions:colormap/paint/superconductor_white",
+        "paint_industrial": "oritech_extensions:colormap/paint/superconductor_industrial",
+        "paint_netherite": "oritech_extensions:colormap/paint/superconductor_netherite",
+        "paint_redstone": "oritech_extensions:colormap/paint/superconductor_redstone",
+        "paint_sculk": "oritech_extensions:colormap/paint/superconductor_sculk"
       }
     }
   ]

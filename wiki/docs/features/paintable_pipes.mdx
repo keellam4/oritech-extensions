@@ -1,13 +1,22 @@
 ---
-title: Paintable Standard Pipes
+title: Paintable Pipes
 icon: oritech:item_pipe
-related_items: ["oritech:item_pipe", "oritech:transparent_item_pipe", "oritech:fluid_pipe", "oritech:white_paint", "oritech:orange_paint"]
-paint_viewer: ["oritech:item_pipe", "oritech:transparent_item_pipe", "oritech:fluid_pipe"]
+related_items: ["oritech:item_pipe", "oritech:fluid_pipe", "oritech:energy_pipe", "oritech:superconductor", "oritech:item_pipe_duct_block", "oritech:framed_item_pipe", "oritech:white_paint", "oritech:orange_paint"]
+paint_viewer: ["oritech:item_pipe", "oritech:transparent_item_pipe", "oritech:fluid_pipe", "oritech:item_pipe_duct_block", "oritech:fluid_pipe_duct_block", "oritech:energy_pipe", "oritech:energy_pipe_duct_block", "oritech:superconductor", "oritech:superconductor_duct_block"]
 ---
 
-# Paintable Standard Pipes
+# Paintable Pipes
 
-Color Cartridges can paint **standard item pipes**, **transparent item pipes**, and **standard fluid pipes** (including their connection segments). Transparent and standard item pipes are one network in Oritech, so they are painted together.
+Color Cartridges paint every kind of Oritech pipe network:
+
+| Network | Blocks | What takes the colour |
+|---|---|---|
+| Item | Item pipes, transparent item pipes, framed item pipes, item pipe ducts | The copper pipe; the duct's ring |
+| Fluid | Fluid pipes, framed fluid pipes, fluid pipe ducts | The orange pipe; the duct's ring |
+| Energy | Energy pipes, framed energy pipes, energy pipe ducts | The orange connectors; the duct's light ring |
+| Superconductor | Superconductors, framed superconductors, superconductor ducts | The teal parts |
+
+Framed and duct versions are part of their pipe's network in Oritech, so they paint together with it. Frames, duct casings and the red indicator lights keep their look. Connection segments paint with the pipe.
 
 ## How it works
 
@@ -22,14 +31,15 @@ Painted pipes only connect to pipes of the **same colour**, so you can run two i
 - **Unpainted pipes connect to every colour.** Use one as a bridge on purpose, or paint it to split two lines.
 - Painting only spreads through pipes that currently share the clicked pipe's colour, so repainting one line never bleeds into the line next to it.
 - Repainting a line to match its neighbour joins them again.
-- Item and fluid pipes never connect to each other, painted or not.
+- This works for ducts too: two ducts side by side normally always join, but not when they're painted different colours.
+- Different pipe types (item, fluid, energy, superconductor) never connect to each other, painted or not.
 
 Turn this off with `pipePaintIsolation = false` if you only want paint as decoration.
 
 ## Rules
 
 - Colour is **world-only**. Broken pipes always drop unpainted.
-- A newly placed standard pipe inherits colour if it touches a same-type painted neighbour of **one** colour. Conflicting neighbours leave it unpainted.
+- A newly placed pipe inherits colour if it touches a same-type painted neighbour of **one** colour. Conflicting neighbours leave it unpainted.
 - Item filters and smart splitters keep Oritech's own paint behaviour; network paint does not recolour them.
 
 ## Config
@@ -38,7 +48,3 @@ Turn this off with `pipePaintIsolation = false` if you only want paint as decora
 |---|---|---|
 | `pipePaintCostMode` | `NETWORK` | `NETWORK` = one cartridge for the whole network; `PER_BLOCK` = one per block. Also used for glass, reactors and accelerators |
 | `pipePaintIsolation` | `true` | Painted pipes only connect to the same colour (unpainted connects to all). Changes apply to pipes the next time they're painted or placed |
-
-## Not yet supported
-
-Framed pipes, duct pipes, and energy pipes.

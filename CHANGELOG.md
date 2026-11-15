@@ -5,6 +5,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
+- **More paintable blocks.** Color Cartridges now also paint Metal Beams and Metal Girders (a touching support structure paints in one click), Pipe Boosters (one at a time), item and fluid pipe ducts and framed pipes (with their pipe network), and energy pipes and superconductors with their framed and duct versions (their orange connectors, light duct rings and teal parts take the colour). Colour-isolated pipes work for all of them, including ducts placed side by side.
 - **Paintable block tags for modpacks.** Add blocks to `oritech_extensions:paintable` (one block per click) or `oritech_extensions:paintable_connected` (touching blocks paint together) with a datapack, and list their textures in the painted-texture atlas with a resource pack. See "For Modpack Makers" on the website.
 
 ## [0.4.1+fabric] - Beta (Fabric)
