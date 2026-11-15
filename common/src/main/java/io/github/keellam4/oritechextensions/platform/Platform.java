@@ -38,6 +38,24 @@ public interface Platform {
     /** Client only: sends {@code payload} to the server. */
     void sendToServer(CustomPacketPayload payload);
 
+    /** A menu type whose client side is made with {@code factory} (no extra data). */
+    <T extends net.minecraft.world.inventory.AbstractContainerMenu> net.minecraft.world.inventory.MenuType<T> menuType(
+            java.util.function.BiFunction<Integer, net.minecraft.world.entity.player.Inventory, T> factory);
+
+    /**
+     * Inserts {@code stack} into the inventory at {@code pos}, reached from {@code side}. Returns how many fit
+     * (moved unless {@code simulate}).
+     */
+    int insertItem(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side,
+                   net.minecraft.world.item.ItemStack stack, boolean simulate);
+
+    /**
+     * Takes up to {@code max} items of the first type matching {@code filter} out of the inventory at {@code pos},
+     * reached from {@code side}. Returns them (taken unless {@code simulate}), or an empty stack.
+     */
+    net.minecraft.world.item.ItemStack extractItem(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side,
+                                                   java.util.function.Predicate<net.minecraft.world.item.ItemStack> filter, int max, boolean simulate);
+
     boolean isModLoaded(String modId);
 
     /** True on the game client (also while it hosts a singleplayer world), false on a dedicated server. */

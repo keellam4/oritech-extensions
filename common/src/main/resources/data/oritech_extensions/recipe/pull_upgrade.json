@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " H ",
+    "SMS"
+  ],
+  "key": {
+    "H": {
+      "item": "minecraft:hopper"
+    },
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "M": {
+      "item": "oritech:motor"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:pull_upgrade",
+    "count": 1
+  }
+}

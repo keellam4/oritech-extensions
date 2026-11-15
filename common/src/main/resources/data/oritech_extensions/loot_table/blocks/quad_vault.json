@@ -14,7 +14,8 @@
               "source": "block_entity",
               "include": [
                 "oritech_extensions:vault_contents",
-                "oritech_extensions:paint"
+                "oritech_extensions:paint",
+                "minecraft:container"
               ]
             }
           ]

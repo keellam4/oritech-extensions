@@ -60,6 +60,7 @@ public final class OritechExtensionsNeoForge {
             event.accept(ModContent.GRID_VAULT_ITEM.get());
             event.accept(ModContent.COMPACTING_VAULT_ITEM.get());
             event.accept(ModContent.DUAL_COMPACTING_VAULT_ITEM.get());
+            ModContent.VAULT_UPGRADES.values().forEach(upgrade -> event.accept(upgrade.get()));
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModContent.GUIDE.get());

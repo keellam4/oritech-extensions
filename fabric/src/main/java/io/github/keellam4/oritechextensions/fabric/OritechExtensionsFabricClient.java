@@ -31,6 +31,9 @@ public final class OritechExtensionsFabricClient implements ClientModInitializer
                 io.github.keellam4.oritechextensions.client.VaultHud.render(graphics));
         io.github.keellam4.oritechextensions.storage.CargoVault.clientSlotLookup = io.github.keellam4.oritechextensions.client.VaultHud::slotUnderCrosshair;
 
+        net.minecraft.client.gui.screens.MenuScreens.register(ModContent.VAULT_UPGRADE_MENU.get(),
+                io.github.keellam4.oritechextensions.client.VaultUpgradeScreen::new);
+
         FabricPaintModels.register();
         ClientTickEvents.END_CLIENT_TICK.register(FabricPaintModels::afterReload);
         if (PaintClient.smokeTest()) ClientTickEvents.END_CLIENT_TICK.register(client -> PaintClient.smokeTestTick());

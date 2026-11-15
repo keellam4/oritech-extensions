@@ -64,6 +64,43 @@ public final class FabricPlatform implements Platform {
     }
 
     @Override
+    public <T extends net.minecraft.world.inventory.AbstractContainerMenu> net.minecraft.world.inventory.MenuType<T> menuType(
+            java.util.function.BiFunction<Integer, net.minecraft.world.entity.player.Inventory, T> factory) {
+        return new net.minecraft.world.inventory.MenuType<>(factory::apply, net.minecraft.world.flag.FeatureFlags.VANILLA_SET);
+    }
+
+    @Override
+    public int insertItem(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side,
+                          net.minecraft.world.item.ItemStack stack, boolean simulate) {
+        var storage = net.fabricmc.fabric.api.transfer.v1.item.ItemStorage.SIDED.find(level, pos, side);
+        if (storage == null || stack.isEmpty()) return 0;
+        try (var transaction = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+            long moved = storage.insert(net.fabricmc.fabric.api.transfer.v1.item.ItemVariant.of(stack), stack.getCount(), transaction);
+            if (!simulate) transaction.commit();
+            return (int) moved;
+        }
+    }
+
+    @Override
+    public net.minecraft.world.item.ItemStack extractItem(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side,
+                                                          java.util.function.Predicate<net.minecraft.world.item.ItemStack> filter, int max, boolean simulate) {
+        var storage = net.fabricmc.fabric.api.transfer.v1.item.ItemStorage.SIDED.find(level, pos, side);
+        if (storage == null || max <= 0) return net.minecraft.world.item.ItemStack.EMPTY;
+        try (var transaction = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+            for (var view : storage.nonEmptyViews()) {
+                var resource = view.getResource();
+                if (!filter.test(resource.toStack())) continue;
+                long taken = view.extract(resource, max, transaction);
+                if (taken > 0) {
+                    if (!simulate) transaction.commit();
+                    return resource.toStack((int) taken);
+                }
+            }
+        }
+        return net.minecraft.world.item.ItemStack.EMPTY;
+    }
+
+    @Override
     public void sendToServer(CustomPacketPayload payload) {
         // Only called on the client; the class is only loaded when this runs.
         net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(payload);

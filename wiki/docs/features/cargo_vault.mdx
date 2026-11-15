@@ -20,9 +20,10 @@ Shaped: Steel Ingot, Industrial Glass, Steel Ingot / Nickel Ingot, Barrel, Nicke
 | Right-click twice quickly, or with an empty hand | Put in every matching item from your inventory |
 | Left-click the front | Take a stack |
 | Sneak + left-click the front | Take one item |
-| Sneak + right-click with an empty hand | Lock or unlock the item type |
+| Sneak + right-click with an empty hand (or right-click a side) | Open the upgrade screen, with the lock |
+| Right-click with an upgrade | Put it straight into its slot |
 
-A **locked** vault keeps its item type when it's empty, so it only ever takes that item. The count turns orange while it's locked. Break a vault from any side but the front (or when it's empty).
+A **locked** vault (the padlock in the upgrade screen) keeps its item types when it's empty, so it only ever takes that item. The count turns orange while it's locked. Break a vault from any side but the front (or when it's empty).
 
 ## Size
 
@@ -43,6 +44,22 @@ The **Dual Compacting Vault** works the same with two forms (ingots and blocks, 
 Each step can be a 3 × 3 or a 2 × 2 recipe, but it must also craft back: vanilla Quartz Blocks can't be turned back into quartz, so quartz stays a single form.
 
 Crafting: Steel Ingot, Piston, Steel Ingot / Motor, Cargo Vault, Motor / Steel Ingot, Piston, Steel Ingot. The Dual Compacting Vault has Steel Ingots instead of the bottom Piston.
+
+## Upgrades
+
+Sneak + right-click a vault with an empty hand (or right-click its side or top) to open the upgrade screen. It has one slot per kind of upgrade, so a vault never takes two Voids. You can also right-click the vault holding an upgrade to put it straight in. Upgrades stay in the vault when you break it.
+
+| Upgrade | Slot takes | What it does |
+|---|---|---|
+| Capacity (Steel ×2, Electrum ×4, Energite ×8, Duratium ×16, Prometheum ×32) | 5, of one tier | More room in every window; they add up, so five Electrum make ×20. They can't come out while the vault holds more than it could without them. |
+| Void | 1 | Items that don't fit are deleted instead of backing up, but only items the vault already holds. |
+| Pull | 1 | Once a second, pulls the vault's items from the inventories on the sides you pick. |
+| Push | 1 | Once a second, pushes the vault's items into the inventories on the sides you pick. |
+| Redstone | 1 | The vault gives off a redstone signal as strong as it is full. A redstone signal into the vault pauses Pull and Push. |
+
+Pull and Push each have a small unfolded cube of the vault's sides (Front, Back, Left, Right, Up, Down) in the screen: click a side to turn it on or off. Several sides can be on at once. Both start on the back.
+
+Crafting: each Capacity upgrade is four of its ingot around the tier below (Steel around a Chest). Void: Obsidian around Enderic Compound. Pull: Hopper over Steel, Motor, Steel. Push: Dropper over Steel, Motor, Steel. Redstone: Comparator over Steel, Block of Redstone, Steel.
 
 ## Readout
 

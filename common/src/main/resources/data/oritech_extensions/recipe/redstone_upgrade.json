@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "SRS"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:comparator"
+    },
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:redstone_upgrade",
+    "count": 1
+  }
+}
