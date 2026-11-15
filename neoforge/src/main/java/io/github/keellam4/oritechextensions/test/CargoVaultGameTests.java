@@ -83,7 +83,7 @@ public class CargoVaultGameTests {
             return;
         }
         var contents = dropped.get().get(ModContent.VAULT_CONTENTS.get());
-        if (contents == null || contents.count() != 50 || !contents.item().is(Items.REDSTONE)) helper.fail("the dropped vault lost its items: " + contents);
+        if (contents == null || contents.slot(0).count() != 50 || !contents.slot(0).item().is(Items.REDSTONE)) helper.fail("the dropped vault lost its items: " + contents);
         if (dropped.get().get(ModContent.PAINT_COMPONENT.get()) != Paint.CAMO) helper.fail("the dropped vault lost its paint");
 
         // Placing it again brings both back.
