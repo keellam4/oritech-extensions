@@ -100,7 +100,7 @@ public class CargoLinkItem extends Item {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.link.unbound").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
-        if (energy(stack) <= 0) {
+        if (energy(stack) <= 0 && !player.getAbilities().instabuild) {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.link.battery").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
@@ -161,7 +161,7 @@ public class CargoLinkItem extends Item {
 
         @Override
         public boolean pay(Player player, int items) {
-            // Creative players pay too, so the battery behaves the same everywhere.
+            if (player.getAbilities().instabuild) return true; // creative: free
             if (spend(player.getItemInHand(hand), items, upgrade)) return true;
             player.displayClientMessage(Component.translatable("message.oritech_extensions.link.battery").withStyle(ChatFormatting.RED), true);
             return false;

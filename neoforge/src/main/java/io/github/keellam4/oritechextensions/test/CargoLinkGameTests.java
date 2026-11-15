@@ -133,16 +133,22 @@ public class CargoLinkGameTests {
         helper.succeed();
     }
 
-    /** Creative players pay for transfers too. */
+    /** Survival players pay for transfers; creative players don't. */
     @GameTest(template = TEMPLATE, timeoutTicks = 40)
-    public static void creativePaysToo(GameTestHelper helper) {
+    public static void survivalPaysCreativeDoesnt(GameTestHelper helper) {
+        var survivor = helper.makeMockPlayer(GameType.SURVIVAL);
+        var used = new ItemStack(ModContent.CARGO_LINK.get());
+        CargoLinkItem.setEnergy(used, 1000);
+        survivor.setItemInHand(InteractionHand.MAIN_HAND, used);
+        new CargoLinkItem.Access(InteractionHand.MAIN_HAND, GlobalPos.of(helper.getLevel().dimension(), BlockPos.ZERO), 32).pay(survivor, 10);
+        if (CargoLinkItem.energy(survivor.getMainHandItem()) >= 1000) helper.fail("a survival player's Link should use energy");
         var player = helper.makeMockPlayer(GameType.CREATIVE);
         var link = new ItemStack(ModContent.CARGO_LINK.get());
         CargoLinkItem.setEnergy(link, 1000);
         player.setItemInHand(InteractionHand.MAIN_HAND, link);
         var access = new CargoLinkItem.Access(InteractionHand.MAIN_HAND, GlobalPos.of(helper.getLevel().dimension(), BlockPos.ZERO), 32);
         access.pay(player, 10);
-        if (CargoLinkItem.energy(player.getMainHandItem()) >= 1000) helper.fail("a creative player's Link should use energy");
+        if (CargoLinkItem.energy(player.getMainHandItem()) != 1000) helper.fail("a creative player's Link shouldn't use energy");
         helper.succeed();
     }
 
