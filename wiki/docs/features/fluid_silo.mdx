@@ -1,7 +1,7 @@
 ---
 title: Fluid Silo
 icon: oritech_extensions:silo_controller
-related_items: ["oritech_extensions:silo_controller", "oritech_extensions:silo_casing", "oritech_extensions:silo_glass", "oritech_extensions:fluid_vault", "oritech_extensions:cargo_controller", "oritech_extensions:detailing_tool"]
+related_items: ["oritech_extensions:silo_controller", "oritech_extensions:partition_upgrade", "oritech_extensions:advanced_partition_upgrade", "oritech_extensions:partition_matrix", "oritech_extensions:silo_casing", "oritech_extensions:silo_glass", "oritech_extensions:fluid_vault", "oritech_extensions:cargo_controller", "oritech_extensions:detailing_tool"]
 ---
 
 # Fluid Silo
@@ -12,7 +12,7 @@ The Fluid Silo is a big multiblock tank for one fluid. You see the fluid through
 
 - Build a solid 3 × 3 column of **Silo Casing** and **Silo Glass**, 3 to 9 blocks tall. Mix in as much or as little glass as you like.
 - Put one **Silo Controller** anywhere in the bottom layer, in place of a casing.
-- The controller checks the silo once a second. Right-click any block of the silo with an empty hand to see its size and how full it is. Right-click an unfinished controller to see what's missing.
+- The controller checks the silo once a second. Right-click the controller to open its screen, or any other block of the silo with an empty hand to see its size and how full it is. Right-click an unfinished controller to see what's missing.
 
 ## Size
 
@@ -24,10 +24,31 @@ The Fluid Silo is a big multiblock tank for one fluid. You see the fluid through
 - **Pipes:** fluid pipes connect to any block of the silo, the controller included.
 - **Cargo network:** when the controller touches a vault, a Cargo Controller or a Crafting Terminal, the silo joins that network as one big tank. Its fluid shows in the terminals, and fluid pipes on the Cargo Controller reach it too.
 
+## More than one fluid
+
+A silo holds one fluid. Put a **partition upgrade** in the slot in the controller's screen and it holds several, all sharing the silo's space: water can use the whole silo until lava arrives, then they share what's free.
+
+| Upgrade | Fluids at once |
+|---|---|
+| none | 1 |
+| Partition Upgrade | 4 |
+| Advanced Partition Upgrade | 9 |
+| Partition Matrix | any number |
+
+The screen shows a bar of the whole silo and a row for each fluid with four buttons:
+- **Limit** (L): the most of the silo that fluid may use, from 10% to 90%. Left-click for more, right-click for less.
+- **Reserve** (R): space kept free for that fluid even when it's empty. Reserves can't add up to more than the whole silo.
+- **Lock**: the fluid keeps its row when it runs empty, so no other fluid takes its place.
+- **Void**: fluid that doesn't fit is deleted instead of backing up the pipe.
+
+Pipes pulling from the silo take the top row first; shift-click a fluid's name to move it up. Through the glass, the fluids sit in layers by density: lava at the bottom, gases on top. The upgrade can't come out while the silo holds more than one fluid.
+
+Crafting: Partition Upgrade: Steel Ingot, Fluid Pipe, Steel Ingot / Industrial Glass, Silo Casing, Industrial Glass / Steel Ingot, Fluid Pipe, Steel Ingot. Advanced: Electrum Ingot, Processing Unit, Electrum Ingot / Energite Ingot, Partition Upgrade, Energite Ingot / Electrum Ingot, Processing Unit, Electrum Ingot. Matrix: Prometheum Ingots in the corners, Enderic Compound on the sides, an Advanced Partition Upgrade in the middle.
+
 ## Breaking it
 
 - If a block of the silo is missing, the silo stops taking fluid. The fluid stays in the controller and you can still drain it. Put the block back and it works again.
-- A mined controller keeps the fluid on its item; the tooltip shows what it holds. Place it in a new silo to carry on.
+- A mined controller keeps its fluids, their settings and its upgrade on its item; the tooltip shows what it holds. Place it in a new silo to carry on.
 
 ## Paint
 
