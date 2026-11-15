@@ -17,7 +17,7 @@ import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,8 +32,8 @@ public final class NeoForgePlatform implements Platform {
             DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, OritechExtensions.MODID);
 
     /** Paint on a machine addon block entity. Saved with the block entity under "neoforge:attachments". */
-    public static final Supplier<AttachmentType<ColorVariant>> PAINT = ATTACHMENT_TYPES.register(
-            "paint", () -> AttachmentType.builder(() -> ColorVariant.ORANGE).serialize(PaintColors.CODEC).build());
+    public static final Supplier<AttachmentType<Paint>> PAINT = ATTACHMENT_TYPES.register(
+            "paint", () -> AttachmentType.builder(() -> Paint.ORANGE).serialize(PaintColors.CODEC).build());
 
     /** Adds every register to the mod bus. Call after {@code ModContent.init()}. */
     static void registerAll(IEventBus modBus) {
@@ -51,8 +51,8 @@ public final class NeoForgePlatform implements Platform {
     }
 
     @Override
-    public ColorVariant getAddonPaint(BlockEntity blockEntity) {
-        return blockEntity.hasData(PAINT) ? blockEntity.getData(PAINT) : ColorVariant.ORANGE;
+    public Paint getAddonPaint(BlockEntity blockEntity) {
+        return blockEntity.hasData(PAINT) ? blockEntity.getData(PAINT) : Paint.ORANGE;
     }
 
     @Override
@@ -61,7 +61,7 @@ public final class NeoForgePlatform implements Platform {
     }
 
     @Override
-    public void setAddonPaint(BlockEntity blockEntity, ColorVariant variant) {
+    public void setAddonPaint(BlockEntity blockEntity, Paint variant) {
         if (PaintColors.isPainted(variant)) {
             blockEntity.setData(PAINT, variant);
         } else {

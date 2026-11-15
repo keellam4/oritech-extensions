@@ -1,6 +1,7 @@
 package io.github.keellam4.oritechextensions;
 
 import io.github.keellam4.oritechextensions.guide.GuideBookItem;
+import io.github.keellam4.oritechextensions.paint.RainbowCartridgeItem;
 import io.github.keellam4.oritechextensions.hangar.HangarDoorExtensionBlock;
 import io.github.keellam4.oritechextensions.hangar.HangarDoorExtensionBlockEntity;
 import io.github.keellam4.oritechextensions.paint.PaintColors;
@@ -12,7 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import java.util.function.Supplier;
 
@@ -32,14 +33,18 @@ public final class ModContent {
     public static final Supplier<GuideBookItem> GUIDE = PLATFORM.register(BuiltInRegistries.ITEM,
             "guide", () -> new GuideBookItem(new Item.Properties().stacksTo(1)));
 
+    /** Paints like a Color Cartridge, but the block keeps cycling through the colours. */
+    public static final Supplier<RainbowCartridgeItem> RAINBOW_CARTRIDGE = PLATFORM.register(BuiltInRegistries.ITEM,
+            "rainbow_cartridge", () -> new RainbowCartridgeItem(new Item.Properties()));
+
     @SuppressWarnings("DataFlowIssue")
     public static final Supplier<BlockEntityType<HangarDoorExtensionBlockEntity>> HANGAR_DOOR_EXTENSION_ENTITY = PLATFORM.register(
             BuiltInRegistries.BLOCK_ENTITY_TYPE, "hangar_door_extension",
             () -> BlockEntityType.Builder.of(HangarDoorExtensionBlockEntity::new, HANGAR_DOOR_EXTENSION.get()).build(null));
 
     /** Paint remembered on a machine addon item, so a picked-up addon is placed back in its colour. */
-    public static final Supplier<DataComponentType<ColorVariant>> PAINT_COMPONENT = PLATFORM.register(
-            BuiltInRegistries.DATA_COMPONENT_TYPE, "paint", () -> DataComponentType.<ColorVariant>builder()
+    public static final Supplier<DataComponentType<Paint>> PAINT_COMPONENT = PLATFORM.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE, "paint", () -> DataComponentType.<Paint>builder()
                     .persistent(PaintColors.CODEC)
                     .networkSynchronized(PaintColors.STREAM_CODEC)
                     .build());

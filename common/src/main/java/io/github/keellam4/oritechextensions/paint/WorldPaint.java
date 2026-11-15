@@ -6,7 +6,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -71,7 +70,7 @@ public final class WorldPaint {
      *
      * @return the positions whose stored colour changed.
      */
-    public static List<BlockPos> apply(ServerLevel level, List<BlockPos> group, ColorVariant variant, int budget) {
+    public static List<BlockPos> apply(ServerLevel level, List<BlockPos> group, Paint variant, int budget) {
         if (budget <= 0) return List.of();
         var data = PipePaintData.get(level);
         var changed = new ArrayList<BlockPos>();
@@ -86,12 +85,12 @@ public final class WorldPaint {
 
     /** The colour a newly placed block takes over: its painted same-family neighbours' colour, if they all agree. */
     @Nullable
-    public static ColorVariant inheritanceColor(ServerLevel level, BlockPos pos, Function<Block, Object> family, int reach) {
+    public static Paint inheritanceColor(ServerLevel level, BlockPos pos, Function<Block, Object> family, int reach) {
         var ownFamily = family.apply(level.getBlockState(pos).getBlock());
         if (ownFamily == null) return null;
 
         var data = PipePaintData.get(level);
-        ColorVariant agreed = null;
+        Paint agreed = null;
         for (var direction : Direction.values()) {
             for (int distance = 1; distance <= reach; distance++) {
                 var neighbor = pos.relative(direction, distance);

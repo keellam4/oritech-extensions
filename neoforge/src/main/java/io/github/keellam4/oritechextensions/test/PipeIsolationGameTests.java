@@ -13,7 +13,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import rearth.oritech.block.blocks.pipes.AbstractPipeBlock;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public class PipeIsolationGameTests {
     private static final String TEMPLATE = "empty_tall";
 
     /** Paint {@code pos} the way the cartridge path does: store the colour, then let isolation react. */
-    private static void paint(ServerLevel level, BlockPos pos, ColorVariant colour) {
+    private static void paint(ServerLevel level, BlockPos pos, Paint colour) {
         var data = PipePaintData.get(level);
         var before = data.getOrDefault(pos);
         data.set(pos, colour);
@@ -62,9 +62,9 @@ public class PipeIsolationGameTests {
                 helper.fail("fresh unpainted pipes didn't connect");
                 return;
             }
-            paint(level, a, ColorVariant.WHITE);
-            paint(level, b, ColorVariant.WHITE);
-            paint(level, c, ColorVariant.SCULK);
+            paint(level, a, Paint.WHITE);
+            paint(level, b, Paint.WHITE);
+            paint(level, c, Paint.SCULK);
 
             if (connected(level, b, Direction.EAST) || connected(level, c, Direction.WEST)) {
                 helper.fail("white and sculk pipes still connect");
@@ -79,7 +79,7 @@ public class PipeIsolationGameTests {
                 return;
             }
 
-            paint(level, c, ColorVariant.WHITE);
+            paint(level, c, Paint.WHITE);
             if (!connected(level, b, Direction.EAST) || !connected(level, c, Direction.WEST)) {
                 helper.fail("repainting to the same colour didn't reconnect");
                 return;
@@ -101,19 +101,19 @@ public class PipeIsolationGameTests {
         for (var pos : new BlockPos[]{a, b, c}) place(level, pos, BlockContent.FLUID_PIPE);
 
         helper.runAfterDelay(2, () -> {
-            paint(level, a, ColorVariant.WHITE);
-            paint(level, c, ColorVariant.SCULK);
+            paint(level, a, Paint.WHITE);
+            paint(level, c, Paint.SCULK);
             if (!connected(level, b, Direction.WEST) || !connected(level, b, Direction.EAST)) {
                 helper.fail("unpainted fluid pipe stopped connecting to painted neighbours");
                 return;
             }
             // Clearing paint (orange) makes a pipe universal again.
-            paint(level, b, ColorVariant.WHITE);
+            paint(level, b, Paint.WHITE);
             if (connected(level, b, Direction.EAST)) {
                 helper.fail("white pipe connects to sculk pipe");
                 return;
             }
-            paint(level, b, ColorVariant.ORANGE);
+            paint(level, b, Paint.ORANGE);
             if (!connected(level, b, Direction.EAST) || !connected(level, c, Direction.WEST)) {
                 helper.fail("clearing paint didn't reconnect");
                 return;
@@ -136,9 +136,9 @@ public class PipeIsolationGameTests {
                 helper.fail("fresh unpainted ducts aren't one network");
                 return;
             }
-            paint(level, a, ColorVariant.WHITE);
-            paint(level, b, ColorVariant.WHITE);
-            paint(level, c, ColorVariant.SCULK);
+            paint(level, a, Paint.WHITE);
+            paint(level, b, Paint.WHITE);
+            paint(level, c, Paint.SCULK);
             if (network(level, b) != null && network(level, b).equals(network(level, c))) {
                 helper.fail("white and sculk ducts are still one network");
                 return;

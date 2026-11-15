@@ -17,7 +17,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,11 +35,11 @@ public final class PaintClient {
      * Colours of blocks whose paint lives in the world rather than on a block entity (pipes, Industrial Glass,
      * reactor and accelerator blocks, tagged blocks), as sent by the server.
      */
-    private static final Map<BlockPos, ColorVariant> WORLD_PAINT = new ConcurrentHashMap<>();
+    private static final Map<BlockPos, Paint> WORLD_PAINT = new ConcurrentHashMap<>();
 
     /** The world-stored colour at {@code pos}, or null if that block is unpainted. */
     @Nullable
-    public static ColorVariant worldPaint(BlockPos pos) {
+    public static Paint worldPaint(BlockPos pos) {
         return WORLD_PAINT.get(pos);
     }
 
@@ -87,7 +87,9 @@ public final class PaintClient {
                 "oritech:block/energy_pipe_paint_sculk", // energy palette
                 "oritech:block/energy_pipe_duct_block_paint_fluxite",
                 "oritech:block/superconductor_paint_industrial", // superconductor palette
-                "oritech:block/superconductor_duct_block_paint_camo"}) {
+                "oritech:block/superconductor_duct_block_paint_camo",
+                "oritech:block/item_pipe_paint_rainbow", // animated rainbow textures (single sprites, not palettes)
+                "oritech:block/capacitor_ctm/horizontal_paint_rainbow"}) {
             var id = ResourceLocation.parse(sample);
             if (!Platform.INSTANCE.isModLoaded(id.getNamespace())) {
                 // e.g. Oritech Things, which has no Fabric build

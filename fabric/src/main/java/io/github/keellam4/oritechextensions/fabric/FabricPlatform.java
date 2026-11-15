@@ -16,7 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import java.util.function.Supplier;
 
@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 public final class FabricPlatform implements Platform {
 
     /** Paint on a machine addon block entity. Saved with the block entity under "fabric:attachments". */
-    public static final AttachmentType<ColorVariant> PAINT = AttachmentRegistry.<ColorVariant>builder()
+    public static final AttachmentType<Paint> PAINT = AttachmentRegistry.<Paint>builder()
             .persistent(PaintColors.CODEC)
             .buildAndRegister(OritechExtensions.id("paint"));
 
@@ -37,9 +37,9 @@ public final class FabricPlatform implements Platform {
     }
 
     @Override
-    public ColorVariant getAddonPaint(BlockEntity blockEntity) {
+    public Paint getAddonPaint(BlockEntity blockEntity) {
         var paint = ((AttachmentTarget) blockEntity).getAttached(PAINT);
-        return paint != null ? paint : ColorVariant.ORANGE;
+        return paint != null ? paint : Paint.ORANGE;
     }
 
     @Override
@@ -48,7 +48,7 @@ public final class FabricPlatform implements Platform {
     }
 
     @Override
-    public void setAddonPaint(BlockEntity blockEntity, ColorVariant variant) {
+    public void setAddonPaint(BlockEntity blockEntity, Paint variant) {
         var target = (AttachmentTarget) blockEntity;
         if (PaintColors.isPainted(variant)) {
             target.setAttached(PAINT, variant);

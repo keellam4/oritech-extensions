@@ -18,7 +18,7 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 /** Painting Oritech pipe networks: item, fluid, energy and superconductor, with framed and duct versions (server side). */
 @GameTestHolder(OritechExtensions.MODID)
@@ -61,7 +61,7 @@ public class PipePaintGameTests {
             return;
         }
         for (var pos : new BlockPos[]{a, b, c}) {
-            if (PipePaint.getPaint(level, pos) != ColorVariant.SCULK) {
+            if (PipePaint.getPaint(level, pos) != Paint.SCULK) {
                 helper.fail("pipe at " + pos + " isn't sculk");
                 return;
             }
@@ -97,7 +97,7 @@ public class PipePaintGameTests {
             return;
         }
         for (var pos : positions) {
-            if (PipePaint.getPaint(level, pos) != ColorVariant.REDSTONE) {
+            if (PipePaint.getPaint(level, pos) != Paint.REDSTONE) {
                 helper.fail(level.getBlockState(pos).getBlock() + " at " + pos + " isn't redstone");
                 return;
             }
@@ -117,7 +117,7 @@ public class PipePaintGameTests {
         var paint = new ItemStack(ItemContent.WHITE_PAINT, 4);
         player.setItemInHand(InteractionHand.MAIN_HAND, paint);
         PipePaintEvents.tryPaint(level, item, player, InteractionHand.MAIN_HAND, paint);
-        if (PipePaint.getPaint(level, item) != ColorVariant.WHITE) helper.fail("item pipe wasn't painted");
+        if (PipePaint.getPaint(level, item) != Paint.WHITE) helper.fail("item pipe wasn't painted");
         if (PipePaintData.get(level).has(energy)) helper.fail("painting the item pipe spread into the energy pipe");
         helper.succeed();
     }
@@ -129,13 +129,13 @@ public class PipePaintGameTests {
         var b = helper.absolutePos(new BlockPos(2, 1, 2));
         var pipe = BlockContent.ITEM_PIPE;
         level.setBlockAndUpdate(a, pipe.defaultBlockState());
-        PipePaintData.get(level).set(a, ColorVariant.WHITE);
+        PipePaintData.get(level).set(a, Paint.WHITE);
 
         level.setBlockAndUpdate(b, pipe.defaultBlockState());
         var inherited = PipePaint.inheritanceColor(level, b);
-        if (inherited != ColorVariant.WHITE) helper.fail("expected white inheritance, got " + inherited);
+        if (inherited != Paint.WHITE) helper.fail("expected white inheritance, got " + inherited);
         PipePaintData.get(level).set(b, inherited);
-        if (PipePaint.getPaint(level, b) != ColorVariant.WHITE) helper.fail("placed pipe did not inherit");
+        if (PipePaint.getPaint(level, b) != Paint.WHITE) helper.fail("placed pipe did not inherit");
         helper.succeed();
     }
 
@@ -148,8 +148,8 @@ public class PipePaintGameTests {
         var pipe = BlockContent.ITEM_PIPE;
         level.setBlockAndUpdate(left, pipe.defaultBlockState());
         level.setBlockAndUpdate(right, pipe.defaultBlockState());
-        PipePaintData.get(level).set(left, ColorVariant.WHITE);
-        PipePaintData.get(level).set(right, ColorVariant.SCULK);
+        PipePaintData.get(level).set(left, Paint.WHITE);
+        PipePaintData.get(level).set(right, Paint.SCULK);
 
         level.setBlockAndUpdate(mid, pipe.defaultBlockState());
         if (PipePaint.inheritanceColor(level, mid) != null) helper.fail("conflicting neighbours should not inherit");
@@ -163,7 +163,7 @@ public class PipePaintGameTests {
         var pos = helper.absolutePos(new BlockPos(2, 1, 2));
         var pipe = BlockContent.ITEM_PIPE;
         level.setBlockAndUpdate(pos, pipe.defaultBlockState());
-        PipePaintData.get(level).set(pos, ColorVariant.WHITE);
+        PipePaintData.get(level).set(pos, Paint.WHITE);
 
         level.destroyBlock(pos, true);
         // BreakEvent may not fire from destroyBlock in game tests — clear explicitly if needed for assert path,
@@ -213,7 +213,7 @@ public class PipePaintGameTests {
             helper.fail("NETWORK mode should use 1 cartridge, left " + player.getMainHandItem().getCount());
         }
         for (var pos : new BlockPos[]{a, b, c}) {
-            if (PipePaint.getPaint(level, pos) != ColorVariant.WHITE) {
+            if (PipePaint.getPaint(level, pos) != Paint.WHITE) {
                 helper.fail("pipe at " + pos + " isn't white");
                 return;
             }

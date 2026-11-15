@@ -6,7 +6,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.List;
 
@@ -61,22 +60,22 @@ public final class PipePaint {
         return WorldPaint.discover(level, origin, PipePaint::familyOf, Integer.MAX_VALUE, 1);
     }
 
-    public static ColorVariant getPaint(ServerLevel level, BlockPos pos) {
+    public static Paint getPaint(ServerLevel level, BlockPos pos) {
         return PipePaintData.get(level).getOrDefault(pos);
     }
 
     /** Colour every position in {@code network}. Orange clears. Returns positions whose stored colour changed. */
-    public static List<BlockPos> applyToNetwork(ServerLevel level, List<BlockPos> network, ColorVariant variant) {
+    public static List<BlockPos> applyToNetwork(ServerLevel level, List<BlockPos> network, Paint variant) {
         return WorldPaint.apply(level, network, variant, Integer.MAX_VALUE);
     }
 
     /** Like {@link #applyToNetwork}, but at most {@code budget} changes, in network order. */
-    public static List<BlockPos> applyToNetworkBudgeted(ServerLevel level, List<BlockPos> network, ColorVariant variant, int budget) {
+    public static List<BlockPos> applyToNetworkBudgeted(ServerLevel level, List<BlockPos> network, Paint variant, int budget) {
         return WorldPaint.apply(level, network, variant, budget);
     }
 
     /** Inherit paint from same-family painted neighbours when they all agree on one colour. */
-    public static @Nullable ColorVariant inheritanceColor(ServerLevel level, BlockPos pos) {
+    public static @Nullable Paint inheritanceColor(ServerLevel level, BlockPos pos) {
         return WorldPaint.inheritanceColor(level, pos, PipePaint::familyOf, 1);
     }
 

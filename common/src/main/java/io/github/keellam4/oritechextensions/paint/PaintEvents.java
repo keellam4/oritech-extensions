@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.util.ColorableMachine;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +44,12 @@ public final class PaintEvents {
         return blockEntity instanceof AddonBlockEntity && !(blockEntity instanceof ColorableMachine);
     }
 
-    public static ColorVariant getPaint(BlockEntity blockEntity) {
+    public static Paint getPaint(BlockEntity blockEntity) {
         return Platform.INSTANCE.getAddonPaint(blockEntity);
     }
 
     /** Sets (or with ORANGE, clears) the paint on a block and tells nearby players. Server side. */
-    public static void setPaint(ServerLevel level, BlockEntity blockEntity, ColorVariant variant) {
+    public static void setPaint(ServerLevel level, BlockEntity blockEntity, Paint variant) {
         Platform.INSTANCE.setAddonPaint(blockEntity, variant);
         blockEntity.setChanged();
 
@@ -82,7 +81,7 @@ public final class PaintEvents {
 
     // ---------------------------------------------------------------- keeping paint when a block is moved
 
-    private record PendingPlacement(ColorVariant variant, Item item, long gameTime) {
+    private record PendingPlacement(Paint variant, Item item, long gameTime) {
     }
 
     private static final Map<UUID, PendingPlacement> PENDING = new ConcurrentHashMap<>();
@@ -94,14 +93,14 @@ public final class PaintEvents {
 
     /** Loader hook: a block is dropping items. The paint its own block item should carry, or null. */
     @Nullable
-    public static ColorVariant paintForDrops(@Nullable BlockEntity blockEntity) {
+    public static Paint paintForDrops(@Nullable BlockEntity blockEntity) {
         if (!isPaintable(blockEntity)) return null;
         var paint = getPaint(blockEntity);
         return PaintColors.isPainted(paint) ? paint : null;
     }
 
     /** Copy of {@code drop} carrying {@code paint} if it is {@code state}'s own block item; otherwise {@code drop}. */
-    public static ItemStack paintDrop(BlockState state, ItemStack drop, ColorVariant paint) {
+    public static ItemStack paintDrop(BlockState state, ItemStack drop, Paint paint) {
         if (!drop.is(state.getBlock().asItem())) return drop;
         var stack = drop.copy();
         stack.set(ModContent.PAINT_COMPONENT.get(), paint);

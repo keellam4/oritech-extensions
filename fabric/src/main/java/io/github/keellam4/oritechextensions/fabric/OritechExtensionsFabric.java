@@ -32,7 +32,10 @@ public final class OritechExtensionsFabric implements ModInitializer {
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> entries.accept(ModContent.HANGAR_DOOR_EXTENSION_ITEM.get()));
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.BUILDING_BLOCKS).register(entries -> entries.accept(ModContent.HANGAR_DOOR_EXTENSION_ITEM.get()));
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> entries.accept(ModContent.GUIDE.get()));
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> {
+            entries.accept(ModContent.GUIDE.get());
+            entries.accept(ModContent.RAINBOW_CARTRIDGE.get());
+        });
 
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             var stack = player.getItemInHand(hand);

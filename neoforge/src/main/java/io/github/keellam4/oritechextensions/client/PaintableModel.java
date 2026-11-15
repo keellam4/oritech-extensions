@@ -15,7 +15,7 @@ import net.neoforged.neoforge.client.model.BakedModelWrapper;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.client.model.data.ModelProperty;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.List;
  */
 final class PaintableModel extends BakedModelWrapper<BakedModel> {
 
-    static final ModelProperty<ColorVariant> PAINT = new ModelProperty<>();
+    static final ModelProperty<Paint> PAINT = new ModelProperty<>();
 
     private final PaintedSprites sprites;
 

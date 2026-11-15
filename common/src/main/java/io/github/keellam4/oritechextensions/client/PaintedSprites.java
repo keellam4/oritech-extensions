@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.inventory.InventoryMenu;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,12 +22,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 final class PaintedSprites {
 
-    private record Key(TextureAtlasSprite original, ColorVariant variant) {
+    private record Key(TextureAtlasSprite original, Paint variant) {
     }
 
     private final ConcurrentHashMap<Key, Optional<TextureAtlasSprite>> cache = new ConcurrentHashMap<>();
 
-    Optional<TextureAtlasSprite> find(TextureAtlasSprite original, ColorVariant variant) {
+    Optional<TextureAtlasSprite> find(TextureAtlasSprite original, Paint variant) {
         return cache.computeIfAbsent(new Key(original, variant), key -> {
             var atlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
             var name = original.contents().name().withSuffix(PaintColors.spriteSuffix(variant));

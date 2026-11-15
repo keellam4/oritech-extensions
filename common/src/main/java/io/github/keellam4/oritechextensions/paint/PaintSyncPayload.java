@@ -6,13 +6,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.List;
 
 /**
  * Server → client: paint colours for a set of block positions. Sent when blocks are painted, and for every
- * painted block in a chunk when that chunk is sent to a player. Colour id = ColorVariant ordinal (ORANGE = unpainted).
+ * painted block in a chunk when that chunk is sent to a player. Colour id = Paint ordinal (ORANGE = unpainted).
  * <p>
  * {@code world} says where the colour lives: false = on the block entity (machine addons), true = in the
  * position map (pipes, Industrial Glass, reactor and accelerator blocks).
@@ -26,11 +25,11 @@ public record PaintSyncPayload(List<Entry> entries) implements CustomPacketPaylo
                 ByteBufCodecs.BOOL, Entry::world,
                 Entry::new);
 
-        public static Entry onBlockEntity(BlockPos pos, ColorVariant variant) {
+        public static Entry onBlockEntity(BlockPos pos, Paint variant) {
             return new Entry(pos, PaintColors.toId(variant), false);
         }
 
-        public static Entry inWorld(BlockPos pos, ColorVariant variant) {
+        public static Entry inWorld(BlockPos pos, Paint variant) {
             return new Entry(pos, PaintColors.toId(variant), true);
         }
     }

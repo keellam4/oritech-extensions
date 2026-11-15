@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "oritech:redstone_paint" },
+    { "item": "oritech:industrial_paint" },
+    { "item": "oritech:camo_paint" },
+    { "item": "oritech:diamond_paint" },
+    { "item": "oritech:sculk_paint" },
+    { "item": "oritech:fluxite_paint" }
+  ],
+  "result": {
+    "id": "oritech_extensions:rainbow_cartridge",
+    "count": 6
+  }
+}

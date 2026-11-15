@@ -22,7 +22,7 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 /** Painting machine addons with Oritech's Color Cartridges (server side). */
 @GameTestHolder(OritechExtensions.MODID)
@@ -83,7 +83,7 @@ public class PaintGameTests {
 
         // 1. Paint it white: uses one cartridge.
         if (!PaintEvents.tryPaint(level, pos, player, InteractionHand.MAIN_HAND, paint)) helper.fail("painting was refused");
-        if (PaintEvents.getPaint(level.getBlockEntity(pos)) != ColorVariant.WHITE) helper.fail("block isn't white after painting");
+        if (PaintEvents.getPaint(level.getBlockEntity(pos)) != Paint.WHITE) helper.fail("block isn't white after painting");
         if (player.getMainHandItem().getCount() != 3) helper.fail("expected 3 cartridges left, have " + player.getMainHandItem().getCount());
 
         // 2. Same colour again: nothing happens, nothing used.
@@ -98,13 +98,13 @@ public class PaintGameTests {
             helper.fail("addon didn't drop");
             return;
         }
-        if (dropped.get().get(ModContent.PAINT_COMPONENT.get()) != ColorVariant.WHITE) helper.fail("dropped item lost its paint");
+        if (dropped.get().get(ModContent.PAINT_COMPONENT.get()) != Paint.WHITE) helper.fail("dropped item lost its paint");
 
         // 4. Place it again: the block is white again.
         PaintEvents.rememberHeldPaint(player, dropped.get(), level.getGameTime());
         level.setBlockAndUpdate(pos, state);
         PaintEvents.applyRememberedPaint(level, pos, player);
-        if (PaintEvents.getPaint(level.getBlockEntity(pos)) != ColorVariant.WHITE) helper.fail("placed addon isn't white");
+        if (PaintEvents.getPaint(level.getBlockEntity(pos)) != Paint.WHITE) helper.fail("placed addon isn't white");
 
         // 5. Orange (Oritech's default) removes the paint.
         var orange = new ItemStack(ItemContent.ORANGE_PAINT);

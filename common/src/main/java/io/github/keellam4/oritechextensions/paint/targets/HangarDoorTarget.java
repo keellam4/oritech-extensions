@@ -9,7 +9,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.util.ColorableMachine;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import java.util.List;
 
@@ -54,24 +54,25 @@ public final class HangarDoorTarget implements PaintTarget {
     }
 
     @Override
-    public ColorVariant get(ServerLevel level, BlockPos pos) {
+    public Paint get(ServerLevel level, BlockPos pos) {
         var door = door(level, doorPos(level, pos));
-        return door != null ? door.getCurrentColor() : ColorVariant.ORANGE;
+        return door != null ? Paint.of(door.getCurrentColor()) : Paint.ORANGE;
     }
 
     /** {@code group} holds the door's own position (see {@link #group}). */
     @Override
-    public List<BlockPos> apply(ServerLevel level, List<BlockPos> group, ColorVariant variant, int budget) {
+    public List<BlockPos> apply(ServerLevel level, List<BlockPos> group, Paint variant, int budget) {
         if (budget <= 0 || group.isEmpty()) return List.of();
         var door = door(level, group.get(0));
-        if (door == null || door.getCurrentColor() == variant) return List.of();
-        door.assignColor(variant); // Oritech saves it and sends it to players
+        // Oritech paints the door itself, so only Oritech's colours work here (no rainbow).
+        if (door == null || variant.variant() == null || Paint.of(door.getCurrentColor()) == variant) return List.of();
+        door.assignColor(variant.variant()); // Oritech saves it and sends it to players
         return group;
     }
 
     @Override
-    public boolean alreadyPainted(Level level, BlockPos pos, ColorVariant variant) {
+    public boolean alreadyPainted(Level level, BlockPos pos, Paint variant) {
         var door = door(level, doorPos(level, pos));
-        return door != null && door.getCurrentColor() == variant;
+        return door != null && Paint.of(door.getCurrentColor()) == variant;
     }
 }

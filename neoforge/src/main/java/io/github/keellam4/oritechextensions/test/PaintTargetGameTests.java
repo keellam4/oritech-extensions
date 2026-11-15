@@ -24,7 +24,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.ColorableMachine;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import static rearth.oritech.block.blocks.decorative.HangarDoorBlock.ROTATED;
 import static rearth.oritech.block.blocks.decorative.HangarDoorBlock.SURFACE;
@@ -53,7 +53,7 @@ public class PaintTargetGameTests {
             return;
         }
         for (var pos : new BlockPos[]{a, b, c}) {
-            if (colour(level, pos) != ColorVariant.SCULK) helper.fail("glass at " + pos + " isn't sculk");
+            if (colour(level, pos) != Paint.SCULK) helper.fail("glass at " + pos + " isn't sculk");
         }
         if (PipePaintData.get(level).has(apart)) helper.fail("glass that doesn't touch the group was painted");
         if (Config.pipePaintCostMode() == Config.PipePaintCostMode.NETWORK && player.getMainHandItem().getCount() != 3) {
@@ -84,7 +84,7 @@ public class PaintTargetGameTests {
             return;
         }
         for (var pos : new BlockPos[]{beamA, beamB, girderA, girderB}) {
-            if (colour(level, pos) != ColorVariant.NETHERITE) helper.fail(level.getBlockState(pos).getBlock() + " at " + pos + " isn't netherite");
+            if (colour(level, pos) != Paint.NETHERITE) helper.fail(level.getBlockState(pos).getBlock() + " at " + pos + " isn't netherite");
         }
         if (PipePaintData.get(level).has(apart)) helper.fail("a beam that doesn't touch the structure was painted");
         helper.succeed();
@@ -103,7 +103,7 @@ public class PaintTargetGameTests {
             helper.fail("painting a Pipe Booster was refused");
             return;
         }
-        if (colour(level, a) != ColorVariant.FLUXITE) helper.fail("booster isn't fluxite");
+        if (colour(level, a) != Paint.FLUXITE) helper.fail("booster isn't fluxite");
         if (PipePaintData.get(level).has(b)) helper.fail("painting one booster also painted the one next to it");
         helper.succeed();
     }
@@ -131,7 +131,7 @@ public class PaintTargetGameTests {
             return;
         }
         for (var pos : new BlockPos[]{wallA, wallB, controller, rod, heatPipe}) {
-            if (colour(level, pos) != ColorVariant.WHITE) helper.fail("reactor block at " + pos + " isn't white");
+            if (colour(level, pos) != Paint.WHITE) helper.fail("reactor block at " + pos + " isn't white");
         }
         if (PipePaintData.get(level).has(glass)) helper.fail("glass next to the reactor was painted with it");
 
@@ -163,7 +163,7 @@ public class PaintTargetGameTests {
             return;
         }
         for (var pos : new BlockPos[]{ring, ringAcrossGap, motor}) {
-            if (colour(level, pos) != ColorVariant.NETHERITE) helper.fail("accelerator part at " + pos + " isn't netherite");
+            if (colour(level, pos) != Paint.NETHERITE) helper.fail("accelerator part at " + pos + " isn't netherite");
         }
         if (PipePaintData.get(level).has(tooFar)) helper.fail("a ring beyond reach was painted");
         helper.succeed();
@@ -176,10 +176,10 @@ public class PaintTargetGameTests {
         var painted = helper.absolutePos(new BlockPos(1, 1, 2));
         var placed = helper.absolutePos(new BlockPos(2, 1, 2));
         level.setBlockAndUpdate(painted, BlockContent.INDUSTRIAL_GLASS_BLOCK.defaultBlockState());
-        PipePaintData.get(level).set(painted, ColorVariant.FLUXITE);
+        PipePaintData.get(level).set(painted, Paint.FLUXITE);
         level.setBlockAndUpdate(placed, BlockContent.INDUSTRIAL_GLASS_BLOCK.defaultBlockState());
 
-        if (WorldPaintTarget.GLASS.inheritanceColor(level, placed) != ColorVariant.FLUXITE) helper.fail("new glass did not take over its neighbour's colour");
+        if (WorldPaintTarget.GLASS.inheritanceColor(level, placed) != Paint.FLUXITE) helper.fail("new glass did not take over its neighbour's colour");
         if (WorldPaintTarget.REACTOR.inheritanceColor(level, placed) != null) helper.fail("glass was treated as a reactor block");
         helper.succeed();
     }
@@ -209,11 +209,18 @@ public class PaintTargetGameTests {
             helper.fail("painting the extension was refused");
             return;
         }
-        if (!(level.getBlockEntity(anchor) instanceof ColorableMachine door) || door.getCurrentColor() != ColorVariant.WHITE) {
+        if (!(level.getBlockEntity(anchor) instanceof ColorableMachine door) || Paint.of(door.getCurrentColor()) != Paint.WHITE) {
             helper.fail("the door isn't white after painting its extension");
             return;
         }
         if (player.getMainHandItem().getCount() != 3) helper.fail("painting a door should use one cartridge");
+
+        // Oritech paints the door itself, so a Rainbow Cartridge leaves it alone and isn't used up.
+        var rainbow = new ItemStack(ModContent.RAINBOW_CARTRIDGE.get(), 2);
+        player.setItemInHand(InteractionHand.MAIN_HAND, rainbow);
+        if (paint(level, extension, player)) helper.fail("a Rainbow Cartridge painted a hangar door");
+        if (player.getMainHandItem().getCount() != 2) helper.fail("a Rainbow Cartridge was used on a hangar door");
+        if (Paint.of(door.getCurrentColor()) != Paint.WHITE) helper.fail("a Rainbow Cartridge changed the door's colour");
         if (paint(level, extension, player)) helper.fail("repainted the door with the same colour");
         helper.succeed();
     }
@@ -230,7 +237,7 @@ public class PaintTargetGameTests {
         return PaintTargets.tryPaint(level, pos, player, InteractionHand.MAIN_HAND, player.getMainHandItem());
     }
 
-    private static ColorVariant colour(ServerLevel level, BlockPos pos) {
+    private static Paint colour(ServerLevel level, BlockPos pos) {
         return PipePaintData.get(level).getOrDefault(pos);
     }
 }

@@ -1,5 +1,6 @@
 package io.github.keellam4.oritechextensions.paint;
 
+import io.github.keellam4.oritechextensions.ModContent;
 import io.github.keellam4.oritechextensions.platform.Platform;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -21,7 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.item.other.ColorCartridgeItem;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -81,19 +81,28 @@ public final class PaintTargets {
 
     // ---------------------------------------------------------------- applying paint
 
+    /** The colour a cartridge in {@code stack} paints with: Oritech's Color Cartridges, or this mod's Rainbow Cartridge. */
+    @Nullable
+    public static Paint cartridgePaint(ItemStack stack) {
+        if (stack.getItem() instanceof ColorCartridgeItem cartridge) return Paint.of(cartridge.variant);
+        if (stack.is(ModContent.RAINBOW_CARTRIDGE.get())) return Paint.RAINBOW;
+        return null;
+    }
+
     /**
      * Loader hook: a player right-clicked a block. Returns the result to cancel the click with, or null to let
      * the click behave normally.
      */
     @Nullable
     public static InteractionResult onRightClickBlock(Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack stack) {
-        if (!(stack.getItem() instanceof ColorCartridgeItem cartridge)) return null;
+        var paint = cartridgePaint(stack);
+        if (paint == null) return null;
         var target = find(level, pos);
         if (target == null) return null;
 
         if (level instanceof ServerLevel serverLevel) {
             if (!tryPaint(serverLevel, pos, player, hand, stack)) return null;
-        } else if (target.alreadyPainted(level, pos, cartridge.variant)) {
+        } else if (target.alreadyPainted(level, pos, paint)) {
             return null; // nothing to do: let the click behave normally
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
@@ -109,7 +118,8 @@ public final class PaintTargets {
      * @return false if the block can't be painted, or nothing would change (no cartridge is used).
      */
     public static boolean tryPaint(ServerLevel level, BlockPos pos, Player player, InteractionHand hand, ItemStack stack) {
-        if (!(stack.getItem() instanceof ColorCartridgeItem cartridge)) return false;
+        var paint = cartridgePaint(stack);
+        if (paint == null) return false;
         var target = find(level, pos);
         if (target == null) return false;
         var group = target.group(level, pos);
@@ -119,7 +129,7 @@ public final class PaintTargets {
         boolean perBlock = group.size() > 1 && Config.pipePaintCostMode() == Config.PipePaintCostMode.PER_BLOCK;
         int budget = perBlock && !free ? stack.getCount() : Integer.MAX_VALUE;
 
-        var changed = target.apply(level, group, cartridge.variant, budget);
+        var changed = target.apply(level, group, paint, budget);
         if (changed.isEmpty()) return false;
 
         if (!free) {
@@ -159,12 +169,12 @@ public final class PaintTargets {
         } else if (data.has(pos)) {
             // Left over from a block that was removed without being broken by hand (an explosion, a piston).
             data.remove(pos);
-            syncWorld(level, List.of(pos), ColorVariant.ORANGE);
+            syncWorld(level, List.of(pos), Paint.ORANGE);
         }
-        if (target.isolated() && data.getOrDefault(pos) != ColorVariant.ORANGE) {
+        if (target.isolated() && data.getOrDefault(pos) != Paint.ORANGE) {
             // The pipe connected to its neighbours while still unpainted; drop the links its colour doesn't allow.
-            PipeIsolation.onPaintChanged(level, java.util.Map.of(pos.immutable(), ColorVariant.ORANGE));
-        } else if (target.isolated() && before != ColorVariant.ORANGE) {
+            PipeIsolation.onPaintChanged(level, java.util.Map.of(pos.immutable(), Paint.ORANGE));
+        } else if (target.isolated() && before != Paint.ORANGE) {
             PipeIsolation.onPaintChanged(level, java.util.Map.of(pos.immutable(), before));
         }
     }
@@ -175,7 +185,7 @@ public final class PaintTargets {
         if (!data.has(pos)) return;
 
         data.remove(pos);
-        syncWorld(level, List.of(pos), ColorVariant.ORANGE);
+        syncWorld(level, List.of(pos), Paint.ORANGE);
     }
 
     /** Loader hook: {@code chunk} was just sent to {@code player}. */
@@ -192,7 +202,7 @@ public final class PaintTargets {
     }
 
     /** Tells every player who can see {@code positions} that they now have {@code variant} (ORANGE = cleared). */
-    public static void syncWorld(ServerLevel level, List<BlockPos> positions, ColorVariant variant) {
+    public static void syncWorld(ServerLevel level, List<BlockPos> positions, Paint variant) {
         if (positions.isEmpty()) return;
         var entries = new ArrayList<PaintSyncPayload.Entry>(positions.size());
         for (var pos : positions) {

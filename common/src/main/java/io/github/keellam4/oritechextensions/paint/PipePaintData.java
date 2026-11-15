@@ -9,7 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,7 +27,7 @@ public final class PipePaintData extends SavedData {
 
     public static final String DATA_NAME = "oritech_extensions_pipe_paint";
 
-    private final Map<BlockPos, ColorVariant> paints = new HashMap<>();
+    private final Map<BlockPos, Paint> paints = new HashMap<>();
     /** The same positions grouped by chunk, so sending a chunk to a player doesn't walk the whole map. */
     private final Map<Long, Set<BlockPos>> byChunk = new HashMap<>();
 
@@ -47,11 +46,11 @@ public final class PipePaintData extends SavedData {
         for (int i = 0; i < list.size(); i++) {
             var entry = list.getCompound(i);
             var pos = BlockPos.of(entry.getLong("pos"));
-            ColorVariant variant;
+            Paint variant;
             try {
-                variant = ColorVariant.valueOf(entry.getString("color").toUpperCase(Locale.ROOT));
+                variant = Paint.valueOf(entry.getString("color").toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
-                variant = ColorVariant.ORANGE;
+                variant = Paint.ORANGE;
             }
             if (PaintColors.isPainted(variant)) {
                 data.put(pos.immutable(), variant);
@@ -74,7 +73,7 @@ public final class PipePaintData extends SavedData {
         return tag;
     }
 
-    public Map<BlockPos, ColorVariant> all() {
+    public Map<BlockPos, Paint> all() {
         return Collections.unmodifiableMap(paints);
     }
 
@@ -85,16 +84,16 @@ public final class PipePaintData extends SavedData {
     }
 
     @Nullable
-    public ColorVariant get(BlockPos pos) {
+    public Paint get(BlockPos pos) {
         return paints.get(pos);
     }
 
-    public ColorVariant getOrDefault(BlockPos pos) {
+    public Paint getOrDefault(BlockPos pos) {
         var paint = paints.get(pos);
-        return paint != null ? paint : ColorVariant.ORANGE;
+        return paint != null ? paint : Paint.ORANGE;
     }
 
-    public void set(BlockPos pos, ColorVariant variant) {
+    public void set(BlockPos pos, Paint variant) {
         if (PaintColors.isPainted(variant)) {
             put(pos.immutable(), variant);
             setDirty();
@@ -118,7 +117,7 @@ public final class PipePaintData extends SavedData {
         return paints.containsKey(pos);
     }
 
-    private void put(BlockPos pos, ColorVariant variant) {
+    private void put(BlockPos pos, Paint variant) {
         paints.put(pos, variant);
         byChunk.computeIfAbsent(ChunkPos.asLong(pos), key -> new HashSet<>()).add(pos);
     }
