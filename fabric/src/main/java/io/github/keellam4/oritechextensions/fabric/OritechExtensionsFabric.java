@@ -54,6 +54,10 @@ public final class OritechExtensionsFabric implements ModInitializer {
         ItemStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultItemStorage(vault), ModContent.COMPACTING_VAULT_ENTITY.get());
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultFluidStorage(vault), ModContent.FLUID_VAULT_ENTITY.get());
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((silo, side) -> new VaultFluidStorage(silo), ModContent.SILO_CONTROLLER_ENTITY.get());
+        net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlocks((level, pos, state, blockEntity, side) -> {
+            var silo = io.github.keellam4.oritechextensions.storage.SiloParts.controllerOf(level, pos);
+            return silo == null ? null : new VaultFluidStorage(silo);
+        }, ModContent.SILO_CASING.get(), ModContent.SILO_GLASS.get());
         ServerPlayNetworking.registerGlobalReceiver(DetailingToolPayload.TYPE,
                 (payload, context) -> DetailingTool.onScroll(context.player(), payload.direction()));
 

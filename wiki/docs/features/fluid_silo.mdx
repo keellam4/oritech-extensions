@@ -1,0 +1,42 @@
+---
+title: Fluid Silo
+icon: oritech_extensions:silo_controller
+related_items: ["oritech_extensions:silo_controller", "oritech_extensions:silo_casing", "oritech_extensions:silo_glass", "oritech_extensions:fluid_vault", "oritech_extensions:cargo_controller", "oritech_extensions:detailing_tool"]
+---
+
+# Fluid Silo
+
+The Fluid Silo is a big multiblock tank for one fluid. You see the fluid through its glass, rising as the silo fills.
+
+## Building it
+
+- Build a solid 3 × 3 column of **Silo Casing** and **Silo Glass**, 3 to 9 blocks tall. Mix in as much or as little glass as you like.
+- Put one **Silo Controller** anywhere in the bottom layer, in place of a casing.
+- The controller checks the silo once a second. Right-click any block of the silo with an empty hand to see its size and how full it is. Right-click an unfinished controller to see what's missing.
+
+## Size
+
+1,000 buckets per block of the silo, so 27,000 buckets for a 3 × 3 × 3 silo and 81,000 for a 3 × 3 × 9 one. Server owners can change it with `siloBucketsPerBlock` in the config.
+
+## Using it
+
+- **Buckets and tanks:** right-click any block of the silo to fill or empty it.
+- **Pipes:** fluid pipes connect to any block of the silo, the controller included.
+- **Cargo network:** when the controller touches a vault, a Cargo Controller or a Crafting Terminal, the silo joins that network as one big tank. Its fluid shows in the terminals, and fluid pipes on the Cargo Controller reach it too.
+
+## Breaking it
+
+- If a block of the silo is missing, the silo stops taking fluid. The fluid stays in the controller and you can still drain it. Put the block back and it works again.
+- A mined controller keeps the fluid on its item; the tooltip shows what it holds. Place it in a new silo to carry on.
+
+## Paint
+
+The orange frames take paint, Rainbow included. One cartridge or one click of the [Detailing Tool](detailing_tool) paints the whole silo. A new casing or glass block takes the colour of its painted neighbours.
+
+## Crafting
+
+| Block | Recipe |
+|---|---|
+| Silo Casing ×8 | Steel Ingot, Nickel Ingot, Steel Ingot / Nickel Ingot, empty, Nickel Ingot / Steel Ingot, Nickel Ingot, Steel Ingot |
+| Silo Glass ×4 | Industrial Glass on the four sides of a Silo Casing |
+| Silo Controller | Steel Ingot, Processing Unit, Steel Ingot / Silo Casing, Fluid Vault, Silo Casing / Steel Ingot, Fluid Pipe, Steel Ingot |

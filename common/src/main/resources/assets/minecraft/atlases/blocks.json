@@ -79,7 +79,10 @@
         "oritech_extensions:block/fluid_vault_front",
         "oritech_extensions:block/fluid_vault_side",
         "oritech_extensions:block/cargo_controller_front",
-        "oritech_extensions:block/crafting_terminal_front"
+        "oritech_extensions:block/crafting_terminal_front",
+        "oritech_extensions:block/silo_casing",
+        "oritech_extensions:block/silo_glass",
+        "oritech_extensions:block/silo_controller_front"
       ],
       "palette_key": "oritech_extensions:colormap/paint/extender_key",
       "permutations": {
@@ -456,6 +459,21 @@
       "type": "minecraft:single",
       "resource": "oritech_extensions:rainbow/oritech_extensions/block/crafting_terminal_front",
       "sprite": "oritech_extensions:block/crafting_terminal_front_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/silo_casing",
+      "sprite": "oritech_extensions:block/silo_casing_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/silo_glass",
+      "sprite": "oritech_extensions:block/silo_glass_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/silo_controller_front",
+      "sprite": "oritech_extensions:block/silo_controller_front_paint_rainbow"
     },
     {
       "type": "minecraft:single",

@@ -104,6 +104,10 @@ public final class OritechExtensionsNeoForge {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModContent.CARGO_CONTROLLER_ENTITY.get(), (controller, side) -> new ControllerItemHandler(controller));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.CARGO_CONTROLLER_ENTITY.get(), (controller, side) -> new ControllerFluidHandler(controller));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.SILO_CONTROLLER_ENTITY.get(), (silo, side) -> new VaultFluidHandler(silo));
+        event.registerBlock(Capabilities.FluidHandler.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var silo = io.github.keellam4.oritechextensions.storage.SiloParts.controllerOf(level, pos);
+            return silo == null ? null : new VaultFluidHandler(silo);
+        }, ModContent.SILO_CASING.get(), ModContent.SILO_GLASS.get());
     }
 
     private static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {

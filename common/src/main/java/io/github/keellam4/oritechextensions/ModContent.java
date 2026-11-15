@@ -125,14 +125,14 @@ public final class ModContent {
 
     // ---------------------------------------------------------------- Fluid Silo
 
-    public static final Supplier<net.minecraft.world.level.block.Block> SILO_CASING = PLATFORM.register(BuiltInRegistries.BLOCK, "silo_casing",
-            () -> new net.minecraft.world.level.block.Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f).sound(SoundType.METAL)));
+    public static final Supplier<io.github.keellam4.oritechextensions.storage.SiloParts.Casing> SILO_CASING = PLATFORM.register(BuiltInRegistries.BLOCK, "silo_casing",
+            () -> new io.github.keellam4.oritechextensions.storage.SiloParts.Casing(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f).sound(SoundType.METAL)));
 
     public static final Supplier<BlockItem> SILO_CASING_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "silo_casing",
             () -> new BlockItem(SILO_CASING.get(), new Item.Properties()));
 
-    public static final Supplier<net.minecraft.world.level.block.TransparentBlock> SILO_GLASS = PLATFORM.register(BuiltInRegistries.BLOCK, "silo_glass",
-            () -> new net.minecraft.world.level.block.TransparentBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f)
+    public static final Supplier<io.github.keellam4.oritechextensions.storage.SiloParts.Glass> SILO_GLASS = PLATFORM.register(BuiltInRegistries.BLOCK, "silo_glass",
+            () -> new io.github.keellam4.oritechextensions.storage.SiloParts.Glass(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f)
                     .sound(SoundType.GLASS).noOcclusion().isViewBlocking((state, level, pos) -> false)
                     .isSuffocating((state, level, pos) -> false).isRedstoneConductor((state, level, pos) -> false)));
 
