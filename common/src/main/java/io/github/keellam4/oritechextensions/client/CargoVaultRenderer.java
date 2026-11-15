@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import io.github.keellam4.oritechextensions.storage.CargoVaultBlock;
 import io.github.keellam4.oritechextensions.storage.CargoVaultBlockEntity;
 import io.github.keellam4.oritechextensions.storage.VaultLayout;
+import io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -51,6 +52,11 @@ public class CargoVaultRenderer<T extends CargoVaultBlockEntity> implements Bloc
         // Now the front is the +z face, seen from outside: a point (u, v) of the front is at x = u - 0.5, y = 0.5 - v.
 
         var cells = block.layout().cells();
+        if (vault instanceof FluidVaultBlockEntity tank) {
+            renderFluid(tank, cells[0], pose, buffers, facing);
+            pose.popPose();
+            return;
+        }
         float t = level.getGameTime() + partialTick;
         for (int slot = 0; slot < cells.length && slot < vault.slots(); slot++) {
             var cell = cells[slot];
@@ -76,6 +82,40 @@ public class CargoVaultRenderer<T extends CargoVaultBlockEntity> implements Bloc
             drawCount(pose, buffers, format(vault.count(slot)), vault.isLocked(), cx, 0.5f - (cell.glassV1() - height * 0.2f), height * 0.19f);
         }
         pose.popPose();
+    }
+
+    private void renderFluid(FluidVaultBlockEntity tank, VaultLayout.Cell cell, PoseStack pose, MultiBufferSource buffers, net.minecraft.core.Direction facing) {
+        if (tank.amount() <= 0) return;
+        drawGauge(pose, buffers, cell, tank.fill());
+        var level = tank.getLevel();
+        var fluid = tank.fluid();
+        var sprite = ClientPlatform.INSTANCE.fluidSprite(fluid);
+        int colour = ClientPlatform.INSTANCE.fluidColour(fluid, level, tank.getBlockPos());
+        int light = fluid.defaultFluidState().createLegacyBlock().getLightEmission() > 0 ? LightTexture.FULL_BRIGHT
+                : net.minecraft.client.renderer.LevelRenderer.getLightColor(level, tank.getBlockPos().relative(facing));
+
+        // The fluid fills the glass from the bottom, as high as the tank is full (at least a sliver).
+        float height = cell.glassV1() - cell.glassV0();
+        float level01 = Math.max(0.06f, tank.fill());
+        float left = cell.glassU0() - 0.5f;
+        float right = cell.glassU1() - 0.5f;
+        float bottom = 0.5f - cell.glassV1();
+        float top = bottom + height * level01;
+        float z = 0.5f + 0.001f;
+        float u0 = sprite.getU0();
+        float u1 = sprite.getU0() + (sprite.getU1() - sprite.getU0()) * (cell.glassU1() - cell.glassU0());
+        float v1 = sprite.getV1();
+        float v0 = sprite.getV1() - (sprite.getV1() - sprite.getV0()) * height * level01;
+        var consumer = buffers.getBuffer(RenderType.entityTranslucentCull(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS));
+        var last = pose.last();
+        consumer.addVertex(last, left, bottom, z).setColor(colour).setUv(u0, v1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(last, 0, 0, 1);
+        consumer.addVertex(last, right, bottom, z).setColor(colour).setUv(u1, v1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(last, 0, 0, 1);
+        consumer.addVertex(last, right, top, z).setColor(colour).setUv(u1, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(last, 0, 0, 1);
+        consumer.addVertex(last, left, top, z).setColor(colour).setUv(u0, v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(last, 0, 0, 1);
+
+        float cx = (cell.glassU0() + cell.glassU1()) / 2 - 0.5f;
+        drawCount(pose, buffers, format((int) Math.min(Integer.MAX_VALUE, tank.amount() / 1000)) + "B", tank.isLocked(),
+                cx, 0.5f - (cell.glassV1() - height * 0.2f), height * 0.19f);
     }
 
     private static void drawGauge(PoseStack pose, MultiBufferSource buffers, VaultLayout.Cell cell, float fill) {

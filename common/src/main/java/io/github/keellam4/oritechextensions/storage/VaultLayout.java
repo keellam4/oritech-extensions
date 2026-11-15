@@ -21,7 +21,9 @@ public enum VaultLayout {
     /** Compacting Vault: a wide window on top for the biggest form, two below for the smaller ones. */
     COMPACTING(3),
     /** Dual Compacting Vault: two forms, the bigger one on top (same windows as the Dual Vault). */
-    COMPACTING_DUAL(2);
+    COMPACTING_DUAL(2),
+    /** Fluid Vault: one big window the fluid fills from the bottom (same window as the Cargo Vault). */
+    FLUID(1);
 
     /** One slot's window: the glass the item floats in and the strip that shows how full it is. */
     public record Cell(float glassU0, float glassV0, float glassU1, float glassV1,
@@ -57,7 +59,7 @@ public enum VaultLayout {
 
     private static Cell[] makeCells(int slots) {
         return switch (slots) {
-            case 1 -> new Cell[]{Cell.px(16, 3, 4, 13, 12, 3, 3, 13)};
+            case 1 -> new Cell[]{Cell.px(16, 3, 4, 13, 12, 3, 3, 13)}; // SINGLE and FLUID
             // Wide windows: glass 14 px, gauge 10 px above it.
             case 2 -> new Cell[]{Cell.px(16, 1, 2, 15, 7, 3, 1, 13), Cell.px(16, 1, 10, 15, 15, 3, 9, 13)};
             case 3 -> new Cell[]{Cell.px(16, 1, 2, 15, 7, 3, 1, 13), Cell.px(16, 1, 10, 7, 15, 2, 9, 6), Cell.px(16, 9, 10, 15, 15, 10, 9, 14)};
@@ -82,7 +84,7 @@ public enum VaultLayout {
     /** The window at (u, v) on the front. */
     public int slotAt(double u, double v) {
         return switch (this) {
-            case SINGLE -> 0;
+            case SINGLE, FLUID -> 0;
             case DUAL, COMPACTING_DUAL -> v < 0.5 ? 0 : 1;
             case COMPACTING -> v < 0.5 ? 0 : u < 0.5 ? 1 : 2;
             case QUAD, GRID -> {

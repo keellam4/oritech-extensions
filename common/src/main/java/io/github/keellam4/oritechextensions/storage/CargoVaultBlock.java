@@ -83,6 +83,7 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        if (layout == VaultLayout.FLUID) return new FluidVaultBlockEntity(pos, state);
         return layout.compacting() ? new CompactingVaultBlockEntity(pos, state) : new CargoVaultBlockEntity(pos, state);
     }
 
@@ -102,6 +103,13 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
                 }
             }
             return ItemInteractionResult.sidedSuccess(level.isClientSide());
+        }
+        if (vault instanceof FluidVaultBlockEntity tank && slotAt(state, pos, hit) >= 0) {
+            // Buckets and fluid containers fill or empty the tank (whatever the loader's fluid API supports).
+            if (io.github.keellam4.oritechextensions.platform.Platform.INSTANCE.interactWithFluidItem(player, hand, tank)) {
+                return ItemInteractionResult.sidedSuccess(level.isClientSide());
+            }
+            return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
         }
         if (slotAt(state, pos, hit) < 0) {
             // Side or top: the upgrade screen.

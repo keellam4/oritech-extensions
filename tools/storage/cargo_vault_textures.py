@@ -209,6 +209,30 @@ def draw_any(rows):
     return image
 
 
+# Fluid Vault: the same front with clean glass (the fluid fills it) and a steel grille instead of the lower emitter.
+FLUID_FRONT = [row if not 5 <= i <= 10 else row[:4] + "22222222" + row[12:] for i, row in enumerate(FRONT)]
+FLUID_FRONT[12] = FRONT[12][:3] + "bcbcbcbcbc" + FRONT[12][13:]
+
+
+def fluid_side(x, y):
+    """A round steel fluid port in the middle of the side panel."""
+    f = frame(x, y)
+    if f:
+        return f
+    if x in (1, 14) or y in (1, 14):
+        return "I"
+    r = math.hypot(x - 7.5, y - 7.5)
+    if r < 1.8:
+        return "T"
+    if r < 2.6:
+        return "t"
+    if r < 3.6:
+        return "c" if x + y < 15 else "a"
+    if r < 4.4:
+        return "b"
+    return "O"
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     draw(FRONT).save(OUT / "cargo_vault_front.png")
@@ -219,6 +243,8 @@ def main():
     draw_any(cells_front(DUAL_CELLS)).save(OUT / "dual_vault_front.png")
     draw_any(with_arrow(cells_front(COMPACTING_CELLS))).save(OUT / "compacting_vault_front.png")
     draw_any(with_arrow(cells_front(DUAL_CELLS))).save(OUT / "dual_compacting_vault_front.png")
+    draw(FLUID_FRONT).save(OUT / "fluid_vault_front.png")
+    draw(grid(fluid_side)).save(OUT / "fluid_vault_side.png")
 
 
 if __name__ == "__main__":

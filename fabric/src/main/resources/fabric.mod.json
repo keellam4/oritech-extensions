@@ -26,7 +26,8 @@
       "io.github.keellam4.oritechextensions.test.RainbowGameTests",
       "io.github.keellam4.oritechextensions.test.DetailingToolGameTests",
       "io.github.keellam4.oritechextensions.test.CargoVaultGameTests",
-      "io.github.keellam4.oritechextensions.test.VaultUpgradeGameTests"
+      "io.github.keellam4.oritechextensions.test.VaultUpgradeGameTests",
+      "io.github.keellam4.oritechextensions.test.FluidVaultGameTests"
     ]
   },
   "mixins": [

@@ -42,6 +42,7 @@ public final class OritechExtensionsFabric implements ModInitializer {
                 (payload, context) -> CargoVault.take(context.player(), payload.pos(), payload.slot(), payload.one()));
         ItemStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultItemStorage(vault), ModContent.CARGO_VAULT_ENTITY.get());
         ItemStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultItemStorage(vault), ModContent.COMPACTING_VAULT_ENTITY.get());
+        net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultFluidStorage(vault), ModContent.FLUID_VAULT_ENTITY.get());
         ServerPlayNetworking.registerGlobalReceiver(DetailingToolPayload.TYPE,
                 (payload, context) -> DetailingTool.onScroll(context.player(), payload.direction()));
 
@@ -54,6 +55,7 @@ public final class OritechExtensionsFabric implements ModInitializer {
             entries.accept(ModContent.GRID_VAULT_ITEM.get());
             entries.accept(ModContent.COMPACTING_VAULT_ITEM.get());
             entries.accept(ModContent.DUAL_COMPACTING_VAULT_ITEM.get());
+            entries.accept(ModContent.FLUID_VAULT_ITEM.get());
             ModContent.VAULT_UPGRADES.values().forEach(upgrade -> entries.accept(upgrade.get()));
         });
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> {

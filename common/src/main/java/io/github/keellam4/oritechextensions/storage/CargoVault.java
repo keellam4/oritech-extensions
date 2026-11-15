@@ -86,7 +86,7 @@ public final class CargoVault {
 
     public static void toggleLock(CargoVaultBlockEntity vault, Player player) {
         boolean locked = !vault.isLocked();
-        if (locked && !vault.hasAnyItemType()) {
+        if (locked && !vault.hasContentType()) {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.cargo_vault.nothing_to_lock"), true);
             return;
         }
@@ -106,7 +106,7 @@ public final class CargoVault {
         var state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof CargoVaultBlock) || player.isSpectator()) return false;
         if (face != state.getValue(BlockStateProperties.HORIZONTAL_FACING)) return false;
-        if (!(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault) || vault.isEmpty()) return false;
+        if (!(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault) || !vault.takesByHand()) return false;
         if (level.isClientSide()) {
             int slot = clientSlotLookup.applyAsInt(pos);
             Platform.INSTANCE.sendToServer(new VaultTakePayload(pos, Math.max(0, slot), player.isShiftKeyDown()));

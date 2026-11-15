@@ -62,6 +62,8 @@ public final class ModContent {
     public static final Supplier<CargoVaultBlock> COMPACTING_VAULT = vault("compacting_vault", VaultLayout.COMPACTING);
     /** One item in two forms, for items that compact only once. */
     public static final Supplier<CargoVaultBlock> DUAL_COMPACTING_VAULT = vault("dual_compacting_vault", VaultLayout.COMPACTING_DUAL);
+    /** A tank for one fluid. */
+    public static final Supplier<CargoVaultBlock> FLUID_VAULT = vault("fluid_vault", VaultLayout.FLUID);
 
     public static final Supplier<CargoVaultItem> CARGO_VAULT_ITEM = vaultItem("cargo_vault", CARGO_VAULT);
     public static final Supplier<CargoVaultItem> DUAL_VAULT_ITEM = vaultItem("dual_vault", DUAL_VAULT);
@@ -69,6 +71,7 @@ public final class ModContent {
     public static final Supplier<CargoVaultItem> GRID_VAULT_ITEM = vaultItem("grid_vault", GRID_VAULT);
     public static final Supplier<CargoVaultItem> COMPACTING_VAULT_ITEM = vaultItem("compacting_vault", COMPACTING_VAULT);
     public static final Supplier<CargoVaultItem> DUAL_COMPACTING_VAULT_ITEM = vaultItem("dual_compacting_vault", DUAL_COMPACTING_VAULT);
+    public static final Supplier<CargoVaultItem> FLUID_VAULT_ITEM = vaultItem("fluid_vault", FLUID_VAULT);
 
     /** Upgrade cards for the vaults' upgrade screens, one per {@link VaultUpgrade}. */
     public static final java.util.Map<io.github.keellam4.oritechextensions.storage.VaultUpgrade, Supplier<io.github.keellam4.oritechextensions.storage.VaultUpgradeItem>> VAULT_UPGRADES = upgrades();
@@ -86,6 +89,18 @@ public final class ModContent {
     public static final Supplier<BlockEntityType<CompactingVaultBlockEntity>> COMPACTING_VAULT_ENTITY = PLATFORM.register(
             BuiltInRegistries.BLOCK_ENTITY_TYPE, "compacting_vault",
             () -> BlockEntityType.Builder.of(CompactingVaultBlockEntity::new, COMPACTING_VAULT.get(), DUAL_COMPACTING_VAULT.get()).build(null));
+
+    @SuppressWarnings("DataFlowIssue")
+    public static final Supplier<BlockEntityType<io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity>> FLUID_VAULT_ENTITY = PLATFORM.register(
+            BuiltInRegistries.BLOCK_ENTITY_TYPE, "fluid_vault",
+            () -> BlockEntityType.Builder.of(io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity::new, FLUID_VAULT.get()).build(null));
+
+    /** A Fluid Vault's fluid, kept on its item. */
+    public static final Supplier<DataComponentType<io.github.keellam4.oritechextensions.storage.FluidContents>> FLUID_CONTENTS = PLATFORM.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE, "fluid_contents", () -> DataComponentType.<io.github.keellam4.oritechextensions.storage.FluidContents>builder()
+                    .persistent(io.github.keellam4.oritechextensions.storage.FluidContents.CODEC)
+                    .networkSynchronized(io.github.keellam4.oritechextensions.storage.FluidContents.STREAM_CODEC)
+                    .build());
 
     /** A Cargo Vault's contents, kept on its item. */
     public static final Supplier<DataComponentType<VaultContents>> VAULT_CONTENTS = PLATFORM.register(

@@ -2,6 +2,8 @@ package io.github.keellam4.oritechextensions.client;
 
 import io.github.keellam4.oritechextensions.storage.CargoVaultBlock;
 import io.github.keellam4.oritechextensions.storage.CargoVaultBlockEntity;
+import io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
@@ -44,12 +46,23 @@ public final class VaultHud {
         int slot = slotUnderCrosshair(pos);
         if (slot < 0 || slot >= vault.slots()) return;
 
-        var item = vault.item(slot);
+        ItemStack item;
+        Component name;
+        String amount;
+        if (vault instanceof FluidVaultBlockEntity tank) {
+            var fluid = tank.fluid();
+            boolean empty = fluid == net.minecraft.world.level.material.Fluids.EMPTY;
+            item = empty ? ItemStack.EMPTY : new ItemStack(fluid.getBucket());
+            name = empty ? Component.translatable("hud.oritech_extensions.vault.empty") : fluid.defaultFluidState().createLegacyBlock().getBlock().getName();
+            amount = String.format("%,d / %,d mB", tank.amount(), tank.fluidCapacity());
+        } else {
+            item = vault.item(slot);
+            name = item.isEmpty() ? Component.translatable("hud.oritech_extensions.vault.empty") : item.getHoverName();
+            amount = item.isEmpty()
+                    ? String.format("0 / %,d", vault.capacity(slot))
+                    : String.format("%,d / %,d", vault.count(slot), vault.capacity(slot));
+        }
         var font = minecraft.font;
-        Component name = item.isEmpty() ? Component.translatable("hud.oritech_extensions.vault.empty") : item.getHoverName();
-        String amount = item.isEmpty()
-                ? String.format("0 / %,d", vault.capacity(slot))
-                : String.format("%,d / %,d", vault.count(slot), vault.capacity(slot));
         Component lock = vault.isLocked() ? Component.translatable("hud.oritech_extensions.vault.locked") : null;
 
         int textWidth = Math.max(font.width(name), font.width(amount) + (lock == null ? 0 : font.width(lock) + 6));

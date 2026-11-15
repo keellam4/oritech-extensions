@@ -353,6 +353,11 @@ public class CargoVaultBlockEntity extends BlockEntity {
         changed();
     }
 
+    /** Whether there's something to lock to: an item type, or a Fluid Vault's fluid. */
+    public boolean hasContentType() {
+        return hasAnyItemType();
+    }
+
     public boolean hasAnyItemType() {
         for (int i = 0; i < slots(); i++) {
             if (!item(i).isEmpty()) return true;
@@ -423,6 +428,11 @@ public class CargoVaultBlockEntity extends BlockEntity {
 
     // ---------------------------------------------------------------- Pull and Push
 
+    /** Whether a left-click on the front takes something out by hand (items; not a Fluid Vault's fluid). */
+    public boolean takesByHand() {
+        return !isEmpty();
+    }
+
     /** Server tick: Pull and Push upgrades move a stack with the inventories on their picked sides, once a second. */
     public static void tick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, CargoVaultBlockEntity vault) {
         if (!(level instanceof ServerLevel server) || (level.getGameTime() + pos.asLong()) % 20 != 0) return;
@@ -430,6 +440,12 @@ public class CargoVaultBlockEntity extends BlockEntity {
         boolean push = vault.has(VaultUpgrade.PUSH);
         if (!pull && !push) return;
         if (vault.has(VaultUpgrade.REDSTONE) && level.hasNeighborSignal(pos)) return;
+        vault.moveWithNeighbours(server, pos, state, pull, push);
+    }
+
+    /** Pull and Push for items; the Fluid Vault moves fluid instead. */
+    protected void moveWithNeighbours(ServerLevel server, BlockPos pos, BlockState state, boolean pull, boolean push) {
+        var vault = this;
 
         var facing = state.getValue(CargoVaultBlock.FACING);
         var platform = io.github.keellam4.oritechextensions.platform.Platform.INSTANCE;
