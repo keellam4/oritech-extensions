@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+"""Draws the Cargo Vault ("Stasis Cell") block textures.
+
+The orange parts use only colours from colormap/paint/extender_key, so the paint system recolours them like the
+Machine Extender. The emitter strip above the glass is drawn dim: CargoVaultRenderer lights it up to show how full
+the vault is. The stored item floats in the glass, drawn by the renderer too.
+
+    python3 tools/storage/cargo_vault_textures.py
+"""
+import math
+from pathlib import Path
+
+from PIL import Image
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT = ROOT / "common/src/main/resources/assets/oritech_extensions/textures/block"
+
+COLOURS = {
+    # orange, from Oritech's Machine Extender (all in extender_key)
+    "H": "#e09f67", "h": "#dc8b4e", "E": "#e87f4a", "O": "#c36c2b", "I": "#b25020", "S": "#c63c33", "D": "#9c3215",
+    # teal glow
+    "t": "#3597ad", "T": "#3ec9d5", "W": "#9cfff5", "g": "#1f4f5a",
+    # dark glass
+    "1": "#161b21", "2": "#232a33", "3": "#343b49", "4": "#4c5466",
+    # steel
+    "a": "#4a4f56", "b": "#6c727a", "c": "#959ba3", "d": "#c4c9ce",
+}
+
+FRONT = [
+    "ddcHHHHHHHHHHcbS",
+    "dbaOOOOOOOOOOabS",
+    "caDDDDDDDDDDDDaS",
+    "HODggggggggggDOS",  # fill gauge: lit by the renderer
+    "HOD1222222221DOS",
+    "HOD1233333421DOS",
+    "HOD1233334321DOS",
+    "HOD1233343321DOS",
+    "HOD1233433321DOS",
+    "HOD1234333321DOS",
+    "HOD1243333321DOS",
+    "HOD1222222221DOS",
+    "HODtTTWWWWTTtDOS",
+    "caDDDDDDDDDDDDaS",
+    "dbaOOOOOOOOOOabS",
+    "cbaSSSSSSSSSSabS",
+]
+
+
+def frame(x, y):
+    if y == 0:
+        return "H" if x < 15 else "S"
+    if y == 15 or x == 15:
+        return "S"
+    if x == 0:
+        return "H"
+    return None
+
+
+def side(x, y):
+    f = frame(x, y)
+    if f:
+        return f
+    if x in (1, 14) or y in (1, 14):
+        return "I"
+    if 4 <= x <= 11 and 3 <= y <= 12:
+        if y % 2 == 1:
+            return "2"
+        return "S" if x == 4 else "h" if x == 11 else "O"
+    if (x, y) in ((3, 13), (12, 13)):
+        return "T"
+    return "O"
+
+
+def top(x, y):
+    if x in (0, 15) or y in (0, 15):
+        return "c" if (x in (0, 15) and y in (0, 15)) else "b"
+    if x in (1, 14) or y in (1, 14):
+        return "O"
+    r = math.hypot(x - 7.5, y - 7.5)
+    if r < 1.6:
+        return "W"
+    if r < 2.8:
+        return "T"
+    if r < 3.7:
+        return "a"
+    return "c" if (x + y) % 2 == 0 and x < 8 and y < 8 else "b"
+
+
+def draw(rows):
+    image = Image.new("RGBA", (16, 16))
+    for y, row in enumerate(rows):
+        assert len(row) == 16, row
+        for x, ch in enumerate(row):
+            c = COLOURS[ch]
+            image.putpixel((x, y), tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) + (255,))
+    return image
+
+
+def grid(fn):
+    return ["".join(fn(x, y) for x in range(16)) for y in range(16)]
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    draw(FRONT).save(OUT / "cargo_vault_front.png")
+    draw(grid(side)).save(OUT / "cargo_vault_side.png")
+    draw(grid(top)).save(OUT / "cargo_vault_top.png")
+
+
+if __name__ == "__main__":
+    main()

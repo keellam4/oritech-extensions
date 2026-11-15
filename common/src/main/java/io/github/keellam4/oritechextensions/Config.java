@@ -46,6 +46,10 @@ public class Config {
             .comment("The longest side, in blocks, of an area the Detailing Tool paints in Area mode.")
             .defineInRange("detailingToolAreaSize", 32, 1, 128);
 
+    public static final ModConfigSpec.IntValue CARGO_VAULT_STACKS = BUILDER
+            .comment("How many stacks of its item one Cargo Vault holds (64 stacks of 64 = 4,096 items by default).")
+            .defineInRange("cargoVaultStacks", 64, 1, 1024);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     /** How many extension blocks may be attached to one door. Safe to call before the config has loaded. */
@@ -72,5 +76,9 @@ public class Config {
 
     public static int detailingToolAreaSize() {
         return SPEC.isLoaded() ? DETAILING_TOOL_AREA_SIZE.get() : DETAILING_TOOL_AREA_SIZE.getDefault();
+    }
+
+    public static int cargoVaultStacks() {
+        return SPEC.isLoaded() ? CARGO_VAULT_STACKS.get() : CARGO_VAULT_STACKS.getDefault();
     }
 }

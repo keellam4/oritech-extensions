@@ -59,6 +59,11 @@ public final class WorldPaintTarget implements PaintTarget {
             block -> block == BlockContent.METAL_BEAM_BLOCK || block == BlockContent.METAL_GIRDER_BLOCK ? "supports" : null,
             Config::maxPaintGroupSize, 1);
 
+    /** Cargo Vaults: touching vaults (a Cargo Wall) paint together, and a vault keeps its paint on its item. */
+    public static final WorldPaintTarget VAULTS = new WorldPaintTarget(
+            block -> block instanceof io.github.keellam4.oritechextensions.storage.CargoVaultBlock ? "cargo_vault" : null,
+            Config::maxPaintGroupSize, 1);
+
     /** Pipe Boosters: one block per click, and a new booster doesn't take over its neighbours' colour. */
     public static final WorldPaintTarget PIPE_BOOSTER = new WorldPaintTarget(
             block -> block == BlockContent.PIPE_BOOSTER_BLOCK ? "pipe_booster" : null, () -> 1, 1, false, false);

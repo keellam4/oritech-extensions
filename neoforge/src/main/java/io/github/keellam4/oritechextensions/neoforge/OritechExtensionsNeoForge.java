@@ -7,6 +7,10 @@ import io.github.keellam4.oritechextensions.paint.PaintEvents;
 import io.github.keellam4.oritechextensions.paint.PaintSyncPayload;
 import io.github.keellam4.oritechextensions.paint.PaintTargets;
 import io.github.keellam4.oritechextensions.tool.DetailingTool;
+import io.github.keellam4.oritechextensions.storage.CargoVault;
+import io.github.keellam4.oritechextensions.storage.VaultTakePayload;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import io.github.keellam4.oritechextensions.tool.DetailingToolPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
@@ -33,10 +37,12 @@ public final class OritechExtensionsNeoForge {
         NeoForgePlatform.registerAll(modBus);
         modBus.addListener(OritechExtensionsNeoForge::addCreative);
         modBus.addListener(OritechExtensionsNeoForge::registerPayloads);
+        modBus.addListener(OritechExtensionsNeoForge::registerCapabilities);
         container.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
         var game = NeoForge.EVENT_BUS;
         game.addListener(OritechExtensionsNeoForge::onRightClickBlock);
+        game.addListener(OritechExtensionsNeoForge::onLeftClickBlock);
         game.addListener(OritechExtensionsNeoForge::onBlockPlaced);
         game.addListener(OritechExtensionsNeoForge::onBlockBreak);
         game.addListener(OritechExtensionsNeoForge::onBlockDrops);
@@ -46,6 +52,9 @@ public final class OritechExtensionsNeoForge {
     private static void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS || event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(ModContent.HANGAR_DOOR_EXTENSION_ITEM.get());
+        }
+        if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+            event.accept(ModContent.CARGO_VAULT_ITEM.get());
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModContent.GUIDE.get());
@@ -61,6 +70,14 @@ public final class OritechExtensionsNeoForge {
                 (payload, context) -> context.enqueueWork(() -> {
                     if (context.player() instanceof ServerPlayer player) DetailingTool.onScroll(player, payload.direction());
                 }));
+        event.registrar(VaultTakePayload.VERSION).playToServer(VaultTakePayload.TYPE, VaultTakePayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> {
+                    if (context.player() instanceof ServerPlayer player) CargoVault.take(player, payload.pos(), payload.one());
+                }));
+    }
+
+    private static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModContent.CARGO_VAULT_ENTITY.get(), (vault, side) -> new VaultItemHandler(vault));
     }
 
     private static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
@@ -70,6 +87,14 @@ public final class OritechExtensionsNeoForge {
         if (result != null) {
             event.setCanceled(true);
             event.setCancellationResult(result);
+        }
+    }
+
+    private static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+        var action = event.getAction();
+        if (action != PlayerInteractEvent.LeftClickBlock.Action.START && action != PlayerInteractEvent.LeftClickBlock.Action.CLIENT_HOLD) return;
+        if (event.getFace() != null && CargoVault.onLeftClick(event.getLevel(), event.getPos(), event.getEntity(), event.getFace())) {
+            event.setCanceled(true);
         }
     }
 

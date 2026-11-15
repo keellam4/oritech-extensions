@@ -49,6 +49,7 @@ public final class NeoForgeClient {
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModContent.HANGAR_DOOR_EXTENSION_ENTITY.get(), HangarDoorExtensionRenderer::new);
+        event.registerBlockEntityRenderer(ModContent.CARGO_VAULT_ENTITY.get(), CargoVaultRenderer::new);
     }
 
     /**

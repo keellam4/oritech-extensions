@@ -1,0 +1,32 @@
+package io.github.keellam4.oritechextensions.storage;
+
+import io.github.keellam4.oritechextensions.ModContent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.block.Block;
+
+import java.util.List;
+
+/** The Cargo Vault's item: keeps the vault's contents, and says what they are. */
+public class CargoVaultItem extends BlockItem {
+
+    public CargoVaultItem(Block block, Properties properties) {
+        super(block, properties);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> lines, TooltipFlag flag) {
+        var contents = stack.get(ModContent.VAULT_CONTENTS.get());
+        if (contents == null || contents.isEmpty()) {
+            lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.empty").withStyle(ChatFormatting.GRAY));
+        } else {
+            lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.contains",
+                    String.format("%,d", contents.count()), contents.item().getHoverName()).withStyle(ChatFormatting.GRAY));
+            if (contents.locked()) lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.locked").withStyle(ChatFormatting.GRAY));
+        }
+        lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.help").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+    }
+}

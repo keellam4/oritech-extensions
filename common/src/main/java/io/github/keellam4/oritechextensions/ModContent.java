@@ -3,6 +3,11 @@ package io.github.keellam4.oritechextensions;
 import io.github.keellam4.oritechextensions.guide.GuideBookItem;
 import io.github.keellam4.oritechextensions.paint.RainbowCartridgeItem;
 import io.github.keellam4.oritechextensions.tool.DetailingToolItem;
+import io.github.keellam4.oritechextensions.storage.CargoVaultBlock;
+import io.github.keellam4.oritechextensions.storage.CargoVaultBlockEntity;
+import io.github.keellam4.oritechextensions.storage.CargoVaultItem;
+import io.github.keellam4.oritechextensions.storage.VaultContents;
+import net.minecraft.world.level.block.SoundType;
 import io.github.keellam4.oritechextensions.tool.ToolContents;
 import io.github.keellam4.oritechextensions.hangar.HangarDoorExtensionBlock;
 import io.github.keellam4.oritechextensions.hangar.HangarDoorExtensionBlockEntity;
@@ -42,6 +47,25 @@ public final class ModContent {
     /** Holds Color Cartridges and paints everything this mod and Oritech can paint. */
     public static final Supplier<DetailingToolItem> DETAILING_TOOL = PLATFORM.register(BuiltInRegistries.ITEM,
             "detailing_tool", () -> new DetailingToolItem(new Item.Properties().stacksTo(1)));
+
+    /** Bulk storage for one item type. */
+    public static final Supplier<CargoVaultBlock> CARGO_VAULT = PLATFORM.register(BuiltInRegistries.BLOCK, "cargo_vault",
+            () -> new CargoVaultBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f).sound(SoundType.METAL)));
+
+    public static final Supplier<CargoVaultItem> CARGO_VAULT_ITEM = PLATFORM.register(BuiltInRegistries.ITEM,
+            "cargo_vault", () -> new CargoVaultItem(CARGO_VAULT.get(), new Item.Properties().stacksTo(1)));
+
+    @SuppressWarnings("DataFlowIssue")
+    public static final Supplier<BlockEntityType<CargoVaultBlockEntity>> CARGO_VAULT_ENTITY = PLATFORM.register(
+            BuiltInRegistries.BLOCK_ENTITY_TYPE, "cargo_vault",
+            () -> BlockEntityType.Builder.of(CargoVaultBlockEntity::new, CARGO_VAULT.get()).build(null));
+
+    /** A Cargo Vault's contents, kept on its item. */
+    public static final Supplier<DataComponentType<VaultContents>> VAULT_CONTENTS = PLATFORM.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE, "vault_contents", () -> DataComponentType.<VaultContents>builder()
+                    .persistent(VaultContents.CODEC)
+                    .networkSynchronized(VaultContents.STREAM_CODEC)
+                    .build());
 
     @SuppressWarnings("DataFlowIssue")
     public static final Supplier<BlockEntityType<HangarDoorExtensionBlockEntity>> HANGAR_DOOR_EXTENSION_ENTITY = PLATFORM.register(
