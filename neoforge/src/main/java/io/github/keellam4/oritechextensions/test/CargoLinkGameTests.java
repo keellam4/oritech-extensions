@@ -57,10 +57,10 @@ public class CargoLinkGameTests {
     public static void batteryPaysForTransfers(GameTestHelper helper) {
         var link = new ItemStack(ModContent.CARGO_LINK.get());
         CargoLinkItem.setEnergy(link, 1000);
-        if (!CargoLinkItem.spend(link, 64)) helper.fail("1000 RF should pay for a stack");
+        if (!CargoLinkItem.spend(link, 64, 0)) helper.fail("1000 RF should pay for a stack");
         int left = 1000 - 64 * Config.linkEnergyPerItem();
         if (CargoLinkItem.energy(link) != left) helper.fail("the battery should have " + left + " RF left, has " + CargoLinkItem.energy(link));
-        if (CargoLinkItem.spend(link, 100_000)) helper.fail("an empty battery can't pay");
+        if (CargoLinkItem.spend(link, 100_000, 0)) helper.fail("an empty battery can't pay");
         if (CargoLinkItem.energy(link) != left) helper.fail("a refused transfer mustn't use energy");
         helper.succeed();
     }
@@ -102,29 +102,47 @@ public class CargoLinkGameTests {
         helper.succeed();
     }
 
-    /** Upgrades: Infinite Range ignores distance, Dimensional also other dimensions; they cost more energy. */
+    /** Upgrades in the mast: Infinite Range ignores distance, Dimensional also other dimensions; they cost more energy. */
     @GameTest(template = TEMPLATE, timeoutTicks = 40)
     public static void rangeUpgrades(GameTestHelper helper) {
         var controller = wall(helper);
+        var level = helper.getLevel();
+        helper.setBlock(new BlockPos(3, 1, 2), ModContent.UPLINK_MAST.get());
+        var mast = (io.github.keellam4.oritechextensions.wireless.UplinkMastBlockEntity) helper.getBlockEntity(new BlockPos(3, 1, 2));
+        if (LinkRange.upgrade(level, controller) != 0) helper.fail("no upgrade yet");
+        mast.upgrade().setItem(0, new ItemStack(ModContent.INFINITE_RANGE_UPGRADE.get()));
+        if (LinkRange.upgrade(level, controller) != io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem.INFINITE) helper.fail("the mast's upgrade applies to the wall");
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         var link = new ItemStack(ModContent.CARGO_LINK.get());
-        var target = GlobalPos.of(helper.getLevel().dimension(), controller.getBlockPos());
+        var target = GlobalPos.of(level.dimension(), controller.getBlockPos());
         CargoLinkItem.bind(link, target);
         player.setItemInHand(InteractionHand.MAIN_HAND, link);
         player.setPos(Vec3.atCenterOf(controller.getBlockPos()).add(5000, 0, 0));
-        if (!new CargoLinkItem.Access(InteractionHand.MAIN_HAND, target, Integer.MAX_VALUE).stillValid(player)) helper.fail("infinite range works 5000 blocks away");
+        if (!new CargoLinkItem.Access(InteractionHand.MAIN_HAND, target, Integer.MAX_VALUE, 1).stillValid(player)) helper.fail("infinite range works 5000 blocks away");
         var elsewhere = GlobalPos.of(net.minecraft.world.level.Level.NETHER, controller.getBlockPos());
         CargoLinkItem.bind(link, elsewhere);
-        if (new CargoLinkItem.Access(InteractionHand.MAIN_HAND, elsewhere, Integer.MAX_VALUE, false).stillValid(player)) helper.fail("infinite range stays in its dimension");
-        if (!new CargoLinkItem.Access(InteractionHand.MAIN_HAND, elsewhere, Integer.MAX_VALUE, true).stillValid(player)) helper.fail("dimensional works across dimensions");
+        if (new CargoLinkItem.Access(InteractionHand.MAIN_HAND, elsewhere, Integer.MAX_VALUE, 1).stillValid(player)) helper.fail("infinite range stays in its dimension");
+        if (!new CargoLinkItem.Access(InteractionHand.MAIN_HAND, elsewhere, Integer.MAX_VALUE, 2).stillValid(player)) helper.fail("dimensional works across dimensions");
         var cheap = new ItemStack(ModContent.CARGO_LINK.get());
         var dear = new ItemStack(ModContent.CARGO_LINK.get());
-        dear.set(ModContent.LINK_UPGRADE.get(), io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem.DIMENSIONAL);
         CargoLinkItem.setEnergy(cheap, 10_000);
         CargoLinkItem.setEnergy(dear, 10_000);
-        CargoLinkItem.spend(cheap, 10);
-        CargoLinkItem.spend(dear, 10);
+        CargoLinkItem.spend(cheap, 10, 0);
+        CargoLinkItem.spend(dear, 10, 2);
         if (10_000 - CargoLinkItem.energy(dear) != 4 * (10_000 - CargoLinkItem.energy(cheap))) helper.fail("dimensional transfers cost four times as much");
+        helper.succeed();
+    }
+
+    /** Creative players pay for transfers too. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void creativePaysToo(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(GameType.CREATIVE);
+        var link = new ItemStack(ModContent.CARGO_LINK.get());
+        CargoLinkItem.setEnergy(link, 1000);
+        player.setItemInHand(InteractionHand.MAIN_HAND, link);
+        var access = new CargoLinkItem.Access(InteractionHand.MAIN_HAND, GlobalPos.of(helper.getLevel().dimension(), BlockPos.ZERO), 32);
+        access.pay(player, 10);
+        if (CargoLinkItem.energy(player.getMainHandItem()) >= 1000) helper.fail("a creative player's Link should use energy");
         helper.succeed();
     }
 

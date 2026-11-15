@@ -46,18 +46,16 @@ public class CargoLinkItem extends Item {
         stack.set(ModContent.LINK_ENERGY.get(), Math.max(0, Math.min(CAPACITY, energy)));
     }
 
-    /** Uses the battery for moving {@code items} items. False (and nothing used) if it's too low. */
-    public static boolean spend(ItemStack stack, int items) {
-        // Reaching further costs more: double with Infinite Range, four times with Dimensional.
-        int cost = items * Config.linkEnergyPerItem() * (1 << upgrade(stack));
+    /**
+     * Uses the battery for moving {@code items} items through a wall whose mast has {@code upgrade} (reaching
+     * further costs more: double with Infinite Range, four times with Dimensional). False, and nothing used, if
+     * the battery is too low.
+     */
+    public static boolean spend(ItemStack stack, int items, int upgrade) {
+        int cost = items * Config.linkEnergyPerItem() * (1 << upgrade);
         if (energy(stack) < cost) return false;
         setEnergy(stack, energy(stack) - cost);
         return true;
-    }
-
-    /** 0 = none, {@link LinkUpgradeItem#INFINITE} or {@link LinkUpgradeItem#DIMENSIONAL}. */
-    public static int upgrade(ItemStack stack) {
-        return stack.getOrDefault(ModContent.LINK_UPGRADE.get(), 0);
     }
 
     @Nullable
@@ -102,14 +100,20 @@ public class CargoLinkItem extends Item {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.link.unbound").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
-        int upgrade = upgrade(stack);
-        if (target.dimension() != level.dimension() && upgrade < LinkUpgradeItem.DIMENSIONAL) {
-            player.displayClientMessage(Component.translatable("message.oritech_extensions.link.dimension").withStyle(ChatFormatting.RED), true);
+        if (energy(stack) <= 0) {
+            player.displayClientMessage(Component.translatable("message.oritech_extensions.link.battery").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
         var controller = controller(level, stack);
-        if (controller == null) {
-            player.displayClientMessage(Component.translatable("message.oritech_extensions.link.offline").withStyle(ChatFormatting.RED), true);
+        if (controller == null || controller.getLevel() == null) {
+            player.displayClientMessage(Component.translatable(target.dimension() != level.dimension()
+                    ? "message.oritech_extensions.link.dimension" : "message.oritech_extensions.link.offline").withStyle(ChatFormatting.RED), true);
+            return InteractionResultHolder.fail(stack);
+        }
+        // The wall's Uplink Mast decides the reach: its range, and any upgrade in it.
+        int upgrade = LinkRange.upgrade(controller.getLevel(), controller);
+        if (target.dimension() != level.dimension() && upgrade < LinkUpgradeItem.DIMENSIONAL) {
+            player.displayClientMessage(Component.translatable("message.oritech_extensions.link.dimension").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
         int range = upgrade >= LinkUpgradeItem.INFINITE ? Integer.MAX_VALUE : LinkRange.range(level, controller);
@@ -120,7 +124,7 @@ public class CargoLinkItem extends Item {
                     (int) distance, range).withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
-        var access = new Access(hand, target, range, upgrade >= LinkUpgradeItem.DIMENSIONAL);
+        var access = new Access(hand, target, range, upgrade);
         player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new TerminalMenu(id, inventory, controller, true).remote(access),
                 stack.getHoverName()));
         player.displayClientMessage(signal(distance, range, energy(stack)), true);
@@ -141,42 +145,27 @@ public class CargoLinkItem extends Item {
     }
 
     /** Keeps the remote terminal open while the Link stays in hand, linked and in range, and pays for transfers. */
-    public record Access(InteractionHand hand, GlobalPos target, int range, boolean anyDimension) implements TerminalMenu.RemoteAccess {
+    public record Access(InteractionHand hand, GlobalPos target, int range, int upgrade) implements TerminalMenu.RemoteAccess {
 
         public Access(InteractionHand hand, GlobalPos target, int range) {
-            this(hand, target, range, false);
+            this(hand, target, range, 0);
         }
 
         @Override
         public boolean stillValid(Player player) {
             var stack = player.getItemInHand(hand);
             if (!(stack.getItem() instanceof CargoLinkItem) || !target.equals(CargoLinkItem.target(stack))) return false;
-            if (player.level().dimension() != target.dimension()) return anyDimension;
+            if (player.level().dimension() != target.dimension()) return upgrade >= LinkUpgradeItem.DIMENSIONAL;
             return range == Integer.MAX_VALUE || player.position().distanceTo(target.pos().getCenter()) <= range;
         }
 
         @Override
         public boolean pay(Player player, int items) {
-            if (player.getAbilities().instabuild) return true;
-            if (spend(player.getItemInHand(hand), items)) return true;
+            // Creative players pay too, so the battery behaves the same everywhere.
+            if (spend(player.getItemInHand(hand), items, upgrade)) return true;
             player.displayClientMessage(Component.translatable("message.oritech_extensions.link.battery").withStyle(ChatFormatting.RED), true);
             return false;
         }
-    }
-
-    // ---------------------------------------------------------------- installing upgrades
-
-    /** An upgrade clicked onto the Link in an inventory installs it (a better one replaces a lesser one). */
-    @Override
-    public boolean overrideOtherStackedOnMe(ItemStack link, ItemStack carried, net.minecraft.world.inventory.Slot slot,
-                                            net.minecraft.world.inventory.ClickAction action, Player player,
-                                            net.minecraft.world.entity.SlotAccess access) {
-        if (action != net.minecraft.world.inventory.ClickAction.PRIMARY || !(carried.getItem() instanceof LinkUpgradeItem upgrade)) return false;
-        if (upgrade.level() <= upgrade(link)) return false;
-        link.set(ModContent.LINK_UPGRADE.get(), upgrade.level());
-        carried.shrink(1);
-        player.playSound(net.minecraft.sounds.SoundEvents.SMITHING_TABLE_USE, 0.6f, 1.4f);
-        return true;
     }
 
     // ---------------------------------------------------------------- looks
@@ -203,11 +192,6 @@ public class CargoLinkItem extends Item {
                 ? Component.translatable("tooltip.oritech_extensions.link.unbound").withStyle(ChatFormatting.GRAY)
                 : Component.translatable("tooltip.oritech_extensions.link.bound", target.pos().getX(), target.pos().getY(), target.pos().getZ(),
                         target.dimension().location().toString()).withStyle(ChatFormatting.AQUA));
-        int upgrade = upgrade(stack);
-        if (upgrade > 0) {
-            lines.add(Component.translatable(upgrade == LinkUpgradeItem.DIMENSIONAL ? "tooltip.oritech_extensions.link_upgrade.dimensional"
-                    : "tooltip.oritech_extensions.link_upgrade.infinite").withStyle(ChatFormatting.LIGHT_PURPLE));
-        }
         lines.add(Component.translatable("tooltip.oritech_extensions.link.energy", String.format("%,d", energy(stack)), String.format("%,d", CAPACITY))
                 .withStyle(ChatFormatting.GRAY));
     }

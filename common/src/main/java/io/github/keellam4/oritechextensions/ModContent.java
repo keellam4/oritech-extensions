@@ -287,13 +287,6 @@ public final class ModContent {
                     .networkSynchronized(net.minecraft.core.GlobalPos.STREAM_CODEC)
                     .build());
 
-    /** Which range upgrade the Cargo Link has (see LinkUpgradeItem). */
-    public static final Supplier<DataComponentType<Integer>> LINK_UPGRADE = PLATFORM.register(
-            BuiltInRegistries.DATA_COMPONENT_TYPE, "link_upgrade", () -> DataComponentType.<Integer>builder()
-                    .persistent(com.mojang.serialization.Codec.INT)
-                    .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.VAR_INT)
-                    .build());
-
     public static final Supplier<io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem> INFINITE_RANGE_UPGRADE = PLATFORM.register(BuiltInRegistries.ITEM,
             "infinite_range_upgrade", () -> new io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem(
                     io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem.INFINITE, new Item.Properties().stacksTo(16)));
@@ -311,6 +304,14 @@ public final class ModContent {
     public static final Supplier<io.github.keellam4.oritechextensions.wireless.UplinkMastBlock> UPLINK_MAST = PLATFORM.register(BuiltInRegistries.BLOCK, "uplink_mast",
             () -> new io.github.keellam4.oritechextensions.wireless.UplinkMastBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(3.5f, 6f).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 5)));
+
+    public static final Supplier<BlockEntityType<io.github.keellam4.oritechextensions.wireless.UplinkMastBlockEntity>> UPLINK_MAST_ENTITY = PLATFORM.register(
+            BuiltInRegistries.BLOCK_ENTITY_TYPE, "uplink_mast",
+            () -> BlockEntityType.Builder.of(io.github.keellam4.oritechextensions.wireless.UplinkMastBlockEntity::new, UPLINK_MAST.get()).build(null));
+
+    public static final Supplier<net.minecraft.world.inventory.MenuType<io.github.keellam4.oritechextensions.wireless.UplinkMastMenu>> UPLINK_MAST_MENU =
+            PLATFORM.register(BuiltInRegistries.MENU, "uplink_mast",
+                    () -> PLATFORM.menuType(io.github.keellam4.oritechextensions.wireless.UplinkMastMenu::new));
 
     public static final Supplier<BlockItem> UPLINK_MAST_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "uplink_mast",
             () -> new BlockItem(UPLINK_MAST.get(), new Item.Properties()));

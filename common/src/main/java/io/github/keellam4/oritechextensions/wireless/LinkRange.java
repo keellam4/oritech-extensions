@@ -34,6 +34,20 @@ public final class LinkRange {
         return best;
     }
 
+    /** The best upgrade in any Uplink Mast touching the wall: 0, Infinite Range or Dimensional. */
+    public static int upgrade(Level level, CargoControllerBlockEntity controller) {
+        int best = 0;
+        var wall = new ArrayList<BlockPos>();
+        wall.add(controller.getBlockPos());
+        for (var vault : controller.network().vaults()) wall.add(vault.getBlockPos());
+        for (var pos : wall) {
+            for (var direction : Direction.values()) {
+                if (level.getBlockEntity(pos.relative(direction)) instanceof UplinkMastBlockEntity mast) best = Math.max(best, mast.upgradeLevel());
+            }
+        }
+        return best;
+    }
+
     public static int mastRange(Level level, BlockPos mast) {
         return Config.linkMastRange() + Config.linkSegmentRange() * segments(level, mast);
     }

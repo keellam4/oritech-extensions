@@ -9,8 +9,9 @@ import net.minecraft.world.item.TooltipFlag;
 import java.util.List;
 
 /**
- * A Cargo Link upgrade. Click it onto the Link in your inventory to install it. Infinite Range: the Link works
- * anywhere in its wall's dimension. Dimensional: anywhere, in any dimension (it includes Infinite Range).
+ * An Uplink Mast upgrade, for every Cargo Link on that wall. Right-click the mast to put it in. Infinite Range:
+ * the Links work anywhere in the wall's dimension. Dimensional: anywhere, in any dimension (it includes
+ * Infinite Range).
  */
 public class LinkUpgradeItem extends Item {
 
