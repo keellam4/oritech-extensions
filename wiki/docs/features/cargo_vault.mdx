@@ -1,0 +1,41 @@
+---
+title: Cargo Vault
+icon: oritech_extensions:cargo_vault
+related_items: ["oritech_extensions:cargo_vault", "oritech_extensions:detailing_tool"]
+---
+
+# Cargo Vault
+
+A Cargo Vault holds a lot of one item type. The item floats in its glass front with the count underneath, and the neon strip above the item lights up from left to right as the vault fills, so you can read a whole wall of vaults at a glance.
+
+## Crafting
+
+Shaped: Steel Ingot, Industrial Glass, Steel Ingot / Nickel Ingot, Barrel, Nickel Ingot / Steel Ingot, Adamant Ingot, Steel Ingot.
+
+## Using it
+
+| Action | What it does |
+|---|---|
+| Right-click with items | Put the held stack in |
+| Right-click twice quickly, or with an empty hand | Put in every matching item from your inventory |
+| Left-click the front | Take a stack |
+| Sneak + left-click the front | Take one item |
+| Sneak + right-click with an empty hand | Lock or unlock the item type |
+
+A **locked** vault keeps its item type when it's empty, so it only ever takes that item. The count turns orange while it's locked. Break a vault from any side but the front (or when it's empty).
+
+## Size
+
+64 stacks of its item by default: 4,096 of an item that stacks to 64, 1,024 of one that stacks to 16. Server owners can change it with `cargoVaultStacks` in the config.
+
+## Pipes, hoppers and comparators
+
+Pipes, hoppers and other mods see a vault as one slot holding its item. Items only go into a vault that holds the same item (or an empty, unlocked one). A comparator reads how full it is, from 0 (empty) to 15 (full).
+
+## Breaking it
+
+A broken vault keeps everything: its items, its lock and its paint are stored on the item, and come back when you place it again.
+
+## Paint
+
+The orange frame takes paint, including Rainbow. Touching vaults form a **Cargo Wall** and are painted together with one cartridge or one click of the [Detailing Tool](detailing_tool). A new vault placed against a painted wall takes its colour, unless the vault's item is already painted.
