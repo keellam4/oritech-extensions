@@ -254,13 +254,19 @@ public final class ModContent {
 
     // ---------------------------------------------------------------- Transparent Fluid Pipe
 
+    /** Like Oritech's pipes. (Copying Oritech's block here would load Oritech's blocks before its config on Fabric.) */
+    private static BlockBehaviour.Properties pipeProperties() {
+        return BlockBehaviour.Properties.of().strength(0.6f, 1.5f).sound(SoundType.GLASS).noOcclusion()
+                .isViewBlocking((state, level, pos) -> false).isSuffocating((state, level, pos) -> false);
+    }
+
     public static final Supplier<io.github.keellam4.oritechextensions.pipes.TransparentFluidPipeBlock> TRANSPARENT_FLUID_PIPE = PLATFORM.register(
             BuiltInRegistries.BLOCK, "transparent_fluid_pipe", () -> new io.github.keellam4.oritechextensions.pipes.TransparentFluidPipeBlock(
-                    BlockBehaviour.Properties.ofFullCopy(rearth.oritech.init.BlockContent.TRANSPARENT_ITEM_PIPE)));
+                    pipeProperties()));
 
     public static final Supplier<io.github.keellam4.oritechextensions.pipes.TransparentFluidPipeConnectionBlock> TRANSPARENT_FLUID_PIPE_CONNECTION = PLATFORM.register(
             BuiltInRegistries.BLOCK, "transparent_fluid_pipe_connection", () -> new io.github.keellam4.oritechextensions.pipes.TransparentFluidPipeConnectionBlock(
-                    BlockBehaviour.Properties.ofFullCopy(rearth.oritech.init.BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION)));
+                    pipeProperties()));
 
     public static final Supplier<BlockItem> TRANSPARENT_FLUID_PIPE_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "transparent_fluid_pipe",
             () -> new BlockItem(TRANSPARENT_FLUID_PIPE.get(), new Item.Properties()));
