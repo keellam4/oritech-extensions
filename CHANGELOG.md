@@ -5,6 +5,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
+- **Cargo Link.** A handheld terminal: link it to a Cargo Controller or Crafting Terminal, then open the wall's crafting terminal from up to 32 blocks away. An **Uplink Mast** on the wall raises that to 64, and each **Antenna Segment** on the mast adds 16 (up to 192). Transfers use a little of its battery, which Induction Pylons recharge. Config: `linkRange`, `linkMastRange`, `linkSegmentRange`, `linkEnergyPerItem`.
 - **Transparent Fluid Pipe.** A see-through fluid pipe with a line through its centre, so it's easy to tell from the transparent item pipe. It joins Oritech fluid pipe networks and paints with them.
 - **Tinted glass.** Paint Industrial Glass the colour it already has to tint the pane with that colour (Rainbow too); paint it again to clear the tint.
 - **Induction Pylon animations.** The pylon is dark without power, pulses when powered, and races with light and sparks while charging. Pylons can now be painted.
@@ -28,6 +29,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 - **Paintable block tags for modpacks.** Add blocks to `oritech_extensions:paintable` (one block per click) or `oritech_extensions:paintable_connected` (touching blocks paint together) with a datapack, and list their textures in the painted-texture atlas with a resource pack. See "For Modpack Makers" on the website.
 
 ### Fixed
+- A crash on Fabric when a Cargo Controller's network had Fluid Vaults or a Fluid Silo.
 - The config screen showed raw keys instead of names for the colour-isolated pipes and Fluid Silo options.
 
 ## [0.4.1+fabric] - Beta (Fabric)
