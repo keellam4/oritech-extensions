@@ -113,6 +113,78 @@ public class CargoVaultGameTests {
         helper.succeed();
     }
 
+    private static CargoVaultBlockEntity place(GameTestHelper helper, BlockPos relative, net.minecraft.world.level.block.Block block) {
+        var pos = helper.absolutePos(relative);
+        helper.getLevel().setBlockAndUpdate(pos, block.defaultBlockState());
+        return (CargoVaultBlockEntity) helper.getLevel().getBlockEntity(pos);
+    }
+
+    /** A Quad Vault keeps each item type in its own window, a quarter of the space each. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void quadKeepsItemTypesApart(GameTestHelper helper) {
+        var vault = place(helper, new BlockPos(2, 1, 2), ModContent.QUAD_VAULT.get());
+        if (vault.slots() != 4) helper.fail("a Quad Vault should have 4 slots, has " + vault.slots());
+        int perSlot = Math.max(1, Config.cargoVaultStacks() / 4) * 64;
+        if (vault.capacity(0) != perSlot) helper.fail("slot capacity " + vault.capacity(0) + ", expected " + perSlot);
+
+        vault.insert(new ItemStack(Items.IRON_INGOT, 10), false);
+        vault.insert(new ItemStack(Items.GOLD_INGOT, 10), false);
+        if (!vault.item(0).is(Items.IRON_INGOT) || !vault.item(1).is(Items.GOLD_INGOT)) helper.fail("items didn't go to the first empty windows");
+        if (vault.insert(2, new ItemStack(Items.IRON_INGOT, 5), false) != 0) helper.fail("iron went into a second window");
+        vault.insert(new ItemStack(Items.IRON_INGOT, 5), false);
+        if (vault.count(0) != 15) helper.fail("more iron didn't join the iron window");
+        if (vault.insert(3, new ItemStack(Items.DIAMOND, 1), false) != 1 || !vault.item(3).is(Items.DIAMOND)) helper.fail("a clicked empty window didn't take a new item");
+
+        vault.setLocked(true);
+        if (vault.insert(new ItemStack(Items.EMERALD, 1), true) != 0) helper.fail("a locked vault took a new item type");
+        helper.succeed();
+    }
+
+    /** A Grid Vault has 16 windows; a 17th item type doesn't fit. Breaking it keeps every window. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    public static void gridHoldsSixteenTypes(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var vault = place(helper, new BlockPos(2, 1, 2), ModContent.GRID_VAULT.get());
+        var types = new net.minecraft.world.item.Item[]{Items.STONE, Items.DIRT, Items.SAND, Items.GRAVEL, Items.OAK_LOG, Items.BIRCH_LOG,
+                Items.IRON_INGOT, Items.GOLD_INGOT, Items.COPPER_INGOT, Items.COAL, Items.REDSTONE, Items.LAPIS_LAZULI,
+                Items.DIAMOND, Items.EMERALD, Items.QUARTZ, Items.FLINT};
+        for (int i = 0; i < types.length; i++) {
+            if (vault.insert(new ItemStack(types[i], i + 1), false) != i + 1) helper.fail("window " + i + " didn't take " + types[i]);
+        }
+        if (vault.insert(new ItemStack(Items.CLAY_BALL, 1), true) != 0) helper.fail("a 17th item type fit");
+
+        var pos = vault.getBlockPos();
+        level.destroyBlock(pos, true);
+        var dropped = level.getEntitiesOfClass(ItemEntity.class, new AABB(pos).inflate(2)).stream()
+                .map(ItemEntity::getItem).filter(s -> s.is(ModContent.GRID_VAULT_ITEM.get())).findFirst();
+        if (dropped.isEmpty()) {
+            helper.fail("the Grid Vault didn't drop");
+            return;
+        }
+        var contents = dropped.get().get(ModContent.VAULT_CONTENTS.get());
+        if (contents == null || contents.slots().size() != 16 || contents.slot(15).count() != 16 || !contents.slot(15).item().is(Items.FLINT)) {
+            helper.fail("the dropped Grid Vault lost its windows: " + contents);
+        }
+        helper.succeed();
+    }
+
+    /** Clicks map to windows as seen from the front: top left is slot 0, bottom right the last one. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 20)
+    public static void frontClicksPickWindows(GameTestHelper helper) {
+        var pos = new BlockPos(10, 64, 10);
+        var north = net.minecraft.core.Direction.NORTH;
+        // Facing north: the front is the z = 10 face, and the viewer's right is west (towards smaller x).
+        int topLeft = io.github.keellam4.oritechextensions.storage.VaultLayout.slotAt(north, 2, pos, new net.minecraft.world.phys.Vec3(10.9, 64.9, 10), north);
+        int bottomRight = io.github.keellam4.oritechextensions.storage.VaultLayout.slotAt(north, 2, pos, new net.minecraft.world.phys.Vec3(10.1, 64.1, 10), north);
+        int gridSecond = io.github.keellam4.oritechextensions.storage.VaultLayout.slotAt(north, 4, pos, new net.minecraft.world.phys.Vec3(10.6, 64.9, 10), north);
+        int side = io.github.keellam4.oritechextensions.storage.VaultLayout.slotAt(north, 2, pos, new net.minecraft.world.phys.Vec3(11, 64.5, 10.5), net.minecraft.core.Direction.EAST);
+        if (topLeft != 0) helper.fail("top left is slot " + topLeft);
+        if (bottomRight != 3) helper.fail("bottom right is slot " + bottomRight);
+        if (gridSecond != 1) helper.fail("second grid window is slot " + gridSecond);
+        if (side != -1) helper.fail("a click on the side picked slot " + side);
+        helper.succeed();
+    }
+
     /** Comparators read how full the vault is. */
     @GameTest(template = TEMPLATE, timeoutTicks = 40)
     public static void comparatorReadsFill(GameTestHelper helper) {

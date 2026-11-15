@@ -21,15 +21,19 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+
 /**
- * Bulk storage for one item type. Loader code wraps this in an item handler (NeoForge) or item storage (Fabric)
- * so pipes can reach it; both go through {@link #insert} and {@link #extract}, or the raw setters inside
- * transactions.
+ * Bulk storage in one or more slots, each holding one item type: 1 for the Cargo Vault, 4 for the Quad Vault, 16
+ * for the Grid Vault. All slots together hold {@code cargoVaultStacks} stacks, split evenly.
+ * <p>
+ * An item type lives in one slot only: an empty slot doesn't take an item another slot already holds. Loader code
+ * wraps this in an item handler (NeoForge) or item storage (Fabric) for pipes.
  */
 public class CargoVaultBlockEntity extends BlockEntity {
 
-    private ItemStack item = ItemStack.EMPTY;
-    private int count;
+    private ItemStack[] items;
+    private int[] counts;
     private boolean locked;
 
     /** Paint the vault was placed with (from its item), picked up by PaintTargets.onBlockPlaced. */
@@ -40,101 +44,212 @@ public class CargoVaultBlockEntity extends BlockEntity {
     @Nullable
     private Paint brokenPaint;
 
-    /** Capacity as the server sees it; synced so the client's fill gauge matches the server config. */
-    private int syncedCapacity = -1;
+    /** Stacks per slot as the server sees them; synced so the client's gauges and counter match the server config. */
+    private int syncedStacksPerSlot = -1;
 
     public CargoVaultBlockEntity(BlockPos pos, BlockState state) {
         super(ModContent.CARGO_VAULT_ENTITY.get(), pos, state);
+        int slots = state.getBlock() instanceof CargoVaultBlock vault ? vault.slots() : 1;
+        items = new ItemStack[slots];
+        java.util.Arrays.fill(items, ItemStack.EMPTY);
+        counts = new int[slots];
     }
 
-    // ---------------------------------------------------------------- contents
+    // ---------------------------------------------------------------- slots
 
-    public ItemStack item() {
-        return item;
+    public int slots() {
+        return items.length;
     }
 
-    public int count() {
-        return count;
+    public ItemStack item(int slot) {
+        return items[slot];
+    }
+
+    public int count(int slot) {
+        return counts[slot];
     }
 
     public boolean isLocked() {
         return locked;
     }
 
-    /** Items of one type this vault holds: {@code cargoVaultStacks} stacks of the stored (or offered) item. */
-    public int capacity(ItemStack type) {
-        if (level != null && level.isClientSide() && syncedCapacity >= 0) return syncedCapacity;
-        int perStack = type.isEmpty() ? 64 : type.getMaxStackSize();
-        return Config.cargoVaultStacks() * perStack;
+    /** Stacks one slot holds: the vault's total split evenly between its slots (at least one stack). */
+    public int stacksPerSlot() {
+        if (level != null && level.isClientSide() && syncedStacksPerSlot > 0) return syncedStacksPerSlot;
+        return Math.max(1, Config.cargoVaultStacks() / slots());
     }
 
-    public int capacity() {
-        return capacity(item);
+    /** Items of {@code type} (or of the slot's own item) one slot holds. */
+    public int capacity(int slot, ItemStack type) {
+        var item = items[slot].isEmpty() ? type : items[slot];
+        int perStack = item.isEmpty() ? 64 : item.getMaxStackSize();
+        return stacksPerSlot() * perStack;
     }
 
-    /** 0 to 1, for the fill gauge and comparators. */
+    public int capacity(int slot) {
+        return capacity(slot, ItemStack.EMPTY);
+    }
+
+    /** 0 to 1, for the slot's gauge. */
+    public float fill(int slot) {
+        int capacity = capacity(slot);
+        return capacity <= 0 ? 0 : Math.min(1f, (float) counts[slot] / capacity);
+    }
+
+    /** 0 to 1 over all slots, for comparators. */
     public float fill() {
-        int capacity = capacity();
+        long count = 0;
+        long capacity = 0;
+        for (int i = 0; i < slots(); i++) {
+            count += counts[i];
+            capacity += capacity(i);
+        }
         return capacity <= 0 ? 0 : Math.min(1f, (float) count / capacity);
     }
 
-    public boolean accepts(ItemStack stack) {
-        if (stack.isEmpty()) return false;
-        if (item.isEmpty()) return true;
-        return ItemStack.isSameItemSameComponents(item, stack);
+    public boolean isEmpty() {
+        for (int count : counts) {
+            if (count > 0) return false;
+        }
+        return true;
     }
 
-    /** Puts up to {@code stack.getCount()} items in. Returns how many fit (and were taken unless {@code simulate}). */
-    public int insert(ItemStack stack, boolean simulate) {
-        if (!accepts(stack)) return 0;
-        int moved = Math.min(stack.getCount(), capacity(item.isEmpty() ? stack : item) - count);
+    /** The slot holding {@code stack}'s item, or -1. */
+    public int slotOf(ItemStack stack) {
+        for (int i = 0; i < slots(); i++) {
+            if (!items[i].isEmpty() && ItemStack.isSameItemSameComponents(items[i], stack)) return i;
+        }
+        return -1;
+    }
+
+    /** Whether {@code slot} takes {@code stack}: its own item, or (when empty and unlocked) an item no other slot holds. */
+    public boolean accepts(int slot, ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        if (!items[slot].isEmpty()) return ItemStack.isSameItemSameComponents(items[slot], stack);
+        return !locked && slotOf(stack) < 0;
+    }
+
+    /** Whether any slot takes {@code stack}. */
+    public boolean accepts(ItemStack stack) {
+        for (int i = 0; i < slots(); i++) {
+            if (accepts(i, stack)) return true;
+        }
+        return false;
+    }
+
+    /** Puts up to {@code stack.getCount()} items into {@code slot}. Returns how many fit. */
+    public int insert(int slot, ItemStack stack, boolean simulate) {
+        if (!accepts(slot, stack)) return 0;
+        int moved = Math.min(stack.getCount(), capacity(slot, stack) - counts[slot]);
         if (moved <= 0) return 0;
-        if (!simulate) setContents(item.isEmpty() ? stack : item, count + moved);
+        if (!simulate) setSlot(slot, items[slot].isEmpty() ? stack : items[slot], counts[slot] + moved);
         return moved;
     }
 
-    /** Takes up to {@code amount} items out (at most one stack). */
-    public ItemStack extract(int amount, boolean simulate) {
-        if (item.isEmpty() || count <= 0 || amount <= 0) return ItemStack.EMPTY;
-        int moved = Math.min(Math.min(amount, count), item.getMaxStackSize());
-        var out = item.copyWithCount(moved);
-        if (!simulate) setContents(item, count - moved);
+    /** Puts items into the slot holding them, or else the first empty slot. Returns how many fit. */
+    public int insert(ItemStack stack, boolean simulate) {
+        int slot = slotOf(stack);
+        if (slot < 0) {
+            for (int i = 0; i < slots() && slot < 0; i++) {
+                if (accepts(i, stack)) slot = i;
+            }
+        }
+        return slot < 0 ? 0 : insert(slot, stack, simulate);
+    }
+
+    /** Takes up to {@code amount} items (at most one stack) out of {@code slot}. */
+    public ItemStack extract(int slot, int amount, boolean simulate) {
+        if (items[slot].isEmpty() || counts[slot] <= 0 || amount <= 0) return ItemStack.EMPTY;
+        int moved = Math.min(Math.min(amount, counts[slot]), items[slot].getMaxStackSize());
+        var out = items[slot].copyWithCount(moved);
+        if (!simulate) setSlot(slot, items[slot], counts[slot] - moved);
         return out;
     }
 
-    /** Sets the contents and tells clients. An unlocked vault forgets its item type when it runs empty. */
-    public void setContents(ItemStack type, int newCount) {
-        setContentsQuietly(type, newCount);
+    /** Sets a slot and tells clients. An unlocked slot forgets its item type when it runs empty. */
+    public void setSlot(int slot, ItemStack type, int newCount) {
+        setSlotQuietly(slot, type, newCount);
         changed();
     }
 
-    /** Sets the contents without syncing; for transactions that sync once they commit ({@link #changed}). */
-    public void setContentsQuietly(ItemStack type, int newCount) {
-        count = Math.max(0, newCount);
-        if (count == 0 && !locked) {
-            item = ItemStack.EMPTY;
+    /** Sets a slot without syncing; for transactions that sync once they commit ({@link #changed}). */
+    public void setSlotQuietly(int slot, ItemStack type, int newCount) {
+        counts[slot] = Math.max(0, newCount);
+        if (counts[slot] == 0 && !locked) {
+            items[slot] = ItemStack.EMPTY;
         } else if (!type.isEmpty()) {
-            item = type.copyWithCount(1);
+            items[slot] = type.copyWithCount(1);
         }
     }
 
-    /** Puts back contents saved before a transaction that was rolled back (Fabric), keeping the item type exactly. */
-    public void restoreContents(ItemStack type, int restoredCount) {
-        item = type.isEmpty() ? ItemStack.EMPTY : type.copyWithCount(1);
-        count = Math.max(0, restoredCount);
+    /** Puts back a slot saved before a transaction that was rolled back (Fabric), keeping the item type exactly. */
+    public void restoreSlot(int slot, ItemStack type, int restoredCount) {
+        items[slot] = type.isEmpty() ? ItemStack.EMPTY : type.copyWithCount(1);
+        counts[slot] = Math.max(0, restoredCount);
     }
 
+    /** Locking keeps every slot's item type when it runs empty, so the vault only takes those items. */
     public void setLocked(boolean locked) {
         this.locked = locked;
-        if (!locked && count == 0) item = ItemStack.EMPTY;
+        if (!locked) {
+            for (int i = 0; i < slots(); i++) {
+                if (counts[i] == 0) items[i] = ItemStack.EMPTY;
+            }
+        }
         changed();
     }
 
-    public VaultContents contents() {
-        return new VaultContents(item, count, locked);
+    public boolean hasAnyItemType() {
+        for (var item : items) {
+            if (!item.isEmpty()) return true;
+        }
+        return false;
     }
 
-    /** Saves and tells nearby clients (count text, fill gauge, comparators). */
+    // ---------------------------------------------------------------- single-slot shortcuts (the Cargo Vault)
+
+    public ItemStack item() {
+        return item(0);
+    }
+
+    public int count() {
+        return count(0);
+    }
+
+    public int capacity() {
+        return capacity(0);
+    }
+
+    public void setContents(ItemStack type, int newCount) {
+        setSlot(0, type, newCount);
+    }
+
+    /** Takes from the first slot that has items. */
+    public ItemStack extract(int amount, boolean simulate) {
+        for (int i = 0; i < slots(); i++) {
+            if (counts[i] > 0) return extract(i, amount, simulate);
+        }
+        return ItemStack.EMPTY;
+    }
+
+    // ---------------------------------------------------------------- contents as a whole
+
+    public VaultContents contents() {
+        var slots = new ArrayList<VaultContents.Slot>(slots());
+        for (int i = 0; i < slots(); i++) slots.add(new VaultContents.Slot(items[i], counts[i]));
+        return new VaultContents(slots, locked);
+    }
+
+    private void load(VaultContents contents) {
+        for (int i = 0; i < slots(); i++) {
+            var slot = contents.slot(i);
+            items[i] = slot.item();
+            counts[i] = slot.count();
+        }
+        locked = contents.locked();
+    }
+
+    /** Saves and tells nearby clients (counts, gauges, comparators). */
     public void changed() {
         setChanged();
         if (level != null && !level.isClientSide()) {
@@ -172,12 +287,9 @@ public class CargoVaultBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        var contents = VaultContents.CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), tag.get("vault"))
-                .result().orElse(VaultContents.EMPTY);
-        item = contents.item();
-        count = contents.count();
-        locked = contents.locked();
-        syncedCapacity = tag.contains("capacity", Tag.TAG_INT) ? tag.getInt("capacity") : -1;
+        load(VaultContents.CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), tag.get("vault"))
+                .result().orElse(VaultContents.EMPTY));
+        syncedStacksPerSlot = tag.contains("stacks_per_slot", Tag.TAG_INT) ? tag.getInt("stacks_per_slot") : -1;
     }
 
     private void writeContents(CompoundTag tag, HolderLookup.Provider registries) {
@@ -189,7 +301,7 @@ public class CargoVaultBlockEntity extends BlockEntity {
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         var tag = new CompoundTag();
         writeContents(tag, registries);
-        tag.putInt("capacity", capacity());
+        tag.putInt("stacks_per_slot", stacksPerSlot());
         return tag;
     }
 
@@ -201,17 +313,14 @@ public class CargoVaultBlockEntity extends BlockEntity {
     @Override
     protected void applyImplicitComponents(DataComponentInput input) {
         super.applyImplicitComponents(input);
-        var contents = input.getOrDefault(ModContent.VAULT_CONTENTS.get(), VaultContents.EMPTY);
-        item = contents.item();
-        count = contents.count();
-        locked = contents.locked();
+        load(input.getOrDefault(ModContent.VAULT_CONTENTS.get(), VaultContents.EMPTY));
         placedPaint = input.get(ModContent.PAINT_COMPONENT.get());
     }
 
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
-        if (!item.isEmpty() || locked) components.set(ModContent.VAULT_CONTENTS.get(), contents());
+        if (hasAnyItemType() || locked) components.set(ModContent.VAULT_CONTENTS.get(), contents());
         var paint = currentPaint();
         if (PaintColors.isPainted(paint)) components.set(ModContent.PAINT_COMPONENT.get(), paint);
     }

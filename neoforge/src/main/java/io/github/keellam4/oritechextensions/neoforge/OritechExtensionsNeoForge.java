@@ -55,6 +55,8 @@ public final class OritechExtensionsNeoForge {
         }
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(ModContent.CARGO_VAULT_ITEM.get());
+            event.accept(ModContent.QUAD_VAULT_ITEM.get());
+            event.accept(ModContent.GRID_VAULT_ITEM.get());
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModContent.GUIDE.get());
@@ -72,7 +74,7 @@ public final class OritechExtensionsNeoForge {
                 }));
         event.registrar(VaultTakePayload.VERSION).playToServer(VaultTakePayload.TYPE, VaultTakePayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> {
-                    if (context.player() instanceof ServerPlayer player) CargoVault.take(player, payload.pos(), payload.one());
+                    if (context.player() instanceof ServerPlayer player) CargoVault.take(player, payload.pos(), payload.slot(), payload.one());
                 }));
     }
 

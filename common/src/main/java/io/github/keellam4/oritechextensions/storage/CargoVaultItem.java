@@ -17,14 +17,29 @@ public class CargoVaultItem extends BlockItem {
         super(block, properties);
     }
 
+    private String slotWord() {
+        return getBlock() instanceof CargoVaultBlock vault && vault.slots() > 1 ? "multi" : "single";
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> lines, TooltipFlag flag) {
         var contents = stack.get(ModContent.VAULT_CONTENTS.get());
         if (contents == null || contents.isEmpty()) {
-            lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.empty").withStyle(ChatFormatting.GRAY));
+            lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.empty." + slotWord()).withStyle(ChatFormatting.GRAY));
         } else {
-            lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.contains",
-                    String.format("%,d", contents.count()), contents.item().getHoverName()).withStyle(ChatFormatting.GRAY));
+            int shown = 0;
+            int more = 0;
+            for (var slot : contents.slots()) {
+                if (slot.isEmpty()) continue;
+                if (shown < 4) {
+                    lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.contains",
+                            String.format("%,d", slot.count()), slot.item().getHoverName()).withStyle(ChatFormatting.GRAY));
+                    shown++;
+                } else {
+                    more++;
+                }
+            }
+            if (more > 0) lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.more", more).withStyle(ChatFormatting.GRAY));
             if (contents.locked()) lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.locked").withStyle(ChatFormatting.GRAY));
         }
         lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.help").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));

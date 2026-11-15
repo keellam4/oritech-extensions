@@ -26,6 +26,10 @@ public final class OritechExtensionsFabricClient implements ClientModInitializer
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> PaintClient.forgetWorldPaint());
 
+        net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register((graphics, delta) ->
+                io.github.keellam4.oritechextensions.client.VaultHud.render(graphics));
+        io.github.keellam4.oritechextensions.storage.CargoVault.clientSlotLookup = io.github.keellam4.oritechextensions.client.VaultHud::slotUnderCrosshair;
+
         FabricPaintModels.register();
         ClientTickEvents.END_CLIENT_TICK.register(FabricPaintModels::afterReload);
         if (PaintClient.smokeTest()) ClientTickEvents.END_CLIENT_TICK.register(client -> PaintClient.smokeTestTick());

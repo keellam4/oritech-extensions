@@ -100,11 +100,67 @@ def grid(fn):
     return ["".join(fn(x, y) for x in range(16)) for y in range(16)]
 
 
+def multi_front(size, cells):
+    """Quad (16 px, 2x2) and Grid (32 px, 4x4) fronts: 1 px frame, 6 px cells, 2 px separators.
+    Each cell: a dim 4 px gauge on its top row (lit by the renderer), dark glass below."""
+    rows = []
+    starts = [1 + 8 * i for i in range(cells)]
+    for y in range(size):
+        row = ""
+        for x in range(size):
+            cx = next((i for i, s0 in enumerate(starts) if s0 <= x < s0 + 6), None)
+            cy = next((i for i, s0 in enumerate(starts) if s0 <= y < s0 + 6), None)
+            last = size - 1
+            corner = x in (0, last) and y in (0, last)
+            if corner:
+                row += "c"
+            elif y == 0:
+                row += "H"
+            elif y == last or x == last:
+                row += "S"
+            elif x == 0:
+                row += "H"
+            elif cx is not None and cy is not None:
+                lx, ly = x - starts[cx], y - starts[cy]
+                if ly == 0:
+                    row += "g" if 1 <= lx <= 4 else "D"
+                elif lx in (0, 5) or ly == 5:
+                    row += "1"
+                elif lx + ly == 5:
+                    row += "4"
+                elif lx + ly in (4, 6):
+                    row += "3"
+                else:
+                    row += "2"
+            elif cx is None and cy is None:
+                row += "b"  # where separators cross
+            else:
+                # separators: shadow then highlight, for depth
+                coord = x if cx is None else y
+                offset = (coord - 1) % 8
+                row += "S" if offset == 6 else "h"
+        rows.append(row)
+    return rows
+
+
+def draw_any(rows):
+    size = len(rows)
+    image = Image.new("RGBA", (size, size))
+    for y, row in enumerate(rows):
+        assert len(row) == size, row
+        for x, ch in enumerate(row):
+            c = COLOURS[ch]
+            image.putpixel((x, y), tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) + (255,))
+    return image
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     draw(FRONT).save(OUT / "cargo_vault_front.png")
     draw(grid(side)).save(OUT / "cargo_vault_side.png")
     draw(grid(top)).save(OUT / "cargo_vault_top.png")
+    draw_any(multi_front(16, 2)).save(OUT / "quad_vault_front.png")
+    draw_any(multi_front(32, 4)).save(OUT / "grid_vault_front.png")
 
 
 if __name__ == "__main__":

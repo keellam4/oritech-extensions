@@ -54,14 +54,20 @@
   "oritech_extensions.configuration.detailingToolAreaSize": "Detailing Tool Area Size",
   "oritech_extensions.configuration.detailingToolAreaSize.tooltip": "The longest side, in blocks, of an area the Detailing Tool paints in Area mode.",
   "block.oritech_extensions.cargo_vault": "Cargo Vault",
-  "tooltip.oritech_extensions.cargo_vault.empty": "Empty. Holds lots of one item type.",
   "tooltip.oritech_extensions.cargo_vault.contains": "Contains %s × %s",
   "tooltip.oritech_extensions.cargo_vault.locked": "Locked to this item",
-  "tooltip.oritech_extensions.cargo_vault.help": "Right-click to put items in, left-click the front to take a stack.",
+  "tooltip.oritech_extensions.cargo_vault.help": "Right-click to put items in, left-click a window to take a stack.",
   "message.oritech_extensions.cargo_vault.full": "This vault is full.",
   "message.oritech_extensions.cargo_vault.locked": "Vault locked: it keeps this item type when empty.",
   "message.oritech_extensions.cargo_vault.unlocked": "Vault unlocked.",
   "message.oritech_extensions.cargo_vault.nothing_to_lock": "Put an item in first, then lock it.",
   "oritech_extensions.configuration.cargoVaultStacks": "Cargo Vault Size",
-  "oritech_extensions.configuration.cargoVaultStacks.tooltip": "How many stacks of its item one Cargo Vault holds."
+  "oritech_extensions.configuration.cargoVaultStacks.tooltip": "How many stacks one vault holds. Quad and Grid Vaults split it between their windows.",
+  "block.oritech_extensions.quad_vault": "Quad Vault",
+  "block.oritech_extensions.grid_vault": "Grid Vault",
+  "tooltip.oritech_extensions.cargo_vault.empty.single": "Empty. Holds lots of one item type.",
+  "tooltip.oritech_extensions.cargo_vault.empty.multi": "Empty. Holds a different item type in each window.",
+  "tooltip.oritech_extensions.cargo_vault.more": "…and %s more",
+  "hud.oritech_extensions.vault.empty": "Empty",
+  "hud.oritech_extensions.vault.locked": "Locked"
 }
