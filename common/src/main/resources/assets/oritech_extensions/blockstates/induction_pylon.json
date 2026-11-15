@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "oritech_extensions:block/induction_pylon_bottom"
+    },
+    "half=upper": {
+      "model": "oritech_extensions:block/induction_pylon_top"
+    }
+  }
+}

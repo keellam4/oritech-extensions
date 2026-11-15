@@ -5,6 +5,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
+- **Induction Pylon.** A two-block pylon that wirelessly charges the energy items players carry within 8 blocks: armour first, then Curios slots, held items and the inventory. Charging is fully efficient at the pylon and half as efficient at the edge of its range, and a teal arc shows who it's charging. It charges its owner, the owner's team, or everyone. Comes in three styles (Tesla Spire, Coil Obelisk, Ring Pylon); put one alone in a crafting grid to switch. Config: `pylonRange`, `pylonRate`, `pylonBuffer`.
 - **Fluid Silo.** A multiblock tank: a solid 3 × 3 column of Silo Casing and Silo Glass, 3 to 9 blocks tall, with a Silo Controller in the bottom layer. Holds 1,000 buckets per block (27,000 to 81,000 buckets, `siloBucketsPerBlock`), and the fluid shows through the glass. Buckets and fluid pipes work on any block of the silo. Its controller joins a Cargo network when it touches a vault or controller. A broken silo keeps its fluid, and a mined controller carries it. One click paints the whole silo.
 - **Crafting Terminal.** Placed against a Cargo Wall, it opens the terminal with a 3 × 3 crafting grid that refills from the wall after each craft; shift-click the result to craft as many as the wall has ingredients for.
 - **Terminal redesign.** A bigger list, buttons to sort by amount, name or mod (ascending or descending) and to show only items or only fluids, and an Oritech-style look.
@@ -19,6 +20,9 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 - **Rainbow Color Cartridge.** Paints like a Color Cartridge, but the block keeps blending through red, yellow, green, cyan, blue and pink, in step with every other rainbow block. Works on everything this mod paints (not hangar doors or Oritech's own machines). Crafted from one each of the redstone, industrial, camo, adamant, sculk and fluxite cartridges, giving 6. Rainbow pipes only connect to rainbow pipes.
 - **More paintable blocks.** Color Cartridges now also paint Metal Beams and Metal Girders (a touching support structure paints in one click), Pipe Boosters (one at a time), item and fluid pipe ducts and framed pipes (with their pipe network), and energy pipes and superconductors with their framed and duct versions (their orange connectors, light duct rings and teal parts take the colour). Colour-isolated pipes work for all of them, including ducts placed side by side.
 - **Paintable block tags for modpacks.** Add blocks to `oritech_extensions:paintable` (one block per click) or `oritech_extensions:paintable_connected` (touching blocks paint together) with a datapack, and list their textures in the painted-texture atlas with a resource pack. See "For Modpack Makers" on the website.
+
+### Fixed
+- The config screen showed raw keys instead of names for the colour-isolated pipes and Fluid Silo options.
 
 ## [0.4.1+fabric] - Beta (Fabric)
 

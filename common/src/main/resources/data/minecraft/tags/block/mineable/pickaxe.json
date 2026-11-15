@@ -13,6 +13,9 @@
     "oritech_extensions:crafting_terminal",
     "oritech_extensions:silo_casing",
     "oritech_extensions:silo_glass",
-    "oritech_extensions:silo_controller"
+    "oritech_extensions:silo_controller",
+    "oritech_extensions:induction_pylon",
+    "oritech_extensions:induction_pylon_obelisk",
+    "oritech_extensions:induction_pylon_rings"
   ]
 }

@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "bonus_rolls": 0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "oritech_extensions:induction_pylon_rings",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "oritech_extensions:induction_pylon_rings",
+              "properties": {
+                "half": "lower"
+              }
+            }
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "oritech_extensions:blocks/induction_pylon_rings"
+}

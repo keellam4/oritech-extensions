@@ -93,6 +93,8 @@ dependencies {
     compileOnly "curse.maven:oritech-1030830:${oritech_curse_file_id}"
     compileOnly "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
     compileOnly "dev.architectury:architectury-neoforge:${architectury_version}"
+    // Curios: the Induction Pylon charges items in Curios slots when it's installed.
+    compileOnly "maven.modrinth:curios:9.5.1+1.21.1"
 
     // Present when running the game from this project (runClient / runGameTestServer), not shipped.
     // Tests run against the newest Oritech plus Oritech Things, so compatibility with both is checked on every push.

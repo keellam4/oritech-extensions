@@ -22,6 +22,10 @@ public final class OritechExtensionsFabricClient implements ClientModInitializer
         BlockEntityRenderers.register(ModContent.COMPACTING_VAULT_ENTITY.get(), io.github.keellam4.oritechextensions.client.CargoVaultRenderer::new);
         BlockEntityRenderers.register(ModContent.FLUID_VAULT_ENTITY.get(), io.github.keellam4.oritechextensions.client.CargoVaultRenderer::new);
         BlockEntityRenderers.register(ModContent.SILO_CONTROLLER_ENTITY.get(), io.github.keellam4.oritechextensions.client.SiloRenderer::new);
+        BlockEntityRenderers.register(ModContent.INDUCTION_PYLON_ENTITY.get(), io.github.keellam4.oritechextensions.client.PylonRenderer::new);
+        for (var pylon : io.github.keellam4.oritechextensions.wireless.InductionPylonBlock.all()) {
+            net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlock(pylon, net.minecraft.client.renderer.RenderType.cutout());
+        }
         net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlock(ModContent.SILO_GLASS.get(), net.minecraft.client.renderer.RenderType.cutout());
         ClientPlayNetworking.registerGlobalReceiver(PaintSyncPayload.TYPE, (payload, context) -> PaintClient.handleSync(payload));
         ItemTooltipCallback.EVENT.register((stack, tooltipContext, flag, lines) -> {

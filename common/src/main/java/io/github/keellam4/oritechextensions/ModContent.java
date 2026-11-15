@@ -151,6 +151,33 @@ public final class ModContent {
             BuiltInRegistries.BLOCK_ENTITY_TYPE, "silo_controller",
             () -> BlockEntityType.Builder.of(io.github.keellam4.oritechextensions.storage.SiloControllerBlockEntity::new, SILO_CONTROLLER.get()).build(null));
 
+    // ---------------------------------------------------------------- Induction Pylon
+
+    private static Supplier<io.github.keellam4.oritechextensions.wireless.InductionPylonBlock> pylon(String name, io.github.keellam4.oritechextensions.wireless.PylonStyle style) {
+        return PLATFORM.register(BuiltInRegistries.BLOCK, name, () -> new io.github.keellam4.oritechextensions.wireless.InductionPylonBlock(style,
+                BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f).sound(SoundType.METAL).noOcclusion()
+                        .lightLevel(state -> 7)));
+    }
+
+    public static final Supplier<io.github.keellam4.oritechextensions.wireless.InductionPylonBlock> INDUCTION_PYLON =
+            pylon("induction_pylon", io.github.keellam4.oritechextensions.wireless.PylonStyle.SPIRE);
+    public static final Supplier<io.github.keellam4.oritechextensions.wireless.InductionPylonBlock> INDUCTION_PYLON_OBELISK =
+            pylon("induction_pylon_obelisk", io.github.keellam4.oritechextensions.wireless.PylonStyle.OBELISK);
+    public static final Supplier<io.github.keellam4.oritechextensions.wireless.InductionPylonBlock> INDUCTION_PYLON_RINGS =
+            pylon("induction_pylon_rings", io.github.keellam4.oritechextensions.wireless.PylonStyle.RINGS);
+
+    public static final Supplier<BlockItem> INDUCTION_PYLON_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "induction_pylon",
+            () -> new net.minecraft.world.item.DoubleHighBlockItem(INDUCTION_PYLON.get(), new Item.Properties()));
+    public static final Supplier<BlockItem> INDUCTION_PYLON_OBELISK_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "induction_pylon_obelisk",
+            () -> new net.minecraft.world.item.DoubleHighBlockItem(INDUCTION_PYLON_OBELISK.get(), new Item.Properties()));
+    public static final Supplier<BlockItem> INDUCTION_PYLON_RINGS_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "induction_pylon_rings",
+            () -> new net.minecraft.world.item.DoubleHighBlockItem(INDUCTION_PYLON_RINGS.get(), new Item.Properties()));
+
+    public static final Supplier<BlockEntityType<io.github.keellam4.oritechextensions.wireless.InductionPylonBlockEntity>> INDUCTION_PYLON_ENTITY = PLATFORM.register(
+            BuiltInRegistries.BLOCK_ENTITY_TYPE, "induction_pylon",
+            () -> BlockEntityType.Builder.of(io.github.keellam4.oritechextensions.wireless.InductionPylonBlockEntity::new,
+                    INDUCTION_PYLON.get(), INDUCTION_PYLON_OBELISK.get(), INDUCTION_PYLON_RINGS.get()).build(null));
+
     public static final Supplier<net.minecraft.world.inventory.MenuType<io.github.keellam4.oritechextensions.storage.TerminalMenu>> TERMINAL_MENU =
             PLATFORM.register(BuiltInRegistries.MENU, "cargo_terminal",
                     () -> PLATFORM.menuType(io.github.keellam4.oritechextensions.storage.TerminalMenu::new));

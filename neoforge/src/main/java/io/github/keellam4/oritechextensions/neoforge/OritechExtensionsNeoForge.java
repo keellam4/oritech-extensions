@@ -66,6 +66,9 @@ public final class OritechExtensionsNeoForge {
             event.accept(ModContent.SILO_CONTROLLER_ITEM.get());
             event.accept(ModContent.SILO_CASING_ITEM.get());
             event.accept(ModContent.SILO_GLASS_ITEM.get());
+            event.accept(ModContent.INDUCTION_PYLON_ITEM.get());
+            event.accept(ModContent.INDUCTION_PYLON_OBELISK_ITEM.get());
+            event.accept(ModContent.INDUCTION_PYLON_RINGS_ITEM.get());
             ModContent.VAULT_UPGRADES.values().forEach(upgrade -> event.accept(upgrade.get()));
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
@@ -104,6 +107,7 @@ public final class OritechExtensionsNeoForge {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModContent.CARGO_CONTROLLER_ENTITY.get(), (controller, side) -> new ControllerItemHandler(controller));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.CARGO_CONTROLLER_ENTITY.get(), (controller, side) -> new ControllerFluidHandler(controller));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.SILO_CONTROLLER_ENTITY.get(), (silo, side) -> new VaultFluidHandler(silo));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, ModContent.INDUCTION_PYLON_ENTITY.get(), (pylon, side) -> new PylonEnergyStorage(pylon));
         event.registerBlock(Capabilities.FluidHandler.BLOCK, (level, pos, state, blockEntity, side) -> {
             var silo = io.github.keellam4.oritechextensions.storage.SiloParts.controllerOf(level, pos);
             return silo == null ? null : new VaultFluidHandler(silo);

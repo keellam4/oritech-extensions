@@ -145,5 +145,22 @@
   "message.oritech_extensions.silo.status": "Fluid Silo 3×3×%s · %s · %s / %s B",
   "message.oritech_extensions.silo.empty": "Empty",
   "tooltip.oritech_extensions.silo.holds": "Holds %s: %s B",
-  "tooltip.oritech_extensions.silo.help": "Put it in the bottom layer of a 3 × 3 silo of Silo Casing and Glass, 3 to 9 tall."
+  "tooltip.oritech_extensions.silo.help": "Put it in the bottom layer of a 3 × 3 silo of Silo Casing and Glass, 3 to 9 tall.",
+  "block.oritech_extensions.induction_pylon": "Induction Pylon (Tesla Spire)",
+  "block.oritech_extensions.induction_pylon_obelisk": "Induction Pylon (Coil Obelisk)",
+  "block.oritech_extensions.induction_pylon_rings": "Induction Pylon (Ring Pylon)",
+  "message.oritech_extensions.pylon.status": "Induction Pylon · %s / %s RF · charges %s",
+  "message.oritech_extensions.pylon.access.owner": "only its owner",
+  "message.oritech_extensions.pylon.access.team": "its owner and team",
+  "message.oritech_extensions.pylon.access.everyone": "everyone",
+  "oritech_extensions.configuration.pipePaintIsolation": "Colour-Isolated Pipes",
+  "oritech_extensions.configuration.pipePaintIsolation.tooltip": "Painted item and fluid pipes only connect to pipes of the same colour. Unpainted pipes still connect to every colour.",
+  "oritech_extensions.configuration.siloBucketsPerBlock": "Fluid Silo Buckets per Block",
+  "oritech_extensions.configuration.siloBucketsPerBlock.tooltip": "How many buckets a Fluid Silo holds per block of its size (a 3 x 3 x 5 silo is 45 blocks).",
+  "oritech_extensions.configuration.pylonRange": "Induction Pylon Range",
+  "oritech_extensions.configuration.pylonRange.tooltip": "How far an Induction Pylon reaches, in blocks.",
+  "oritech_extensions.configuration.pylonRate": "Induction Pylon Charge Rate",
+  "oritech_extensions.configuration.pylonRate.tooltip": "How much energy (RF) per tick an Induction Pylon hands out, shared by everyone it charges.",
+  "oritech_extensions.configuration.pylonBuffer": "Induction Pylon Storage",
+  "oritech_extensions.configuration.pylonBuffer.tooltip": "How much energy (RF) an Induction Pylon stores."
 }

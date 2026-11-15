@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "oritech_extensions:induction_pylon_rings"
+    }
+  ],
+  "result": {
+    "id": "oritech_extensions:induction_pylon",
+    "count": 1
+  }
+}

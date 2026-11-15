@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " L ",
+    "SCS",
+    "SMS"
+  ],
+  "key": {
+    "L": {
+      "item": "oritech:enderic_lens"
+    },
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "C": {
+      "item": "oritech:charger_block"
+    },
+    "M": {
+      "item": "oritech:magnetic_coil"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:induction_pylon",
+    "count": 1
+  }
+}
