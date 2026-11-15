@@ -23,7 +23,7 @@ import org.joml.Matrix4f;
  * Draws what's inside a vault, for each slot: the item floating in its glass window, the count under it, and the
  * neon fill gauge above it (the dim strip in the texture lights up from left to right as the slot fills).
  */
-public class CargoVaultRenderer implements BlockEntityRenderer<CargoVaultBlockEntity> {
+public class CargoVaultRenderer<T extends CargoVaultBlockEntity> implements BlockEntityRenderer<T> {
 
     private static final int GAUGE_COLOUR = 0xFF9CFFF5;
     private static final int TEXT_COLOUR = 0xFFDFFFFB;
@@ -38,7 +38,7 @@ public class CargoVaultRenderer implements BlockEntityRenderer<CargoVaultBlockEn
     }
 
     @Override
-    public void render(CargoVaultBlockEntity vault, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
+    public void render(T vault, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
         var state = vault.getBlockState();
         if (!state.hasProperty(BlockStateProperties.HORIZONTAL_FACING) || !(state.getBlock() instanceof CargoVaultBlock block)) return;
         var facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
@@ -50,7 +50,7 @@ public class CargoVaultRenderer implements BlockEntityRenderer<CargoVaultBlockEn
         pose.mulPose(Axis.YP.rotationDegrees(-facing.toYRot()));
         // Now the front is the +z face, seen from outside: a point (u, v) of the front is at x = u - 0.5, y = 0.5 - v.
 
-        var cells = VaultLayout.cells(block.perSide());
+        var cells = block.layout().cells();
         float t = level.getGameTime() + partialTick;
         for (int slot = 0; slot < cells.length && slot < vault.slots(); slot++) {
             var cell = cells[slot];
@@ -62,7 +62,7 @@ public class CargoVaultRenderer implements BlockEntityRenderer<CargoVaultBlockEn
             float height = cell.glassV1() - cell.glassV0();
             float cx = (cell.glassU0() + cell.glassU1()) / 2 - 0.5f;
             float cy = 0.5f - (cell.glassV0() + height * 0.42f);
-            float size = Math.min(width, height) * (block.perSide() == 1 ? 0.84f : 0.7f);
+            float size = Math.min(width, height) * (block.layout() == VaultLayout.SINGLE ? 0.84f : 0.7f);
             float phase = slot * 1.7f;
 
             pose.pushPose();

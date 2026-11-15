@@ -11,9 +11,10 @@ import java.util.List;
 
 /**
  * What a vault holds, kept on its item when it is broken: one entry per slot (an item type and how many), and
- * whether the vault is locked to its item types.
+ * whether the vault is locked to its item types. A Compacting Vault also keeps how many of its smallest form each
+ * slot's item is worth ({@code ratios}); its slots show the same stock in each form.
  */
-public record VaultContents(List<Slot> slots, boolean locked) {
+public record VaultContents(List<Slot> slots, boolean locked, List<Integer> ratios) {
 
     /** One slot: a count-1 template of the item, and how many there are. */
     public record Slot(ItemStack item, int count) {
@@ -50,20 +51,27 @@ public record VaultContents(List<Slot> slots, boolean locked) {
         }
     }
 
-    public static final VaultContents EMPTY = new VaultContents(List.of(), false);
+    public static final VaultContents EMPTY = new VaultContents(List.of(), false, List.of());
 
     public static final Codec<VaultContents> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Slot.CODEC.listOf().optionalFieldOf("slots", List.of()).forGetter(VaultContents::slots),
-            Codec.BOOL.optionalFieldOf("locked", false).forGetter(VaultContents::locked)
+            Codec.BOOL.optionalFieldOf("locked", false).forGetter(VaultContents::locked),
+            Codec.INT.listOf().optionalFieldOf("ratios", List.of()).forGetter(VaultContents::ratios)
     ).apply(instance, VaultContents::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, VaultContents> STREAM_CODEC = StreamCodec.composite(
             Slot.STREAM_CODEC.apply(ByteBufCodecs.list()), VaultContents::slots,
             ByteBufCodecs.BOOL, VaultContents::locked,
+            ByteBufCodecs.VAR_INT.apply(ByteBufCodecs.list()), VaultContents::ratios,
             VaultContents::new);
+
+    public VaultContents(List<Slot> slots, boolean locked) {
+        this(slots, locked, List.of());
+    }
 
     public VaultContents {
         slots = List.copyOf(slots);
+        ratios = List.copyOf(ratios);
     }
 
     public boolean isEmpty() {

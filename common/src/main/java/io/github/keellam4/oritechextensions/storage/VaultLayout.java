@@ -5,50 +5,95 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Where each slot sits on a vault's front, in block units seen from the front (u to the right, v down, 0 to 1).
- * Matches the textures from tools/storage/cargo_vault_textures.py.
+ * The shapes of the vaults' fronts: where each slot's window sits, in block units seen from the front (u to the
+ * right, v down, 0 to 1), and which window a click lands in. Matches the textures from
+ * tools/storage/cargo_vault_textures.py.
  */
-public final class VaultLayout {
+public enum VaultLayout {
+    /** Cargo Vault: one big window. */
+    SINGLE(1),
+    /** Dual Vault: two wide windows, one above the other. */
+    DUAL(2),
+    /** Quad Vault: 2 × 2 windows. */
+    QUAD(4),
+    /** Grid Vault: 4 × 4 windows (a 32 px texture). */
+    GRID(16),
+    /** Compacting Vault: a wide window on top for the biggest form, two below for the smaller ones. */
+    COMPACTING(3);
 
     /** One slot's window: the glass the item floats in and the strip that shows how full it is. */
     public record Cell(float glassU0, float glassV0, float glassU1, float glassV1,
                        float gaugeU0, float gaugeV0, float gaugeU1, float gaugeV1, int gaugePixels) {
-    }
 
-    private VaultLayout() {
-    }
-
-    /** Cells for a vault with {@code perSide} × {@code perSide} slots, in slot order (left to right, top to bottom). */
-    public static Cell[] cells(int perSide) {
-        if (perSide == 1) {
-            return new Cell[]{new Cell(3 / 16f, 4 / 16f, 13 / 16f, 12 / 16f, 3 / 16f, 3 / 16f, 13 / 16f, 4 / 16f, 10)};
+        static Cell px(float size, int glassX0, int glassY0, int glassX1, int glassY1, int gaugeX0, int gaugeY, int gaugeX1) {
+            return new Cell(glassX0 / size, glassY0 / size, glassX1 / size, glassY1 / size,
+                    gaugeX0 / size, gaugeY / size, gaugeX1 / size, (gaugeY + 1) / size, gaugeX1 - gaugeX0);
         }
-        // Quad (16 px) and Grid (32 px): 1 px frame, 6 px cells, 2 px between them.
-        float px = 1f / (perSide * 8);
+    }
+
+    private final int slots;
+    private final Cell[] cells;
+
+    VaultLayout(int slots) {
+        this.slots = slots;
+        this.cells = makeCells(slots);
+    }
+
+    public int slots() {
+        return slots;
+    }
+
+    /** Cells in slot order. */
+    public Cell[] cells() {
+        return cells;
+    }
+
+    private static Cell[] makeCells(int slots) {
+        return switch (slots) {
+            case 1 -> new Cell[]{Cell.px(16, 3, 4, 13, 12, 3, 3, 13)};
+            // Wide windows: glass 14 px, gauge 10 px above it.
+            case 2 -> new Cell[]{Cell.px(16, 1, 2, 15, 7, 3, 1, 13), Cell.px(16, 1, 10, 15, 15, 3, 9, 13)};
+            case 3 -> new Cell[]{Cell.px(16, 1, 2, 15, 7, 3, 1, 13), Cell.px(16, 1, 10, 7, 15, 2, 9, 6), Cell.px(16, 9, 10, 15, 15, 10, 9, 14)};
+            default -> grid(slots == 4 ? 2 : 4);
+        };
+    }
+
+    /** Quad (16 px) and Grid (32 px): 1 px frame, 6 px cells, 2 px between them. */
+    private static Cell[] grid(int perSide) {
+        float size = perSide * 8;
         var cells = new Cell[perSide * perSide];
         for (int row = 0; row < perSide; row++) {
             for (int col = 0; col < perSide; col++) {
-                float u = (1 + 8 * col) * px;
-                float v = (1 + 8 * row) * px;
-                cells[row * perSide + col] = new Cell(u, v + px, u + 6 * px, v + 6 * px, u + px, v, u + 5 * px, v + px, 4);
+                int x = 1 + 8 * col;
+                int y = 1 + 8 * row;
+                cells[row * perSide + col] = Cell.px(size, x, y + 1, x + 6, y + 6, x + 1, y, x + 5);
             }
         }
         return cells;
     }
 
-    /**
-     * The slot under {@code hit} (a point on the block at {@code pos}), or -1 when the point isn't on the front.
-     */
-    public static int slotAt(Direction facing, int perSide, BlockPos pos, Vec3 hit, Direction face) {
+    /** The window at (u, v) on the front. */
+    public int slotAt(double u, double v) {
+        return switch (this) {
+            case SINGLE -> 0;
+            case DUAL -> v < 0.5 ? 0 : 1;
+            case COMPACTING -> v < 0.5 ? 0 : u < 0.5 ? 1 : 2;
+            case QUAD, GRID -> {
+                int perSide = this == QUAD ? 2 : 4;
+                int col = Math.min(perSide - 1, Math.max(0, (int) (u * perSide)));
+                int row = Math.min(perSide - 1, Math.max(0, (int) (v * perSide)));
+                yield row * perSide + col;
+            }
+        };
+    }
+
+    /** The window under {@code hit} (a point on the block at {@code pos}), or -1 when the point isn't on the front. */
+    public int slotAt(Direction facing, BlockPos pos, Vec3 hit, Direction face) {
         if (face != facing) return -1;
-        if (perSide == 1) return 0;
         var local = hit.subtract(pos.getX(), pos.getY(), pos.getZ());
         var right = facing.getCounterClockWise(); // the viewer's right, looking at the front
         double along = right.getAxis().choose(local.x, local.y, local.z);
         double u = right.getAxisDirection() == Direction.AxisDirection.POSITIVE ? along : 1 - along;
-        double v = 1 - local.y;
-        int col = Math.min(perSide - 1, Math.max(0, (int) (u * perSide)));
-        int row = Math.min(perSide - 1, Math.max(0, (int) (v * perSide)));
-        return row * perSide + col;
+        return slotAt(u, 1 - local.y);
     }
 }

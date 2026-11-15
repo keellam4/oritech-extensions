@@ -48,7 +48,11 @@ public class CargoVaultBlockEntity extends BlockEntity {
     private int syncedStacksPerSlot = -1;
 
     public CargoVaultBlockEntity(BlockPos pos, BlockState state) {
-        super(ModContent.CARGO_VAULT_ENTITY.get(), pos, state);
+        this(ModContent.CARGO_VAULT_ENTITY.get(), pos, state);
+    }
+
+    protected CargoVaultBlockEntity(net.minecraft.world.level.block.entity.BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
         int slots = state.getBlock() instanceof CargoVaultBlock vault ? vault.slots() : 1;
         items = new ItemStack[slots];
         java.util.Arrays.fill(items, ItemStack.EMPTY);
@@ -59,6 +63,16 @@ public class CargoVaultBlockEntity extends BlockEntity {
 
     public int slots() {
         return items.length;
+    }
+
+    /** Whole contents, for transactions that may roll back (Fabric). */
+    public VaultContents saveState() {
+        return contents();
+    }
+
+    public void restoreState(VaultContents state) {
+        load(state);
+        changed();
     }
 
     public ItemStack item(int slot) {
@@ -93,7 +107,7 @@ public class CargoVaultBlockEntity extends BlockEntity {
     /** 0 to 1, for the slot's gauge. */
     public float fill(int slot) {
         int capacity = capacity(slot);
-        return capacity <= 0 ? 0 : Math.min(1f, (float) counts[slot] / capacity);
+        return capacity <= 0 ? 0 : Math.min(1f, (float) count(slot) / capacity);
     }
 
     /** 0 to 1 over all slots, for comparators. */
@@ -101,15 +115,15 @@ public class CargoVaultBlockEntity extends BlockEntity {
         long count = 0;
         long capacity = 0;
         for (int i = 0; i < slots(); i++) {
-            count += counts[i];
+            count += count(i);
             capacity += capacity(i);
         }
         return capacity <= 0 ? 0 : Math.min(1f, (float) count / capacity);
     }
 
     public boolean isEmpty() {
-        for (int count : counts) {
-            if (count > 0) return false;
+        for (int i = 0; i < slots(); i++) {
+            if (count(i) > 0) return false;
         }
         return true;
     }
@@ -117,7 +131,7 @@ public class CargoVaultBlockEntity extends BlockEntity {
     /** The slot holding {@code stack}'s item, or -1. */
     public int slotOf(ItemStack stack) {
         for (int i = 0; i < slots(); i++) {
-            if (!items[i].isEmpty() && ItemStack.isSameItemSameComponents(items[i], stack)) return i;
+            if (!item(i).isEmpty() && ItemStack.isSameItemSameComponents(item(i), stack)) return i;
         }
         return -1;
     }
@@ -188,6 +202,10 @@ public class CargoVaultBlockEntity extends BlockEntity {
         counts[slot] = Math.max(0, restoredCount);
     }
 
+    protected void setLockedQuietly(boolean locked) {
+        this.locked = locked;
+    }
+
     /** Locking keeps every slot's item type when it runs empty, so the vault only takes those items. */
     public void setLocked(boolean locked) {
         this.locked = locked;
@@ -200,8 +218,8 @@ public class CargoVaultBlockEntity extends BlockEntity {
     }
 
     public boolean hasAnyItemType() {
-        for (var item : items) {
-            if (!item.isEmpty()) return true;
+        for (int i = 0; i < slots(); i++) {
+            if (!item(i).isEmpty()) return true;
         }
         return false;
     }
@@ -227,7 +245,7 @@ public class CargoVaultBlockEntity extends BlockEntity {
     /** Takes from the first slot that has items. */
     public ItemStack extract(int amount, boolean simulate) {
         for (int i = 0; i < slots(); i++) {
-            if (counts[i] > 0) return extract(i, amount, simulate);
+            if (count(i) > 0) return extract(i, amount, simulate);
         }
         return ItemStack.EMPTY;
     }
@@ -240,7 +258,7 @@ public class CargoVaultBlockEntity extends BlockEntity {
         return new VaultContents(slots, locked);
     }
 
-    private void load(VaultContents contents) {
+    protected void load(VaultContents contents) {
         for (int i = 0; i < slots(); i++) {
             var slot = contents.slot(i);
             items[i] = slot.item();

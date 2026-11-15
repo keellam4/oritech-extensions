@@ -69,5 +69,8 @@
   "tooltip.oritech_extensions.cargo_vault.empty.multi": "Empty. Holds a different item type in each window.",
   "tooltip.oritech_extensions.cargo_vault.more": "…and %s more",
   "hud.oritech_extensions.vault.empty": "Empty",
-  "hud.oritech_extensions.vault.locked": "Locked"
+  "hud.oritech_extensions.vault.locked": "Locked",
+  "block.oritech_extensions.dual_vault": "Dual Vault",
+  "block.oritech_extensions.compacting_vault": "Compacting Vault",
+  "tooltip.oritech_extensions.cargo_vault.empty.compacting": "Empty. Stores one item in up to three forms, like nuggets, ingots and blocks."
 }

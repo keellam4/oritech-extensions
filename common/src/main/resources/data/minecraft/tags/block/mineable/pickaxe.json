@@ -4,6 +4,8 @@
     "oritech_extensions:hangar_door_extension",
     "oritech_extensions:cargo_vault",
     "oritech_extensions:quad_vault",
-    "oritech_extensions:grid_vault"
+    "oritech_extensions:grid_vault",
+    "oritech_extensions:dual_vault",
+    "oritech_extensions:compacting_vault"
   ]
 }

@@ -168,20 +168,81 @@ public class CargoVaultGameTests {
         helper.succeed();
     }
 
+    /** A Dual Vault has two windows with half the space each. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void dualHasTwoHalves(GameTestHelper helper) {
+        var vault = place(helper, new BlockPos(2, 1, 2), ModContent.DUAL_VAULT.get());
+        if (vault.slots() != 2) helper.fail("a Dual Vault should have 2 slots, has " + vault.slots());
+        int perSlot = Math.max(1, Config.cargoVaultStacks() / 2) * 64;
+        if (vault.capacity(1) != perSlot) helper.fail("slot capacity " + vault.capacity(1) + ", expected " + perSlot);
+        vault.insert(new ItemStack(Items.OAK_LOG, 3), false);
+        vault.insert(new ItemStack(Items.SPRUCE_LOG, 4), false);
+        if (vault.count(0) != 3 || vault.count(1) != 4) helper.fail("the two logs didn't get a window each");
+        if (vault.insert(new ItemStack(Items.BIRCH_LOG, 1), true) != 0) helper.fail("a third item type fit");
+        helper.succeed();
+    }
+
+    /** A Compacting Vault stores iron once and hands it out as blocks, ingots or nuggets. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    public static void compactingConvertsForms(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var vault = place(helper, new BlockPos(2, 1, 2), ModContent.COMPACTING_VAULT.get());
+        if (vault.insert(new ItemStack(Items.IRON_INGOT, 20), false) != 20) {
+            helper.fail("the Compacting Vault didn't take 20 iron ingots");
+            return;
+        }
+        if (!vault.item(0).is(Items.IRON_BLOCK) || !vault.item(1).is(Items.IRON_INGOT) || !vault.item(2).is(Items.IRON_NUGGET)) {
+            helper.fail("forms should be block, ingot, nugget; are " + vault.item(0) + ", " + vault.item(1) + ", " + vault.item(2));
+            return;
+        }
+        if (vault.count(0) != 2 || vault.count(1) != 20 || vault.count(2) != 180) helper.fail("20 ingots should read 2 / 20 / 180, read "
+                + vault.count(0) + " / " + vault.count(1) + " / " + vault.count(2));
+
+        var block = vault.extract(0, 1, false);
+        if (!block.is(Items.IRON_BLOCK) || block.getCount() != 1) helper.fail("taking a block gave " + block);
+        if (vault.count(1) != 11 || vault.count(2) != 99) helper.fail("after taking a block: " + vault.count(1) + " ingots, " + vault.count(2) + " nuggets");
+        vault.insert(new ItemStack(Items.IRON_NUGGET, 5), false);
+        if (vault.count(2) != 104 || vault.count(1) != 11) helper.fail("nuggets didn't join the stock");
+        if (vault.insert(new ItemStack(Items.GOLD_INGOT, 1), true) != 0) helper.fail("took a different item");
+
+        // Breaking and placing it again keeps the exact stock.
+        var pos = vault.getBlockPos();
+        level.destroyBlock(pos, true);
+        var dropped = level.getEntitiesOfClass(ItemEntity.class, new AABB(pos).inflate(2)).stream()
+                .map(ItemEntity::getItem).filter(s -> s.is(ModContent.COMPACTING_VAULT_ITEM.get())).findFirst();
+        if (dropped.isEmpty()) {
+            helper.fail("the Compacting Vault didn't drop");
+            return;
+        }
+        var again = place(helper, new BlockPos(2, 1, 4), ModContent.COMPACTING_VAULT.get());
+        again.applyComponentsFromItemStack(dropped.get());
+        if (again.count(2) != 104 || !again.item(0).is(Items.IRON_BLOCK)) helper.fail("the placed vault holds " + again.count(2) + " nuggets");
+
+        // An item with no compacting recipes is kept as it is.
+        var plain = place(helper, new BlockPos(4, 1, 2), ModContent.COMPACTING_VAULT.get());
+        plain.insert(new ItemStack(Items.FLINT, 7), false);
+        if (!plain.item(0).is(Items.FLINT) || plain.count(0) != 7 || !plain.item(1).isEmpty()) helper.fail("flint should sit alone in the top window");
+        helper.succeed();
+    }
+
     /** Clicks map to windows as seen from the front: top left is slot 0, bottom right the last one. */
     @GameTest(template = TEMPLATE, timeoutTicks = 20)
     public static void frontClicksPickWindows(GameTestHelper helper) {
         var pos = new BlockPos(10, 64, 10);
         var north = net.minecraft.core.Direction.NORTH;
         // Facing north: the front is the z = 10 face, and the viewer's right is west (towards smaller x).
-        int topLeft = io.github.keellam4.oritechextensions.storage.VaultLayout.slotAt(north, 2, pos, new net.minecraft.world.phys.Vec3(10.9, 64.9, 10), north);
-        int bottomRight = io.github.keellam4.oritechextensions.storage.VaultLayout.slotAt(north, 2, pos, new net.minecraft.world.phys.Vec3(10.1, 64.1, 10), north);
-        int gridSecond = io.github.keellam4.oritechextensions.storage.VaultLayout.slotAt(north, 4, pos, new net.minecraft.world.phys.Vec3(10.6, 64.9, 10), north);
-        int side = io.github.keellam4.oritechextensions.storage.VaultLayout.slotAt(north, 2, pos, new net.minecraft.world.phys.Vec3(11, 64.5, 10.5), net.minecraft.core.Direction.EAST);
+        int topLeft = io.github.keellam4.oritechextensions.storage.VaultLayout.QUAD.slotAt(north, pos, new net.minecraft.world.phys.Vec3(10.9, 64.9, 10), north);
+        int bottomRight = io.github.keellam4.oritechextensions.storage.VaultLayout.QUAD.slotAt(north, pos, new net.minecraft.world.phys.Vec3(10.1, 64.1, 10), north);
+        int gridSecond = io.github.keellam4.oritechextensions.storage.VaultLayout.GRID.slotAt(north, pos, new net.minecraft.world.phys.Vec3(10.6, 64.9, 10), north);
+        int side = io.github.keellam4.oritechextensions.storage.VaultLayout.QUAD.slotAt(north, pos, new net.minecraft.world.phys.Vec3(11, 64.5, 10.5), net.minecraft.core.Direction.EAST);
         if (topLeft != 0) helper.fail("top left is slot " + topLeft);
         if (bottomRight != 3) helper.fail("bottom right is slot " + bottomRight);
         if (gridSecond != 1) helper.fail("second grid window is slot " + gridSecond);
         if (side != -1) helper.fail("a click on the side picked slot " + side);
+        int dualBottom = io.github.keellam4.oritechextensions.storage.VaultLayout.DUAL.slotAt(north, pos, new net.minecraft.world.phys.Vec3(10.5, 64.2, 10), north);
+        int compactingRight = io.github.keellam4.oritechextensions.storage.VaultLayout.COMPACTING.slotAt(north, pos, new net.minecraft.world.phys.Vec3(10.2, 64.2, 10), north);
+        if (dualBottom != 1) helper.fail("the Dual Vault's bottom window is slot " + dualBottom);
+        if (compactingRight != 2) helper.fail("the Compacting Vault's bottom right window is slot " + compactingRight);
         helper.succeed();
     }
 

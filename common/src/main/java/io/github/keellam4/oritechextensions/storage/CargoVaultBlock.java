@@ -22,19 +22,19 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The vaults: bulk storage in {@code perSide} × {@code perSide} slots (Cargo Vault 1, Quad Vault 2, Grid Vault 4).
+ * The vaults: bulk storage in one or more windows (see {@link VaultLayout}).
  * Each slot's item floats in its glass window, the strip above it shows how full it is. Interactions are in
  * {@link CargoVault}.
  */
 public class CargoVaultBlock extends HorizontalDirectionalBlock implements EntityBlock {
 
-    private final int perSide;
+    private final VaultLayout layout;
     private final MapCodec<CargoVaultBlock> codec;
 
-    public CargoVaultBlock(Properties properties, int perSide) {
+    public CargoVaultBlock(Properties properties, VaultLayout layout) {
         super(properties);
-        this.perSide = perSide;
-        this.codec = simpleCodec(p -> new CargoVaultBlock(p, perSide));
+        this.layout = layout;
+        this.codec = simpleCodec(p -> new CargoVaultBlock(p, layout));
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
@@ -43,18 +43,17 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
         return codec;
     }
 
-    /** Slots along each side of the front. */
-    public int perSide() {
-        return perSide;
+    public VaultLayout layout() {
+        return layout;
     }
 
     public int slots() {
-        return perSide * perSide;
+        return layout.slots();
     }
 
     /** The slot under {@code hit}, or -1 when it isn't on the front. */
     public int slotAt(BlockState state, BlockPos pos, BlockHitResult hit) {
-        return VaultLayout.slotAt(state.getValue(FACING), perSide, pos, hit.getLocation(), hit.getDirection());
+        return layout.slotAt(state.getValue(FACING), pos, hit.getLocation(), hit.getDirection());
     }
 
     @Override
@@ -80,7 +79,7 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new CargoVaultBlockEntity(pos, state);
+        return layout == VaultLayout.COMPACTING ? new CompactingVaultBlockEntity(pos, state) : new CargoVaultBlockEntity(pos, state);
     }
 
     @Override

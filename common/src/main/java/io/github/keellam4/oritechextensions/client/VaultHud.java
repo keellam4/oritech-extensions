@@ -2,7 +2,6 @@ package io.github.keellam4.oritechextensions.client;
 
 import io.github.keellam4.oritechextensions.storage.CargoVaultBlock;
 import io.github.keellam4.oritechextensions.storage.CargoVaultBlockEntity;
-import io.github.keellam4.oritechextensions.storage.VaultLayout;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
@@ -33,7 +32,7 @@ public final class VaultHud {
         if (level == null) return -1;
         var state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof CargoVaultBlock block)) return -1;
-        return VaultLayout.slotAt(state.getValue(BlockStateProperties.HORIZONTAL_FACING), block.perSide(), pos, hit.getLocation(), hit.getDirection());
+        return block.layout().slotAt(state.getValue(BlockStateProperties.HORIZONTAL_FACING), pos, hit.getLocation(), hit.getDirection());
     }
 
     public static void render(GuiGraphics graphics) {
