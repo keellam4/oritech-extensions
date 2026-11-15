@@ -12,12 +12,12 @@ import java.util.List;
 
 /**
  * Which Oritech pipes can be painted, and helpers for their networks. The shared logic is in {@link WorldPaint}.
- * Transparent item pipes count as item pipes (Oritech joins them into the same network). Framed and duct pipes are
- * excluded (match by block identity).
+ * Transparent, framed and duct versions count as their pipe type, because Oritech joins them into the same network.
+ * Energy pipes and superconductors are separate families (separate networks in Oritech too).
  */
 public final class PipePaint {
 
-    public enum Family { ITEM, FLUID }
+    public enum Family { ITEM, FLUID, ENERGY, SUPERCONDUCTOR }
 
     private PipePaint() {
     }
@@ -33,11 +33,25 @@ public final class PipePaint {
     @Nullable
     public static Family familyOf(Block block) {
         if (block == BlockContent.ITEM_PIPE || block == BlockContent.ITEM_PIPE_CONNECTION
-                || block == BlockContent.TRANSPARENT_ITEM_PIPE || block == BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION) {
+                || block == BlockContent.TRANSPARENT_ITEM_PIPE || block == BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION
+                || block == BlockContent.FRAMED_ITEM_PIPE || block == BlockContent.FRAMED_ITEM_PIPE_CONNECTION
+                || block == BlockContent.ITEM_PIPE_DUCT_BLOCK) {
             return Family.ITEM;
         }
-        if (block == BlockContent.FLUID_PIPE || block == BlockContent.FLUID_PIPE_CONNECTION) {
+        if (block == BlockContent.FLUID_PIPE || block == BlockContent.FLUID_PIPE_CONNECTION
+                || block == BlockContent.FRAMED_FLUID_PIPE || block == BlockContent.FRAMED_FLUID_PIPE_CONNECTION
+                || block == BlockContent.FLUID_PIPE_DUCT_BLOCK) {
             return Family.FLUID;
+        }
+        if (block == BlockContent.ENERGY_PIPE || block == BlockContent.ENERGY_PIPE_CONNECTION
+                || block == BlockContent.FRAMED_ENERGY_PIPE || block == BlockContent.FRAMED_ENERGY_PIPE_CONNECTION
+                || block == BlockContent.ENERGY_PIPE_DUCT_BLOCK) {
+            return Family.ENERGY;
+        }
+        if (block == BlockContent.SUPERCONDUCTOR || block == BlockContent.SUPERCONDUCTOR_CONNECTION
+                || block == BlockContent.FRAMED_SUPERCONDUCTOR || block == BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION
+                || block == BlockContent.SUPERCONDUCTOR_DUCT_BLOCK) {
+            return Family.SUPERCONDUCTOR;
         }
         return null;
     }

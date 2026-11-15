@@ -121,4 +121,33 @@ public class PipeIsolationGameTests {
             helper.succeed();
         });
     }
+
+    /** Ducts side by side normally always join; painted different colours, they split into separate networks. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 100)
+    public static void ductsOfDifferentColoursSplitNetworks(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var a = helper.absolutePos(new BlockPos(1, 1, 2));
+        var b = helper.absolutePos(new BlockPos(2, 1, 2));
+        var c = helper.absolutePos(new BlockPos(3, 1, 2));
+        for (var pos : new BlockPos[]{a, b, c}) place(level, pos, BlockContent.ITEM_PIPE_DUCT_BLOCK);
+
+        helper.runAfterDelay(2, () -> {
+            if (network(level, a) == null || !network(level, a).equals(network(level, c))) {
+                helper.fail("fresh unpainted ducts aren't one network");
+                return;
+            }
+            paint(level, a, ColorVariant.WHITE);
+            paint(level, b, ColorVariant.WHITE);
+            paint(level, c, ColorVariant.SCULK);
+            if (network(level, b) != null && network(level, b).equals(network(level, c))) {
+                helper.fail("white and sculk ducts are still one network");
+                return;
+            }
+            if (network(level, a) == null || !network(level, a).equals(network(level, b))) {
+                helper.fail("two white ducts stopped sharing a network");
+                return;
+            }
+            helper.succeed();
+        });
+    }
 }

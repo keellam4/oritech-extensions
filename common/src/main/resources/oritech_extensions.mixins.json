@@ -4,7 +4,8 @@
   "package": "io.github.keellam4.oritechextensions.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "GenericPipeBlockMixin"
+    "GenericPipeBlockMixin",
+    "GenericPipeDuctBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
