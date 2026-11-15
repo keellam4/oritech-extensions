@@ -30,7 +30,7 @@ public class InductionPylonGameTests {
     }
 
     private static ItemStack battery() {
-        return new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("oritech", "basic_battery")));
+        return new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("oritech", "jetpack")));
     }
 
     /** A filled pylon charges a battery in a nearby player's inventory, and loses at least as much as it gave. */
@@ -41,7 +41,7 @@ public class InductionPylonGameTests {
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setPos(helper.absoluteVec(new net.minecraft.world.phys.Vec3(4.5, 1, 2.5)));
         var battery = battery();
-        if (Platform.INSTANCE.itemEnergy(battery) < 0) helper.fail("Oritech's battery should hold energy");
+        if (Platform.INSTANCE.itemEnergy(battery) < 0) helper.fail("Oritech's jetpack should hold energy");
         player.getInventory().setItem(5, battery);
         long cost = pylon.charge(player, 20_000);
         long stored = Platform.INSTANCE.itemEnergy(player.getInventory().getItem(5));
