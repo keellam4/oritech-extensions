@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    "SMS",
+    " S "
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "M": {
+      "item": "oritech:magnetic_coil"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:antenna_segment",
+    "count": 2
+  }
+}

@@ -271,6 +271,39 @@ public final class ModContent {
     public static final Supplier<BlockItem> TRANSPARENT_FLUID_PIPE_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "transparent_fluid_pipe",
             () -> new BlockItem(TRANSPARENT_FLUID_PIPE.get(), new Item.Properties()));
 
+    // ---------------------------------------------------------------- Cargo Link
+
+    /** The Cargo Link's battery, in RF. */
+    public static final Supplier<DataComponentType<Integer>> LINK_ENERGY = PLATFORM.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE, "link_energy", () -> DataComponentType.<Integer>builder()
+                    .persistent(com.mojang.serialization.Codec.INT)
+                    .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.VAR_INT)
+                    .build());
+
+    /** The Cargo Controller or Crafting Terminal a Cargo Link is linked to. */
+    public static final Supplier<DataComponentType<net.minecraft.core.GlobalPos>> LINK_TARGET = PLATFORM.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE, "link_target", () -> DataComponentType.<net.minecraft.core.GlobalPos>builder()
+                    .persistent(net.minecraft.core.GlobalPos.CODEC)
+                    .networkSynchronized(net.minecraft.core.GlobalPos.STREAM_CODEC)
+                    .build());
+
+    public static final Supplier<io.github.keellam4.oritechextensions.wireless.CargoLinkItem> CARGO_LINK = PLATFORM.register(BuiltInRegistries.ITEM, "cargo_link",
+            () -> new io.github.keellam4.oritechextensions.wireless.CargoLinkItem(new Item.Properties().stacksTo(1)));
+
+    public static final Supplier<io.github.keellam4.oritechextensions.wireless.UplinkMastBlock> UPLINK_MAST = PLATFORM.register(BuiltInRegistries.BLOCK, "uplink_mast",
+            () -> new io.github.keellam4.oritechextensions.wireless.UplinkMastBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
+                    .strength(3.5f, 6f).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 5)));
+
+    public static final Supplier<BlockItem> UPLINK_MAST_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "uplink_mast",
+            () -> new BlockItem(UPLINK_MAST.get(), new Item.Properties()));
+
+    public static final Supplier<io.github.keellam4.oritechextensions.wireless.AntennaSegmentBlock> ANTENNA_SEGMENT = PLATFORM.register(BuiltInRegistries.BLOCK, "antenna_segment",
+            () -> new io.github.keellam4.oritechextensions.wireless.AntennaSegmentBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
+                    .strength(2.5f, 6f).sound(SoundType.METAL).noOcclusion()));
+
+    public static final Supplier<BlockItem> ANTENNA_SEGMENT_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "antenna_segment",
+            () -> new BlockItem(ANTENNA_SEGMENT.get(), new Item.Properties()));
+
     // ---------------------------------------------------------------- creative tab
 
     /** The mod's own creative tab (JEI and EMI list what's in it). */
@@ -301,5 +334,11 @@ public final class ModContent {
                         output.accept(INDUCTION_PYLON_ITEM.get());
                         output.accept(INDUCTION_PYLON_OBELISK_ITEM.get());
                         output.accept(INDUCTION_PYLON_RINGS_ITEM.get());
+                        output.accept(CARGO_LINK.get());
+                        var charged = new net.minecraft.world.item.ItemStack(CARGO_LINK.get());
+                        io.github.keellam4.oritechextensions.wireless.CargoLinkItem.setEnergy(charged, io.github.keellam4.oritechextensions.wireless.CargoLinkItem.CAPACITY);
+                        output.accept(charged);
+                        output.accept(UPLINK_MAST_ITEM.get());
+                        output.accept(ANTENNA_SEGMENT_ITEM.get());
                     }));
 }

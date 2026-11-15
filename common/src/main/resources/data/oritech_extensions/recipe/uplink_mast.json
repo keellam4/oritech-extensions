@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SLS",
+    "MCM",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "L": {
+      "item": "oritech:enderic_lens"
+    },
+    "M": {
+      "item": "oritech:magnetic_coil"
+    },
+    "C": {
+      "item": "oritech_extensions:cargo_controller"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:uplink_mast",
+    "count": 1
+  }
+}

@@ -18,6 +18,8 @@
     "oritech_extensions:induction_pylon_obelisk",
     "oritech_extensions:induction_pylon_rings",
     "oritech_extensions:transparent_fluid_pipe",
-    "oritech_extensions:transparent_fluid_pipe_connection"
+    "oritech_extensions:transparent_fluid_pipe_connection",
+    "oritech_extensions:uplink_mast",
+    "oritech_extensions:antenna_segment"
   ]
 }

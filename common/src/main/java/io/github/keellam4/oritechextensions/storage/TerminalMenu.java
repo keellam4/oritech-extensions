@@ -43,8 +43,18 @@ public class TerminalMenu extends AbstractContainerMenu {
     public static final int RESULT_X = 124;
     public static final int RESULT_Y = 138;
 
+    /** Opened from a distance with a Cargo Link: who may keep using it, and the energy each action costs. */
+    public interface RemoteAccess {
+        boolean stillValid(Player player);
+
+        /** Pays for moving up to {@code items} items (a bucket counts as a stack). False if the battery is too low. */
+        boolean pay(Player player, int items);
+    }
+
     @Nullable
     private final CargoControllerBlockEntity controller;
+    @Nullable
+    private RemoteAccess remote;
     private final Player player;
     private final boolean crafting;
     private final net.minecraft.world.inventory.TransientCraftingContainer craftSlots;
@@ -81,6 +91,12 @@ public class TerminalMenu extends AbstractContainerMenu {
             for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9, INVENTORY_X + col * 18, y + row * 18));
         }
         for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, INVENTORY_X + col * 18, y + 58));
+    }
+
+    /** Makes this a remote terminal (Cargo Link). */
+    public TerminalMenu remote(RemoteAccess access) {
+        this.remote = access;
+        return this;
     }
 
     public static int inventoryY(boolean crafting) {
@@ -159,6 +175,10 @@ public class TerminalMenu extends AbstractContainerMenu {
     /** A grid click from the client. */
     public void handle(int action, ItemStack item, net.minecraft.world.level.material.Fluid fluid) {
         if (controller == null) return;
+        if (remote != null && action != CLEAR_GRID) {
+            int items = action == TAKE_ONE || action == INSERT_ONE ? 1 : 64;
+            if (!remote.pay(player, items)) return;
+        }
         var network = controller.network();
         var carried = getCarried();
         switch (action) {
@@ -255,6 +275,7 @@ public class TerminalMenu extends AbstractContainerMenu {
             return ItemStack.EMPTY;
         }
         if (controller == null) return ItemStack.EMPTY;
+        if (remote != null && !remote.pay(player, stack.getCount())) return ItemStack.EMPTY;
         int moved = controller.network().insert(stack, false);
         if (moved <= 0) return ItemStack.EMPTY;
         stack.shrink(moved);
@@ -266,6 +287,7 @@ public class TerminalMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         if (controller == null) return true;
+        if (remote != null) return !controller.isRemoved() && remote.stillValid(player);
         var level = controller.getLevel();
         return level != null && level.getBlockEntity(controller.getBlockPos()) == controller
                 && player.distanceToSqr(controller.getBlockPos().getCenter()) <= 64;
