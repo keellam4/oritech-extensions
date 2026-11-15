@@ -18,7 +18,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.Level;
 
 /**
- * Draws a Fluid Silo's fluid: one box filling the silo from the bottom, as high as it is full. The casing hides
+ * Draws a Fluid Silo's fluids: one layer per fluid, heaviest at the bottom, each as tall as its share of the silo. The casing hides
  * it; the Silo Glass shows it. Drawn from the controller, so it doesn't vanish when the controller is off screen.
  */
 public class SiloRenderer implements BlockEntityRenderer<SiloControllerBlockEntity> {
@@ -32,32 +32,47 @@ public class SiloRenderer implements BlockEntityRenderer<SiloControllerBlockEnti
     @Override
     public void render(SiloControllerBlockEntity silo, float partialTick, PoseStack pose, MultiBufferSource buffers, int packedLight, int packedOverlay) {
         var structure = silo.structure();
-        if (structure == null || silo.amount() <= 0 || silo.getLevel() == null) return;
+        long capacity = silo.fluidCapacity();
+        if (structure == null || silo.amount() <= 0 || silo.getLevel() == null || capacity <= 0) return;
+        // Layers by density: the heaviest at the bottom, gases on top, like oil on water.
+        var layers = new java.util.ArrayList<>(silo.fluids());
+        layers.sort((a, b) -> Integer.compare(ClientPlatform.INSTANCE.fluidDensity(b.fluid()), ClientPlatform.INSTANCE.fluidDensity(a.fluid())));
+        var consumer = buffers.getBuffer(RenderType.entityTranslucentCull(InventoryMenu.BLOCK_ATLAS));
+        float usable = structure.height() - 2 * INSET;
+        float bottom = 0;
+        for (var layer : layers) {
+            // Even a little fluid shows as a thin layer.
+            float depth = Math.max(0.1f, usable * layer.amount() / capacity);
+            float top = Math.min(usable, bottom + depth);
+            if (top > bottom) drawLayer(silo, structure, layer.fluid(), bottom, top, pose, consumer);
+            bottom = top;
+        }
+    }
+
+    /** One fluid's layer, from {@code from} to {@code to} blocks above the silo's floor (inside the inset). */
+    private void drawLayer(SiloControllerBlockEntity silo, SiloStructure structure, net.minecraft.world.level.material.Fluid fluid,
+                           float from, float to, PoseStack pose, VertexConsumer consumer) {
         var level = silo.getLevel();
-        var fluid = silo.fluid();
         var sprite = ClientPlatform.INSTANCE.fluidSprite(fluid);
         int colour = ClientPlatform.INSTANCE.fluidColour(fluid, level, silo.getBlockPos());
         boolean glows = fluid.defaultFluidState().createLegacyBlock().getLightEmission() > 0;
 
         var base = silo.getBlockPos();
         var origin = structure.origin();
+        float floor = origin.getY() - base.getY() + INSET;
         float x0 = origin.getX() - base.getX() + INSET;
-        float y0 = origin.getY() - base.getY() + INSET;
         float z0 = origin.getZ() - base.getZ() + INSET;
         float x1 = x0 + SiloStructure.WIDTH - 2 * INSET;
         float z1 = z0 + SiloStructure.WIDTH - 2 * INSET;
-        // Even a little fluid shows as a thin layer.
-        float depth = Math.max(0.1f, (structure.height() - 2 * INSET) * silo.fill());
-        float y1 = y0 + depth;
-
-        var consumer = buffers.getBuffer(RenderType.entityTranslucentCull(InventoryMenu.BLOCK_ATLAS));
+        float y0 = floor + from;
+        float y1 = floor + to;
         var face = new Face(consumer, pose.last(), sprite, colour);
 
         // Four walls, one quad per block so the texture tiles; lit by the block outside each face.
         for (int cell = 0; cell < SiloStructure.WIDTH; cell++) {
             float a = cell == 0 ? INSET : cell;
             float b = cell == SiloStructure.WIDTH - 1 ? SiloStructure.WIDTH - INSET : cell + 1;
-            for (int row = 0; row * 1f < depth + INSET; row++) {
+            for (int row = (int) Math.floor(from); row < to + INSET; row++) {
                 float bottom = Math.max(y0, origin.getY() - base.getY() + row);
                 float top = Math.min(y1, origin.getY() - base.getY() + row + 1);
                 if (top <= bottom) continue;
@@ -74,7 +89,7 @@ public class SiloRenderer implements BlockEntityRenderer<SiloControllerBlockEnti
                 face.quad(x1, bottom, bz, x1, bottom, az, x1, top, az, x1, top, bz, b - a, top - bottom, 1, 0, 0);
             }
         }
-        // The surface, seen from above through glass in the roof.
+        // The layer's surface; the next layer sits on top of it.
         face.light = light(level, origin.offset(1, structure.height(), 1), glows);
         for (int cx = 0; cx < SiloStructure.WIDTH; cx++) {
             for (int cz = 0; cz < SiloStructure.WIDTH; cz++) {

@@ -26,7 +26,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * The Silo Controller: goes in the bottom layer of a Fluid Silo. Pipes and buckets use it to fill and drain the
- * silo, it joins a Cargo network when it touches a vault or controller, and right-clicking shows the silo's state.
+ * silo, it joins a Cargo network when it touches a vault or controller, and right-clicking opens its screen
+ * (fluids, their rules and the partition upgrade).
  */
 public class SiloControllerBlock extends HorizontalDirectionalBlock implements EntityBlock {
 
@@ -81,7 +82,12 @@ public class SiloControllerBlock extends HorizontalDirectionalBlock implements E
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof SiloControllerBlockEntity silo) {
             silo.checkStructure();
-            player.displayClientMessage(status(silo), true);
+            if (silo.isFormed()) {
+                player.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inventory, p) -> new SiloMenu(id, inventory, silo),
+                        Component.translatable("block.oritech_extensions.silo_controller")));
+            } else {
+                player.displayClientMessage(status(silo), true);
+            }
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
@@ -93,8 +99,10 @@ public class SiloControllerBlock extends HorizontalDirectionalBlock implements E
             return Component.translatable("message.oritech_extensions.silo.not_formed").withStyle(ChatFormatting.RED);
         }
         var size = structure.height() + "";
-        var contents = silo.amount() <= 0 ? Component.translatable("message.oritech_extensions.silo.empty")
-                : silo.fluid().defaultFluidState().createLegacyBlock().getBlock().getName();
+        var fluids = silo.fluids();
+        Component contents = fluids.isEmpty() ? Component.translatable("message.oritech_extensions.silo.empty")
+                : fluids.size() == 1 ? fluids.get(0).fluid().defaultFluidState().createLegacyBlock().getBlock().getName()
+                : Component.translatable("message.oritech_extensions.silo.fluids", fluids.size());
         return Component.translatable("message.oritech_extensions.silo.status", size, contents,
                 String.format("%,d", silo.amount() / 1000), String.format("%,d", silo.fluidCapacity() / 1000)).withStyle(ChatFormatting.AQUA);
     }

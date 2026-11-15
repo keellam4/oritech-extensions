@@ -27,4 +27,12 @@ public final class FabricClientPlatform implements ClientPlatform {
         int colour = handler.getFluidColor(level, pos, fluid.defaultFluidState());
         return colour == -1 ? 0xFFFFFFFF : 0xFF000000 | colour;
     }
+
+    @Override
+    public int fluidDensity(net.minecraft.world.level.material.Fluid fluid) {
+        // Fabric has no density: gases float, and thicker fluids (lava 30000, water 5000) sink.
+        var variant = net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant.of(fluid);
+        if (net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes.isLighterThanAir(variant)) return -1000;
+        return net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes.getViscosity(variant, null) / 5;
+    }
 }

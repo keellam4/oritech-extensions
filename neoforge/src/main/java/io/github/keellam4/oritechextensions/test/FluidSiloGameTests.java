@@ -93,4 +93,70 @@ public class FluidSiloGameTests {
         if (group != 27) helper.fail("painting should cover the whole 3x3x3 silo, covers " + group);
         helper.succeed();
     }
+
+    private static void partitions(GameTestHelper helper, SiloControllerBlockEntity silo, net.minecraft.world.item.Item upgrade) {
+        silo.upgrade().setItem(0, new net.minecraft.world.item.ItemStack(upgrade));
+    }
+
+    /** Without an upgrade the silo holds one fluid; a Partition Upgrade lets several share the space. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void partitionsShareSpace(GameTestHelper helper) {
+        var silo = build(helper, 3); // 27,000 buckets
+        silo.fill(Fluids.WATER, 1_000, false);
+        if (silo.fill(Fluids.LAVA, 1_000, true) != 0) helper.fail("one fluid only without an upgrade");
+        partitions(helper, silo, ModContent.PARTITION_UPGRADE_1.get());
+        if (silo.partitions() != 4) helper.fail("the Partition Upgrade allows 4 fluids, allows " + silo.partitions());
+        if (silo.fill(Fluids.LAVA, 2_000, false) != 2_000) helper.fail("lava should go in next to water");
+        if (silo.fluids().size() != 2) helper.fail("two fluids expected, has " + silo.fluids());
+        long room = silo.roomFor(Fluids.WATER);
+        if (room != 27_000_000L - 3_000) helper.fail("water's room should be what's left of the shared space, is " + room);
+        if (silo.canRemoveUpgrade()) helper.fail("the upgrade can't come out while it holds two fluids");
+        var contents = new java.util.HashSet<net.minecraft.world.level.material.Fluid>();
+        for (var held : silo.fluids()) contents.add(held.fluid());
+        if (!contents.contains(Fluids.LAVA) || !contents.contains(Fluids.WATER)) helper.fail("both fluids should be listed");
+        helper.succeed();
+    }
+
+    /** Limits cap a fluid, reserves keep space for one, locks keep an empty fluid's place, void deletes overflow. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void partitionRules(GameTestHelper helper) {
+        var silo = build(helper, 3);
+        partitions(helper, silo, ModContent.PARTITION_UPGRADE_1.get());
+        silo.fill(Fluids.WATER, 1_000, false);
+        silo.fill(Fluids.LAVA, 1_000, false);
+        int water = 0, lava = 1;
+        silo.configure(water, 0); // limit 10%
+        if (silo.tanks().get(water).limit != 10) helper.fail("limit should step to 10%");
+        if (silo.roomFor(Fluids.WATER) != 2_700_000L - 1_000) helper.fail("water should be capped at 10% of the silo");
+        silo.configure(lava, 2); // reserve 10%
+        silo.configure(lava, 2); // reserve 25%
+        long reserved = 27_000_000L / 4;
+        if (silo.roomFor(Fluids.WATER) != 2_700_000L - 1_000) helper.fail("water's own limit still wins");
+        silo.configure(water, 1); // limit back to none
+        if (silo.roomFor(Fluids.WATER) != 27_000_000L - reserved - 1_000) helper.fail("lava's reserve should be kept free, room " + silo.roomFor(Fluids.WATER));
+        silo.configure(lava, 4); // lock
+        silo.drain(Fluids.LAVA, 1_000, false);
+        if (silo.tanks().size() != 2) helper.fail("a locked fluid keeps its place when empty");
+        silo.configure(water, 5); // void
+        if (silo.fill(Fluids.WATER, 100_000_000L, false) != 100_000_000L) helper.fail("void overflow should accept everything");
+        if (silo.amount() > silo.fluidCapacity()) helper.fail("void overflow mustn't overfill the silo");
+        helper.succeed();
+    }
+
+    /** The fluids, their rules and the upgrade survive saving and loading. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void partitionsSave(GameTestHelper helper) {
+        var silo = build(helper, 3);
+        partitions(helper, silo, ModContent.PARTITION_MATRIX.get());
+        silo.fill(Fluids.WATER, 3_000, false);
+        silo.fill(Fluids.LAVA, 4_000, false);
+        silo.configure(1, 4);
+        var registries = helper.getLevel().registryAccess();
+        var tag = silo.saveWithoutMetadata(registries);
+        var copy = new SiloControllerBlockEntity(silo.getBlockPos(), silo.getBlockState());
+        copy.loadWithComponents(tag, registries);
+        if (copy.tanks().size() != 2 || copy.tanks().get(1).amount != 4_000 || !copy.tanks().get(1).locked) helper.fail("tanks didn't survive saving");
+        if (copy.partitions() != Integer.MAX_VALUE) helper.fail("the Partition Matrix didn't survive saving");
+        helper.succeed();
+    }
 }

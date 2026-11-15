@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PXP",
+    "XIX",
+    "PXP"
+  ],
+  "key": {
+    "P": {
+      "item": "oritech:prometheum_ingot"
+    },
+    "X": {
+      "item": "oritech:enderic_compound"
+    },
+    "I": {
+      "item": "oritech_extensions:advanced_partition_upgrade"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:partition_matrix",
+    "count": 1
+  }
+}

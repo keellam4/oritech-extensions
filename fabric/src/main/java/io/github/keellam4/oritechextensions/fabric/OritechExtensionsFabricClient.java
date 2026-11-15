@@ -44,6 +44,8 @@ public final class OritechExtensionsFabricClient implements ClientModInitializer
                 io.github.keellam4.oritechextensions.client.TerminalScreen::new);
         net.minecraft.client.gui.screens.MenuScreens.register(ModContent.CRAFTING_TERMINAL_MENU.get(),
                 io.github.keellam4.oritechextensions.client.TerminalScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(ModContent.SILO_MENU.get(),
+                io.github.keellam4.oritechextensions.client.SiloScreen::new);
         ClientPlayNetworking.registerGlobalReceiver(io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.TYPE,
                 (payload, context) -> io.github.keellam4.oritechextensions.client.TerminalScreen.receive(payload));
 

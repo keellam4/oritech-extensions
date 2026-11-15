@@ -35,4 +35,23 @@ public interface NetworkTank {
      * obfuscated name at runtime, so a block entity's inherited one wouldn't implement an interface method of ours.)
      */
     boolean tankRemoved();
+
+    /** Every fluid it holds right now. A Fluid Vault holds one; a partitioned Fluid Silo can hold several. */
+    default java.util.List<FluidAmount> fluids() {
+        return amount() > 0 ? java.util.List.of(new FluidAmount(fluid(), amount())) : java.util.List.of();
+    }
+
+    default boolean holds(Fluid wanted) {
+        for (var held : fluids()) if (held.fluid().isSame(wanted)) return true;
+        return false;
+    }
+
+    /** A copy of everything it holds, for undoing a Fabric transaction. */
+    default Object saveFluidState() {
+        return fluidContents();
+    }
+
+    default void restoreFluidState(Object state) {
+        loadFluid((FluidContents) state);
+    }
 }

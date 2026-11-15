@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "EUE",
+    "AIA",
+    "EUE"
+  ],
+  "key": {
+    "E": {
+      "item": "oritech:electrum_ingot"
+    },
+    "U": {
+      "item": "oritech:processing_unit"
+    },
+    "A": {
+      "item": "oritech:energite_ingot"
+    },
+    "I": {
+      "item": "oritech_extensions:partition_upgrade"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:advanced_partition_upgrade",
+    "count": 1
+  }
+}
