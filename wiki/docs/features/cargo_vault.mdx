@@ -1,7 +1,7 @@
 ---
 title: Cargo Vault
 icon: oritech_extensions:cargo_vault
-related_items: ["oritech_extensions:cargo_vault", "oritech_extensions:detailing_tool"]
+related_items: ["oritech_extensions:cargo_vault", "oritech_extensions:quad_vault", "oritech_extensions:grid_vault", "oritech_extensions:detailing_tool"]
 ---
 
 # Cargo Vault
@@ -27,6 +27,16 @@ A **locked** vault keeps its item type when it's empty, so it only ever takes th
 ## Size
 
 64 stacks of its item by default: 4,096 of an item that stacks to 64, 1,024 of one that stacks to 16. Server owners can change it with `cargoVaultStacks` in the config.
+
+## Quad and Grid Vaults
+
+The **Quad Vault** has 4 windows and the **Grid Vault** 16, each holding its own item type. They share the vault's space: with the default config, a Quad window holds 16 stacks and a Grid window 4. Click the window you want: right-click puts items into it, left-click takes from it. An item type only ever lives in one window, so a second stack of iron joins the iron window instead of starting a new one.
+
+Crafting: four Cargo Vaults in a square make a Quad Vault. Four Quad Vaults in the corners, Steel Ingots on the sides and a Processing Unit in the middle make a Grid Vault.
+
+## Readout
+
+Aim at a window and a small panel under the crosshair shows its item and how many it holds out of how many fit, plus "Locked" when the vault is locked.
 
 ## Pipes, hoppers and comparators
 
