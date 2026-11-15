@@ -13,8 +13,9 @@ import java.util.List;
 public record TerminalSyncPayload(int containerId, int vaults, List<CargoNetwork.Entry> entries) implements CustomPacketPayload {
 
     private static final StreamCodec<RegistryFriendlyByteBuf, CargoNetwork.Entry> ENTRY = StreamCodec.composite(
-            ItemStack.STREAM_CODEC, CargoNetwork.Entry::item,
+            ItemStack.OPTIONAL_STREAM_CODEC, CargoNetwork.Entry::item,
             ByteBufCodecs.VAR_LONG, CargoNetwork.Entry::count,
+            ByteBufCodecs.registry(net.minecraft.core.registries.Registries.FLUID), CargoNetwork.Entry::fluid,
             CargoNetwork.Entry::new);
 
     public static final Type<TerminalSyncPayload> TYPE = new Type<>(OritechExtensions.id("terminal_sync"));
@@ -25,7 +26,7 @@ public record TerminalSyncPayload(int containerId, int vaults, List<CargoNetwork
             ENTRY.apply(ByteBufCodecs.list()), TerminalSyncPayload::entries,
             TerminalSyncPayload::new);
 
-    public static final String VERSION = "1";
+    public static final String VERSION = "2";
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

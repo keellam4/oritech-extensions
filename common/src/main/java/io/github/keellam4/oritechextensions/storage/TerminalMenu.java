@@ -24,6 +24,8 @@ public class TerminalMenu extends AbstractContainerMenu {
     public static final int TAKE_TO_INVENTORY = 2;
     public static final int INSERT_CARRIED = 3;
     public static final int INSERT_ONE = 4;
+    /** Fluid entry clicked: fill the empty bucket on the cursor, or empty a full one into the network. */
+    public static final int BUCKET = 5;
 
     public static final int INVENTORY_X = 8;
     public static final int INVENTORY_Y = 125;
@@ -57,15 +59,16 @@ public class TerminalMenu extends AbstractContainerMenu {
         var entries = network.contents();
         if (entries.equals(lastSent)) return;
         lastSent = entries;
-        Platform.INSTANCE.sendToPlayer(serverPlayer, new TerminalSyncPayload(containerId, network.vaults().size(), entries));
+        Platform.INSTANCE.sendToPlayer(serverPlayer, new TerminalSyncPayload(containerId, network.size(), entries));
     }
 
     /** A grid click from the client. */
-    public void handle(int action, ItemStack item) {
+    public void handle(int action, ItemStack item, net.minecraft.world.level.material.Fluid fluid) {
         if (controller == null) return;
         var network = controller.network();
         var carried = getCarried();
         switch (action) {
+            case BUCKET -> bucket(network, fluid);
             case TAKE_STACK, TAKE_ONE, TAKE_TO_INVENTORY -> {
                 if (item.isEmpty()) return;
                 if (action == TAKE_TO_INVENTORY) {
@@ -92,6 +95,43 @@ public class TerminalMenu extends AbstractContainerMenu {
         }
         lastSent = null; // send the new totals right away
         broadcastChanges();
+    }
+
+    /** Older callers: an item click. */
+    public void handle(int action, ItemStack item) {
+        handle(action, item, net.minecraft.world.level.material.Fluids.EMPTY);
+    }
+
+    /** Empty bucket on the cursor: fill it from the network. A full bucket: empty it into the network. */
+    private void bucket(CargoNetwork network, net.minecraft.world.level.material.Fluid clicked) {
+        var carried = getCarried();
+        if (carried.is(net.minecraft.world.item.Items.BUCKET)) {
+            if (clicked == net.minecraft.world.level.material.Fluids.EMPTY) return;
+            var filled = new ItemStack(clicked.getBucket());
+            if (filled.isEmpty() || network.drain(clicked, 1000, true).amount() < 1000) return;
+            network.drain(clicked, 1000, false);
+            carried.shrink(1);
+            if (carried.isEmpty()) setCarried(filled);
+            else if (!player.getInventory().add(filled)) player.drop(filled, false);
+            return;
+        }
+        var held = fluidInBucket(carried);
+        if (held == null || network.fill(held, 1000, true) < 1000) return;
+        network.fill(held, 1000, false);
+        carried.shrink(1);
+        var empty = new ItemStack(net.minecraft.world.item.Items.BUCKET);
+        if (carried.isEmpty()) setCarried(empty);
+        else if (!player.getInventory().add(empty)) player.drop(empty, false);
+    }
+
+    /** The fluid a filled bucket holds, or null. */
+    @Nullable
+    public static net.minecraft.world.level.material.Fluid fluidInBucket(ItemStack stack) {
+        if (stack.isEmpty() || stack.is(net.minecraft.world.item.Items.BUCKET)) return null;
+        for (var fluid : net.minecraft.core.registries.BuiltInRegistries.FLUID) {
+            if (fluid != net.minecraft.world.level.material.Fluids.EMPTY && fluid.isSource(fluid.defaultFluidState()) && stack.is(fluid.getBucket())) return fluid;
+        }
+        return null;
     }
 
     @Override

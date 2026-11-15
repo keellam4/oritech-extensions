@@ -82,7 +82,7 @@ public final class OritechExtensionsNeoForge {
                 io.github.keellam4.oritechextensions.storage.TerminalActionPayload.TYPE, io.github.keellam4.oritechextensions.storage.TerminalActionPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> {
                     if (context.player().containerMenu instanceof io.github.keellam4.oritechextensions.storage.TerminalMenu menu
-                            && menu.containerId == payload.containerId()) menu.handle(payload.action(), payload.item());
+                            && menu.containerId == payload.containerId()) menu.handle(payload.action(), payload.item(), payload.fluid());
                 }));
         event.registrar(io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.VERSION).playToClient(
                 io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.TYPE, io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.STREAM_CODEC,
@@ -98,6 +98,7 @@ public final class OritechExtensionsNeoForge {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModContent.COMPACTING_VAULT_ENTITY.get(), (vault, side) -> new VaultItemHandler(vault));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.FLUID_VAULT_ENTITY.get(), (vault, side) -> new VaultFluidHandler(vault));
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModContent.CARGO_CONTROLLER_ENTITY.get(), (controller, side) -> new ControllerItemHandler(controller));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.CARGO_CONTROLLER_ENTITY.get(), (controller, side) -> new ControllerFluidHandler(controller));
     }
 
     private static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {

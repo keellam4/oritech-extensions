@@ -53,12 +53,13 @@ Crafting: Steel Ingot, Industrial Glass, Steel Ingot / Fluid Pipe, Portable Tank
 
 ## Cargo Controller
 
-A **Cargo Controller** links every item vault touching it, and every vault touching those, into one inventory (a Cargo Wall, up to 1,024 vaults). Fluid Vaults don't join.
+A **Cargo Controller** links every item vault touching it, and every vault touching those, into one inventory (a Cargo Wall, up to 1,024 vaults). Fluid Vaults join too: items go to item vaults, fluids to Fluid Vaults.
 
 - **Pipes:** connect a pipe to the controller instead of to each vault. Items go to the vault that already holds them first, then to a vault with room for a new item type, so one full window never jams the pipe. Pulling from the controller takes from any vault.
 - **Terminal:** right-click the controller to see everything in the wall with totals.
   - Left-click an item to take a stack, right-click to take one, shift-click to send a stack to your inventory.
   - With items on your cursor, left-click the grid to put them all in, right-click to put one in. Shift-click items in your inventory to put them in.
+  - Fluids show with their amount in buckets: click one with an empty bucket to fill it, or with a full bucket of that fluid to empty it in. Fluid pipes on the controller reach every Fluid Vault.
   - Type in the search box to filter by name, or `@mod` to filter by mod.
 - The controller paints with its wall.
 

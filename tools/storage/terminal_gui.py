@@ -32,8 +32,8 @@ def main():
     d.line((2, H - 2, W - 2, H - 2), fill=DARK)
     d.line((W - 2, 2, W - 2, H - 2), fill=DARK)
     # search field
-    d.rectangle((80, 3, 172, 14), fill=EDGE)
-    d.rectangle((81, 4, 171, 13), fill=DARK)
+    d.rectangle((98, 3, 172, 14), fill=EDGE)
+    d.rectangle((99, 4, 171, 13), fill=DARK)
     # item grid: a dark screen with faint cells and a teal edge
     d.rectangle((6, 16, 170, 108), fill=TEAL)
     d.rectangle((7, 17, 169, 107), fill=(18, 22, 27))

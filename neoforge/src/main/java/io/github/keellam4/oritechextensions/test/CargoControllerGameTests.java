@@ -37,7 +37,8 @@ public class CargoControllerGameTests {
         place(helper, 5, 2, ModContent.CARGO_VAULT.get(), CargoVaultBlockEntity.class);
         controller.invalidate();
         int size = controller.network().vaults().size();
-        if (size != 3) helper.fail("expected 3 vaults in the network, found " + size);
+        if (size != 3) helper.fail("expected 3 item vaults in the network, found " + size);
+        if (controller.network().tanks().size() != 1) helper.fail("the Fluid Vault should join as a tank");
         helper.succeed();
     }
 
@@ -66,6 +67,25 @@ public class CargoControllerGameTests {
         if (contents.size() != 1 || contents.get(0).count() != 8 || !contents.get(0).item().is(Items.GOLD_INGOT)) {
             helper.fail("the terminal should list 8 gold, lists " + contents);
         }
+        helper.succeed();
+    }
+
+    /** Fluids go to the Fluid Vault already holding them, then to an empty one, and show in the terminal. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void fluidsGoToTanks(GameTestHelper helper) {
+        var controller = place(helper, 1, 2, ModContent.CARGO_CONTROLLER.get(), CargoControllerBlockEntity.class);
+        var a = place(helper, 2, 2, ModContent.FLUID_VAULT.get(), io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity.class);
+        var b = place(helper, 3, 2, ModContent.FLUID_VAULT.get(), io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity.class);
+        b.fill(net.minecraft.world.level.material.Fluids.LAVA, 1000, false);
+        controller.invalidate();
+        var network = controller.network();
+        network.fill(net.minecraft.world.level.material.Fluids.LAVA, 2000, false);
+        network.fill(net.minecraft.world.level.material.Fluids.WATER, 4000, false);
+        if (b.amount() != 3000 || a.fluid() != net.minecraft.world.level.material.Fluids.WATER) helper.fail("lava should join the lava tank, water the empty one");
+        var fluids = network.contents().stream().filter(io.github.keellam4.oritechextensions.storage.CargoNetwork.Entry::isFluid).toList();
+        if (fluids.size() != 2) helper.fail("the terminal should list two fluids, lists " + fluids.size());
+        var drained = network.drain(net.minecraft.world.level.material.Fluids.WATER, 1000, false);
+        if (drained.amount() != 1000 || a.amount() != 3000) helper.fail("draining water went wrong");
         helper.succeed();
     }
 

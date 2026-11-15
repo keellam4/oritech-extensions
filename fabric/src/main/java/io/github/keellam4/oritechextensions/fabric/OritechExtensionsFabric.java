@@ -44,9 +44,10 @@ public final class OritechExtensionsFabric implements ModInitializer {
                 io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.STREAM_CODEC);
         ServerPlayNetworking.registerGlobalReceiver(io.github.keellam4.oritechextensions.storage.TerminalActionPayload.TYPE, (payload, context) -> {
             if (context.player().containerMenu instanceof io.github.keellam4.oritechextensions.storage.TerminalMenu menu
-                    && menu.containerId == payload.containerId()) menu.handle(payload.action(), payload.item());
+                    && menu.containerId == payload.containerId()) menu.handle(payload.action(), payload.item(), payload.fluid());
         });
         ItemStorage.SIDED.registerForBlockEntity((controller, side) -> new ControllerItemStorage(controller), ModContent.CARGO_CONTROLLER_ENTITY.get());
+        net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((controller, side) -> new ControllerFluidStorage(controller), ModContent.CARGO_CONTROLLER_ENTITY.get());
         ServerPlayNetworking.registerGlobalReceiver(VaultTakePayload.TYPE,
                 (payload, context) -> CargoVault.take(context.player(), payload.pos(), payload.slot(), payload.one()));
         ItemStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultItemStorage(vault), ModContent.CARGO_VAULT_ENTITY.get());

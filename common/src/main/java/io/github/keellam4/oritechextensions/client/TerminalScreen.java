@@ -26,7 +26,8 @@ import java.util.Locale;
 /**
  * The Cargo Controller terminal: a searchable grid of everything in the network.
  * Left-click takes a stack, right-click takes one, shift-click sends a stack to your inventory. With items on the
- * cursor, left-click puts them all in and right-click puts one in. Type "@mod" to search by mod.
+ * cursor, left-click puts them all in and right-click puts one in. Fluids show too: click one with an empty bucket
+ * to fill it, or with a full bucket of that fluid to empty it in. Type "@mod" to search by mod.
  */
 public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
 
@@ -65,7 +66,7 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     @Override
     protected void init() {
         super.init();
-        search = new EditBox(font, leftPos + 82, topPos + 5, 89, 10, Component.translatable("screen.oritech_extensions.terminal.search"));
+        search = new EditBox(font, leftPos + 101, topPos + 5, 70, 10, Component.translatable("screen.oritech_extensions.terminal.search"));
         search.setBordered(false);
         search.setMaxLength(50);
         search.setTextColor(0xFFFFFFFF);
@@ -88,13 +89,18 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
             if (query.isEmpty()) {
                 result.add(entry);
             } else if (query.startsWith("@")) {
-                if (BuiltInRegistries.ITEM.getKey(entry.item().getItem()).getNamespace().contains(query.substring(1))) result.add(entry);
-            } else if (entry.item().getHoverName().getString().toLowerCase(Locale.ROOT).contains(query)) {
+                var key = entry.isFluid() ? BuiltInRegistries.FLUID.getKey(entry.fluid()) : BuiltInRegistries.ITEM.getKey(entry.item().getItem());
+                if (key.getNamespace().contains(query.substring(1))) result.add(entry);
+            } else if (name(entry).getString().toLowerCase(Locale.ROOT).contains(query)) {
                 result.add(entry);
             }
         }
         shown = result;
         scroll = Math.min(scroll, maxScroll());
+    }
+
+    private static Component name(CargoNetwork.Entry entry) {
+        return entry.isFluid() ? entry.fluid().defaultFluidState().createLegacyBlock().getBlock().getName() : entry.item().getHoverName();
     }
 
     private int maxScroll() {
@@ -106,7 +112,11 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         refilter();
         super.render(graphics, mouseX, mouseY, partialTick);
         var hovered = entryAt(mouseX, mouseY);
-        if (hovered != null && menu.getCarried().isEmpty()) {
+        if (hovered != null && hovered.isFluid()) {
+            graphics.renderComponentTooltip(font, List.of(name(hovered),
+                    Component.translatable("screen.oritech_extensions.terminal.stored_fluid", String.format("%,d", hovered.count())).withStyle(ChatFormatting.AQUA),
+                    Component.translatable("screen.oritech_extensions.terminal.bucket_help").withStyle(ChatFormatting.GRAY)), mouseX, mouseY);
+        } else if (hovered != null && menu.getCarried().isEmpty()) {
             var lines = new ArrayList<>(Screen.getTooltipFromItem(Minecraft.getInstance(), hovered.item()));
             lines.add(Component.translatable("screen.oritech_extensions.terminal.stored", String.format("%,d", hovered.count())).withStyle(ChatFormatting.AQUA));
             graphics.renderComponentTooltip(font, lines, mouseX, mouseY);
@@ -123,8 +133,12 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
             var entry = shown.get(first + i);
             int x = leftPos + GRID_X + (i % COLUMNS) * 18;
             int y = topPos + GRID_Y + (i / COLUMNS) * 18;
-            graphics.renderItem(entry.item(), x, y);
-            graphics.renderItemDecorations(font, entry.item(), x, y, CargoVaultRendererText.short_(entry.count()));
+            if (entry.isFluid()) {
+                drawFluid(graphics, entry, x, y);
+            } else {
+                graphics.renderItem(entry.item(), x, y);
+                graphics.renderItemDecorations(font, entry.item(), x, y, CargoVaultRendererText.short_(entry.count()));
+            }
         }
         var hovered = entryAt(mouseX, mouseY);
         if (hovered != null) {
@@ -137,6 +151,20 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         int track = ROWS * 18 - 15;
         int handleY = topPos + GRID_Y + (maxScroll() == 0 ? 0 : track * scroll / maxScroll());
         graphics.fill(leftPos + BAR_X, handleY, leftPos + BAR_X + 12, handleY + 15, maxScroll() == 0 ? 0xFF4A4F56 : 0xFF3EC9D5);
+    }
+
+    /** A fluid entry: its texture, tinted, with the amount in buckets. */
+    private void drawFluid(GuiGraphics graphics, CargoNetwork.Entry entry, int x, int y) {
+        var sprite = ClientPlatform.INSTANCE.fluidSprite(entry.fluid());
+        int colour = ClientPlatform.INSTANCE.fluidColour(entry.fluid(), minecraft == null ? null : minecraft.level,
+                minecraft == null || minecraft.player == null ? null : minecraft.player.blockPosition());
+        float r = (colour >> 16 & 255) / 255f, g = (colour >> 8 & 255) / 255f, b = (colour & 255) / 255f;
+        graphics.blit(x, y, 0, 16, 16, sprite, r, g, b, 1f);
+        var text = CargoVaultRendererText.short_(entry.count() / 1000) + "B";
+        graphics.pose().pushPose();
+        graphics.pose().translate(0, 0, 200);
+        graphics.drawString(font, text, x + 17 - font.width(text), y + 9, 0xFFFFFFFF, true);
+        graphics.pose().popPose();
     }
 
     @Override
@@ -165,6 +193,14 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (overGrid(mouseX, mouseY) && (button == 0 || button == 1)) {
             var carried = menu.getCarried();
+            var clicked = entryAt(mouseX, mouseY);
+            if (clicked != null && clicked.isFluid()) {
+                // Buckets fill from, or empty into, the fluid you click.
+                if (carried.is(net.minecraft.world.item.Items.BUCKET) || TerminalMenu.fluidInBucket(carried) != null) {
+                    send(TerminalMenu.BUCKET, ItemStack.EMPTY, clicked.fluid());
+                }
+                return true;
+            }
             if (!carried.isEmpty()) {
                 send(button == 0 ? TerminalMenu.INSERT_CARRIED : TerminalMenu.INSERT_ONE, ItemStack.EMPTY);
                 return true;
@@ -186,7 +222,11 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     }
 
     private void send(int action, ItemStack item) {
-        Platform.INSTANCE.sendToServer(new TerminalActionPayload(menu.containerId, action, item.copyWithCount(1)));
+        send(action, item, net.minecraft.world.level.material.Fluids.EMPTY);
+    }
+
+    private void send(int action, ItemStack item, net.minecraft.world.level.material.Fluid fluid) {
+        Platform.INSTANCE.sendToServer(new TerminalActionPayload(menu.containerId, action, item.isEmpty() ? ItemStack.EMPTY : item.copyWithCount(1), fluid));
     }
 
     @Override
