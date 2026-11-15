@@ -36,6 +36,8 @@ public final class OritechExtensionsNeoForge {
         ModContent.init();
         NeoForgePlatform.registerAll(modBus);
         modBus.addListener(OritechExtensionsNeoForge::registerPayloads);
+        modBus.addListener((net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent event) -> event.modify(
+                rearth.oritech.init.BlockEntitiesContent.FLUID_PIPE_ENTITY, ModContent.TRANSPARENT_FLUID_PIPE_CONNECTION.get()));
         modBus.addListener(OritechExtensionsNeoForge::registerCapabilities);
         container.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
