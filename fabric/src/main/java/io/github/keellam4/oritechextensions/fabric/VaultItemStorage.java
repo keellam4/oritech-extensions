@@ -25,6 +25,10 @@ public final class VaultItemStorage extends CombinedStorage<ItemVariant, VaultIt
         this(vault, new Snapshots(vault));
     }
 
+    public CargoVaultBlockEntity vault() {
+        return vault;
+    }
+
     private VaultItemStorage(CargoVaultBlockEntity vault, Snapshots snapshots) {
         super(slots(vault, snapshots));
         this.vault = vault;

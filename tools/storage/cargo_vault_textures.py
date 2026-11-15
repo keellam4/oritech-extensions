@@ -233,6 +233,29 @@ def fluid_side(x, y):
     return "O"
 
 
+def controller_front(x, y):
+    """Cargo Controller: a terminal screen with teal bars of stock, in the vault frame."""
+    f = frame(x, y)
+    if f:
+        return f
+    if (x, y) in ((1, 1), (14, 1), (1, 14), (14, 14)):
+        return "c"
+    if x in (1, 14) or y in (1, 14):
+        return "O"
+    if x in (2, 13) or y in (2, 12):
+        return "D"
+    if 3 <= x <= 12 and 3 <= y <= 11:
+        # bars of different heights, like a stock chart
+        heights = {4: 6, 5: 6, 7: 4, 8: 4, 10: 7, 11: 7}
+        h = heights.get(x)
+        if h and y >= 12 - h:
+            return "W" if y == 12 - h else "T"
+        return "1" if y == 3 or x in (3, 12) else "2"
+    if y == 13 and 4 <= x <= 11:
+        return "t" if x % 2 == 0 else "b"
+    return "O"
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     draw(FRONT).save(OUT / "cargo_vault_front.png")
@@ -244,6 +267,7 @@ def main():
     draw_any(with_arrow(cells_front(COMPACTING_CELLS))).save(OUT / "compacting_vault_front.png")
     draw_any(with_arrow(cells_front(DUAL_CELLS))).save(OUT / "dual_compacting_vault_front.png")
     draw(FLUID_FRONT).save(OUT / "fluid_vault_front.png")
+    draw(grid(controller_front)).save(OUT / "cargo_controller_front.png")
     draw(grid(fluid_side)).save(OUT / "fluid_vault_side.png")
 
 

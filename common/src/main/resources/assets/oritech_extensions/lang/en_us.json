@@ -120,5 +120,9 @@
   "screen.oritech_extensions.vault_upgrades.kind.void": "a Void Upgrade",
   "screen.oritech_extensions.vault_upgrades.kind.pull": "a Pull Upgrade",
   "screen.oritech_extensions.vault_upgrades.kind.push": "a Push Upgrade",
-  "screen.oritech_extensions.vault_upgrades.kind.redstone": "a Redstone Upgrade"
+  "screen.oritech_extensions.vault_upgrades.kind.redstone": "a Redstone Upgrade",
+  "block.oritech_extensions.cargo_controller": "Cargo Controller",
+  "screen.oritech_extensions.terminal.search": "Search… (@mod)",
+  "screen.oritech_extensions.terminal.stored": "Stored: %s",
+  "screen.oritech_extensions.terminal.info": "%s vaults · %s items"
 }

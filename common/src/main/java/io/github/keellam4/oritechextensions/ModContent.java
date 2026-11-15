@@ -102,6 +102,23 @@ public final class ModContent {
                     .networkSynchronized(io.github.keellam4.oritechextensions.storage.FluidContents.STREAM_CODEC)
                     .build());
 
+    /** Links touching vaults into one inventory, with a terminal screen. */
+    public static final Supplier<io.github.keellam4.oritechextensions.storage.CargoControllerBlock> CARGO_CONTROLLER = PLATFORM.register(
+            BuiltInRegistries.BLOCK, "cargo_controller", () -> new io.github.keellam4.oritechextensions.storage.CargoControllerBlock(
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f).sound(SoundType.METAL)));
+
+    public static final Supplier<BlockItem> CARGO_CONTROLLER_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "cargo_controller",
+            () -> new BlockItem(CARGO_CONTROLLER.get(), new Item.Properties()));
+
+    @SuppressWarnings("DataFlowIssue")
+    public static final Supplier<BlockEntityType<io.github.keellam4.oritechextensions.storage.CargoControllerBlockEntity>> CARGO_CONTROLLER_ENTITY = PLATFORM.register(
+            BuiltInRegistries.BLOCK_ENTITY_TYPE, "cargo_controller",
+            () -> BlockEntityType.Builder.of(io.github.keellam4.oritechextensions.storage.CargoControllerBlockEntity::new, CARGO_CONTROLLER.get()).build(null));
+
+    public static final Supplier<net.minecraft.world.inventory.MenuType<io.github.keellam4.oritechextensions.storage.TerminalMenu>> TERMINAL_MENU =
+            PLATFORM.register(BuiltInRegistries.MENU, "cargo_terminal",
+                    () -> PLATFORM.menuType(io.github.keellam4.oritechextensions.storage.TerminalMenu::new));
+
     /** A Cargo Vault's contents, kept on its item. */
     public static final Supplier<DataComponentType<VaultContents>> VAULT_CONTENTS = PLATFORM.register(
             BuiltInRegistries.DATA_COMPONENT_TYPE, "vault_contents", () -> DataComponentType.<VaultContents>builder()

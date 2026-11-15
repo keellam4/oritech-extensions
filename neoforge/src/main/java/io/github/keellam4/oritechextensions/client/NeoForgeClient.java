@@ -35,7 +35,10 @@ public final class NeoForgeClient {
         // Registered directly on the mod bus so it works on every NeoForge 21.1.x build.
         modBus.addListener(NeoForgeClient::registerRenderers);
         modBus.addListener((net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) ->
-                event.register(ModContent.VAULT_UPGRADE_MENU.get(), VaultUpgradeScreen::new));
+                {
+                    event.register(ModContent.VAULT_UPGRADE_MENU.get(), VaultUpgradeScreen::new);
+                    event.register(ModContent.TERMINAL_MENU.get(), TerminalScreen::new);
+                });
         modBus.addListener((net.neoforged.neoforge.client.event.RegisterGuiLayersEvent event) ->
                 event.registerAboveAll(OritechExtensions.id("vault_hud"), (graphics, delta) -> VaultHud.render(graphics)));
         io.github.keellam4.oritechextensions.storage.CargoVault.clientSlotLookup = VaultHud::slotUnderCrosshair;
