@@ -29,6 +29,8 @@ public final class OritechExtensionsFabricClient implements ClientModInitializer
         net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlock(ModContent.SILO_GLASS.get(), net.minecraft.client.renderer.RenderType.cutout());
         net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlocks(net.minecraft.client.renderer.RenderType.cutout(),
                 ModContent.TRANSPARENT_FLUID_PIPE.get(), ModContent.TRANSPARENT_FLUID_PIPE_CONNECTION.get());
+        net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlocks(net.minecraft.client.renderer.RenderType.cutout(),
+                ModContent.UPLINK_MAST.get(), ModContent.ANTENNA_SEGMENT.get());
         ClientPlayNetworking.registerGlobalReceiver(PaintSyncPayload.TYPE, (payload, context) -> PaintClient.handleSync(payload));
         ItemTooltipCallback.EVENT.register((stack, tooltipContext, flag, lines) -> {
             var line = PaintClient.paintTooltip(stack);
@@ -48,6 +50,8 @@ public final class OritechExtensionsFabricClient implements ClientModInitializer
                 io.github.keellam4.oritechextensions.client.TerminalScreen::new);
         net.minecraft.client.gui.screens.MenuScreens.register(ModContent.SILO_MENU.get(),
                 io.github.keellam4.oritechextensions.client.SiloScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(ModContent.UPLINK_MAST_MENU.get(),
+                io.github.keellam4.oritechextensions.client.UplinkMastScreen::new);
         ClientPlayNetworking.registerGlobalReceiver(io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.TYPE,
                 (payload, context) -> io.github.keellam4.oritechextensions.client.TerminalScreen.receive(payload));
 

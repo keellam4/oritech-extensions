@@ -88,7 +88,9 @@
         "oritech_extensions:block/induction_pylon_obelisk_bottom",
         "oritech_extensions:block/induction_pylon_obelisk_top",
         "oritech_extensions:block/induction_pylon_rings_bottom",
-        "oritech_extensions:block/induction_pylon_rings_top"
+        "oritech_extensions:block/induction_pylon_rings_top",
+        "oritech_extensions:block/uplink_mast",
+        "oritech_extensions:block/antenna_segment"
       ],
       "palette_key": "oritech_extensions:colormap/paint/extender_key",
       "permutations": {
@@ -511,6 +513,16 @@
       "type": "minecraft:single",
       "resource": "oritech_extensions:rainbow/oritech_extensions/block/induction_pylon_rings_top",
       "sprite": "oritech_extensions:block/induction_pylon_rings_top_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/uplink_mast",
+      "sprite": "oritech_extensions:block/uplink_mast_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/antenna_segment",
+      "sprite": "oritech_extensions:block/antenna_segment_paint_rainbow"
     },
     {
       "type": "minecraft:single",

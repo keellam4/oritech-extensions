@@ -1,0 +1,28 @@
+---
+title: Cargo Link
+id: oritech_extensions:cargo_link
+icon: oritech_extensions:cargo_link
+related_items: ["oritech_extensions:cargo_link", "oritech_extensions:infinite_range_upgrade", "oritech_extensions:dimensional_upgrade", "oritech_extensions:network_anchor", "oritech_extensions:uplink_mast", "oritech_extensions:antenna_segment", "oritech_extensions:cargo_controller", "oritech_extensions:induction_pylon"]
+---
+
+# Cargo Link
+
+A handheld terminal for your Cargo Wall. It opens the wall's crafting terminal from wherever you are, as long as you're in range.
+
+## Using it
+
+- Sneak + right-click a Cargo Controller or Crafting Terminal to link it. The tooltip shows where it's linked.
+- Right-click anywhere to open the terminal, with the crafting grid. The action bar shows the signal, distance and battery.
+- Range: 32 blocks from the controller with no mast, 64 with an Uplink Mast on the wall, plus 16 for each Antenna Segment on the mast (up to 8, 192 blocks).
+- Each transfer uses a little of its 200,000 RF battery (5 RF per item, a bucket counts as 64). Charge it with an Induction Pylon or any charger.
+- The terminal closes if you walk out of range or put the Link away.
+- Upgrades go in the Uplink Mast (right-click it): Infinite Range (no range limit in this dimension) or Dimensional (any dimension). They work for every Link on the wall.
+- In survival the Link won't open with an empty battery. In creative it's free.
+
+## Recipe
+
+<CraftingRecipe
+    slots={['oritech:steel_ingot', 'oritech:enderic_lens', 'oritech:steel_ingot', 'oritech:processing_unit', 'oritech_extensions:crafting_terminal', 'oritech:processing_unit', 'oritech:steel_ingot', 'oritech:advanced_battery', 'oritech:steel_ingot']}
+    result="oritech_extensions:cargo_link"
+    count={1}
+/>

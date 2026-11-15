@@ -39,6 +39,12 @@ It uses the [moddedmc.wiki](https://moddedmc.wiki) layout (`sinytra-wiki.json`),
 - [Silo Glass](content/silo_glass.mdx)
 - [Induction Pylon](content/induction_pylon.mdx)
 - [Transparent Fluid Pipe](content/transparent_fluid_pipe.mdx)
+- [Cargo Link](content/cargo_link.mdx)
+- [Uplink Mast](content/uplink_mast.mdx)
+- [Antenna Segment](content/antenna_segment.mdx)
+- [Infinite Range Upgrade](content/infinite_range_upgrade.mdx)
+- [Dimensional Upgrade](content/dimensional_upgrade.mdx)
+- [Network Anchor](content/network_anchor.mdx)
 
 **Developers** (`developers/`, website only, left out of the in-game book): building, versions, the paint system, modpack notes, releasing
 

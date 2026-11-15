@@ -76,6 +76,12 @@ public final class WorldPaintTarget implements PaintTarget {
     public static final WorldPaintTarget PYLON = new WorldPaintTarget(
             block -> block instanceof io.github.keellam4.oritechextensions.wireless.InductionPylonBlock ? "induction_pylon" : null, () -> 2, 1, false, false);
 
+    /** Uplink Mast and its Antenna Segments: one tower paints together. */
+    public static final WorldPaintTarget UPLINK = new WorldPaintTarget(
+            block -> block instanceof io.github.keellam4.oritechextensions.wireless.UplinkMastBlock
+                    || block instanceof io.github.keellam4.oritechextensions.wireless.AntennaSegmentBlock ? "uplink" : null,
+            Config::maxPaintGroupSize, 1);
+
     /** Pipe Boosters: one block per click, and a new booster doesn't take over its neighbours' colour. */
     public static final WorldPaintTarget PIPE_BOOSTER = new WorldPaintTarget(
             block -> block == BlockContent.PIPE_BOOSTER_BLOCK ? "pipe_booster" : null, () -> 1, 1, false, false);

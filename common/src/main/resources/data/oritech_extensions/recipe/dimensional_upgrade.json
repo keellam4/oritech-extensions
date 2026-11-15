@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "POP",
+    "XIX",
+    "POP"
+  ],
+  "key": {
+    "P": {
+      "item": "oritech:prometheum_ingot"
+    },
+    "O": {
+      "item": "oritech:overcharged_crystal"
+    },
+    "X": {
+      "item": "oritech:enderic_compound"
+    },
+    "I": {
+      "item": "oritech_extensions:infinite_range_upgrade"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:dimensional_upgrade",
+    "count": 1
+  }
+}

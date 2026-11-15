@@ -40,6 +40,7 @@ public final class NeoForgeClient {
                     event.register(ModContent.TERMINAL_MENU.get(), TerminalScreen::new);
                     event.register(ModContent.CRAFTING_TERMINAL_MENU.get(), TerminalScreen::new);
                     event.register(ModContent.SILO_MENU.get(), SiloScreen::new);
+                    event.register(ModContent.UPLINK_MAST_MENU.get(), UplinkMastScreen::new);
                 });
         modBus.addListener((net.neoforged.neoforge.client.event.RegisterGuiLayersEvent event) ->
                 event.registerAboveAll(OritechExtensions.id("vault_hud"), (graphics, delta) -> VaultHud.render(graphics)));

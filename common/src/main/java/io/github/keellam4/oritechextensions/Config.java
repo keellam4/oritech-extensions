@@ -67,6 +67,26 @@ public class Config {
             .comment("How much energy (RF) an Induction Pylon stores.")
             .defineInRange("pylonBuffer", 1_000_000, 1000, Integer.MAX_VALUE);
 
+    public static final ModConfigSpec.IntValue LINK_RANGE = BUILDER
+            .comment("How far from its Cargo Controller a Cargo Link works without an Uplink Mast, in blocks.")
+            .defineInRange("linkRange", 32, 1, 1024);
+
+    public static final ModConfigSpec.IntValue LINK_MAST_RANGE = BUILDER
+            .comment("How far a Cargo Link works with an Uplink Mast on the wall, in blocks.")
+            .defineInRange("linkMastRange", 64, 1, 4096);
+
+    public static final ModConfigSpec.IntValue LINK_SEGMENT_RANGE = BUILDER
+            .comment("How many blocks of range each Antenna Segment on the mast adds (up to 8 segments).")
+            .defineInRange("linkSegmentRange", 16, 0, 1024);
+
+    public static final ModConfigSpec.IntValue LINK_ENERGY_PER_ITEM = BUILDER
+            .comment("Energy (RF) a Cargo Link uses per item moved (a bucket counts as 64 items).")
+            .defineInRange("linkEnergyPerItem", 5, 0, 10000);
+
+    public static final ModConfigSpec.BooleanValue ALLOW_NETWORK_CHUNK_LOADING = BUILDER
+            .comment("Whether a Network Anchor in a Cargo Controller may keep the network's chunks loaded.")
+            .define("allowNetworkChunkLoading", true);
+
     public static final ModConfigSpec.IntValue SILO_BUCKETS_PER_BLOCK = BUILDER
             .comment("How many buckets a Fluid Silo holds per block of its size (a 3 x 3 x 5 silo is 45 blocks).")
             .defineInRange("siloBucketsPerBlock", 1000, 1, 100000);
@@ -121,5 +141,25 @@ public class Config {
 
     public static int pylonBuffer() {
         return SPEC.isLoaded() ? PYLON_BUFFER.get() : PYLON_BUFFER.getDefault();
+    }
+
+    public static int linkRange() {
+        return SPEC.isLoaded() ? LINK_RANGE.get() : LINK_RANGE.getDefault();
+    }
+
+    public static int linkMastRange() {
+        return SPEC.isLoaded() ? LINK_MAST_RANGE.get() : LINK_MAST_RANGE.getDefault();
+    }
+
+    public static int linkSegmentRange() {
+        return SPEC.isLoaded() ? LINK_SEGMENT_RANGE.get() : LINK_SEGMENT_RANGE.getDefault();
+    }
+
+    public static int linkEnergyPerItem() {
+        return SPEC.isLoaded() ? LINK_ENERGY_PER_ITEM.get() : LINK_ENERGY_PER_ITEM.getDefault();
+    }
+
+    public static boolean allowNetworkChunkLoading() {
+        return SPEC.isLoaded() ? ALLOW_NETWORK_CHUNK_LOADING.get() : ALLOW_NETWORK_CHUNK_LOADING.getDefault();
     }
 }

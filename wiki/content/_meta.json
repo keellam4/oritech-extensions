@@ -14,5 +14,11 @@
   "silo_casing.mdx": "Silo Casing",
   "silo_glass.mdx": "Silo Glass",
   "induction_pylon.mdx": "Induction Pylon",
-  "transparent_fluid_pipe.mdx": "Transparent Fluid Pipe"
+  "transparent_fluid_pipe.mdx": "Transparent Fluid Pipe",
+  "cargo_link.mdx": "Cargo Link",
+  "uplink_mast.mdx": "Uplink Mast",
+  "antenna_segment.mdx": "Antenna Segment",
+  "infinite_range_upgrade.mdx": "Infinite Range Upgrade",
+  "dimensional_upgrade.mdx": "Dimensional Upgrade",
+  "network_anchor.mdx": "Network Anchor"
 }

@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SLS",
+    "PTP",
+    "SBS"
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "L": {
+      "item": "oritech:enderic_lens"
+    },
+    "P": {
+      "item": "oritech:processing_unit"
+    },
+    "T": {
+      "item": "oritech_extensions:crafting_terminal"
+    },
+    "B": {
+      "item": "oritech:advanced_battery"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:cargo_link",
+    "count": 1
+  }
+}
