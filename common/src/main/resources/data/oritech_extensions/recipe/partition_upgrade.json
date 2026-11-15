@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "GCG",
+    "SPS"
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "P": {
+      "item": "oritech:fluid_pipe"
+    },
+    "G": {
+      "item": "oritech:industrial_glass_block"
+    },
+    "C": {
+      "item": "oritech_extensions:silo_casing"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:partition_upgrade",
+    "count": 1
+  }
+}

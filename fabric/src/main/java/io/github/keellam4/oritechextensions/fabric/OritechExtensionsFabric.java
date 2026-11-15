@@ -77,6 +77,9 @@ public final class OritechExtensionsFabric implements ModInitializer {
             entries.accept(ModContent.SILO_CONTROLLER_ITEM.get());
             entries.accept(ModContent.SILO_CASING_ITEM.get());
             entries.accept(ModContent.SILO_GLASS_ITEM.get());
+            entries.accept(ModContent.PARTITION_UPGRADE_1.get());
+            entries.accept(ModContent.PARTITION_UPGRADE_2.get());
+            entries.accept(ModContent.PARTITION_MATRIX.get());
             entries.accept(ModContent.INDUCTION_PYLON_ITEM.get());
             entries.accept(ModContent.INDUCTION_PYLON_OBELISK_ITEM.get());
             entries.accept(ModContent.INDUCTION_PYLON_RINGS_ITEM.get());

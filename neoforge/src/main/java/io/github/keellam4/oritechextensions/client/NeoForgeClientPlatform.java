@@ -23,4 +23,9 @@ public final class NeoForgeClientPlatform implements ClientPlatform {
         if (level != null && pos != null) return extensions.getTintColor(fluid.defaultFluidState(), level, pos);
         return extensions.getTintColor();
     }
+
+    @Override
+    public int fluidDensity(net.minecraft.world.level.material.Fluid fluid) {
+        return fluid.getFluidType().getDensity();
+    }
 }

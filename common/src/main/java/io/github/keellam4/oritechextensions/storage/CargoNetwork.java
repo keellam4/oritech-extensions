@@ -89,11 +89,11 @@ public final class CargoNetwork {
         long remaining = max;
         for (var tank : tanks) {
             if (remaining <= 0) break;
-            if (tank.fluid() != net.minecraft.world.level.material.Fluids.EMPTY && tank.fluid().isSame(fluid)) remaining -= tank.fill(fluid, remaining, simulate);
+            if (tank.holds(fluid)) remaining -= tank.fill(fluid, remaining, simulate);
         }
         for (var tank : tanks) {
             if (remaining <= 0) break;
-            if (tank.fluid() == net.minecraft.world.level.material.Fluids.EMPTY) remaining -= tank.fill(fluid, remaining, simulate);
+            if (!tank.holds(fluid)) remaining -= tank.fill(fluid, remaining, simulate);
         }
         return max - remaining;
     }
@@ -162,7 +162,7 @@ public final class CargoNetwork {
         totals.forEach((key, total) -> entries.add(new Entry(key.item(), total[0], net.minecraft.world.level.material.Fluids.EMPTY)));
         var fluids = new java.util.LinkedHashMap<net.minecraft.world.level.material.Fluid, long[]>();
         for (var tank : tanks) {
-            if (tank.amount() > 0) fluids.computeIfAbsent(tank.fluid(), f -> new long[1])[0] += tank.amount();
+            for (var held : tank.fluids()) fluids.computeIfAbsent(held.fluid(), f -> new long[1])[0] += held.amount();
         }
         fluids.forEach((fluid, total) -> entries.add(new Entry(ItemStack.EMPTY, total[0], fluid)));
         entries.sort((a, b) -> Long.compare(b.count(), a.count()));

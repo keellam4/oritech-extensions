@@ -66,6 +66,9 @@ public final class OritechExtensionsNeoForge {
             event.accept(ModContent.SILO_CONTROLLER_ITEM.get());
             event.accept(ModContent.SILO_CASING_ITEM.get());
             event.accept(ModContent.SILO_GLASS_ITEM.get());
+            event.accept(ModContent.PARTITION_UPGRADE_1.get());
+            event.accept(ModContent.PARTITION_UPGRADE_2.get());
+            event.accept(ModContent.PARTITION_MATRIX.get());
             event.accept(ModContent.INDUCTION_PYLON_ITEM.get());
             event.accept(ModContent.INDUCTION_PYLON_OBELISK_ITEM.get());
             event.accept(ModContent.INDUCTION_PYLON_RINGS_ITEM.get());

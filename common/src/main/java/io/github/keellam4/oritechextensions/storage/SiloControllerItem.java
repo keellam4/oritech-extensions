@@ -19,6 +19,16 @@ public class SiloControllerItem extends BlockItem {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> lines, TooltipFlag flag) {
+        var data = stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
+        if (data != null && data.contains("silo")) {
+            for (var entry : data.copyTag().getCompound("silo").getList("tanks", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
+                var tank = SiloTank.load((net.minecraft.nbt.CompoundTag) entry);
+                if (tank.amount <= 0) continue;
+                lines.add(Component.translatable("tooltip.oritech_extensions.silo.holds",
+                        tank.fluid.defaultFluidState().createLegacyBlock().getBlock().getName(),
+                        String.format("%,d", tank.amount / 1000)).withStyle(ChatFormatting.AQUA));
+            }
+        }
         var fluid = stack.get(ModContent.FLUID_CONTENTS.get());
         if (fluid != null && !fluid.isEmpty()) {
             lines.add(Component.translatable("tooltip.oritech_extensions.silo.holds",

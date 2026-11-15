@@ -19,4 +19,7 @@ public interface ClientPlatform {
 
     /** The fluid's tint (ARGB), for water's biome colour and the like. */
     int fluidColour(Fluid fluid, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos);
+
+    /** How heavy a fluid is, for stacking silo layers (water about 1000, lava higher, gases below 0). */
+    int fluidDensity(Fluid fluid);
 }

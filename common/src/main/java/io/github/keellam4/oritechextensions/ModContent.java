@@ -151,6 +151,20 @@ public final class ModContent {
             BuiltInRegistries.BLOCK_ENTITY_TYPE, "silo_controller",
             () -> BlockEntityType.Builder.of(io.github.keellam4.oritechextensions.storage.SiloControllerBlockEntity::new, SILO_CONTROLLER.get()).build(null));
 
+    public static final Supplier<net.minecraft.world.inventory.MenuType<io.github.keellam4.oritechextensions.storage.SiloMenu>> SILO_MENU =
+            PLATFORM.register(BuiltInRegistries.MENU, "silo_controller",
+                    () -> PLATFORM.menuType(io.github.keellam4.oritechextensions.storage.SiloMenu::new));
+
+    private static Supplier<io.github.keellam4.oritechextensions.storage.PartitionUpgradeItem> partition(String name, int partitions) {
+        return PLATFORM.register(BuiltInRegistries.ITEM, name,
+                () -> new io.github.keellam4.oritechextensions.storage.PartitionUpgradeItem(partitions, new Item.Properties().stacksTo(16)));
+    }
+
+    public static final Supplier<io.github.keellam4.oritechextensions.storage.PartitionUpgradeItem> PARTITION_UPGRADE_1 = partition("partition_upgrade", 4);
+    public static final Supplier<io.github.keellam4.oritechextensions.storage.PartitionUpgradeItem> PARTITION_UPGRADE_2 = partition("advanced_partition_upgrade", 9);
+    public static final Supplier<io.github.keellam4.oritechextensions.storage.PartitionUpgradeItem> PARTITION_MATRIX =
+            partition("partition_matrix", io.github.keellam4.oritechextensions.storage.PartitionUpgradeItem.UNLIMITED);
+
     // ---------------------------------------------------------------- Induction Pylon
 
     private static Supplier<io.github.keellam4.oritechextensions.wireless.InductionPylonBlock> pylon(String name, io.github.keellam4.oritechextensions.wireless.PylonStyle style) {

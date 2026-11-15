@@ -4,17 +4,20 @@ import io.github.keellam4.oritechextensions.storage.NetworkTank;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
-/** Lets pipes, buckets and other mods reach a Fluid Vault or Fluid Silo: one tank. */
+/** Lets pipes, buckets and other mods reach a Fluid Vault or Fluid Silo: one tank per fluid it holds. */
 public record VaultFluidHandler(NetworkTank vault) implements IFluidHandler {
 
     @Override
     public int getTanks() {
-        return 1;
+        return Math.max(1, vault.fluids().size());
     }
 
     @Override
     public FluidStack getFluidInTank(int tank) {
-        return vault.amount() <= 0 ? FluidStack.EMPTY : new FluidStack(vault.fluid(), (int) Math.min(Integer.MAX_VALUE, vault.amount()));
+        var fluids = vault.fluids();
+        if (tank < 0 || tank >= fluids.size()) return FluidStack.EMPTY;
+        var held = fluids.get(tank);
+        return new FluidStack(held.fluid(), (int) Math.min(Integer.MAX_VALUE, held.amount()));
     }
 
     @Override
