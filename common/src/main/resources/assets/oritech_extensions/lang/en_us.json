@@ -126,5 +126,16 @@
   "screen.oritech_extensions.terminal.stored": "Stored: %s",
   "screen.oritech_extensions.terminal.info": "%s vaults · %s entries",
   "screen.oritech_extensions.terminal.stored_fluid": "Stored: %s mB",
-  "screen.oritech_extensions.terminal.bucket_help": "Click with an empty bucket to fill it, or with a full one to empty it in."
+  "screen.oritech_extensions.terminal.bucket_help": "Click with an empty bucket to fill it, or with a full one to empty it in.",
+  "block.oritech_extensions.crafting_terminal": "Crafting Terminal",
+  "screen.oritech_extensions.terminal.sort.amount": "Sort: amount",
+  "screen.oritech_extensions.terminal.sort.name": "Sort: name",
+  "screen.oritech_extensions.terminal.sort.mod": "Sort: mod",
+  "screen.oritech_extensions.terminal.descending": "Descending",
+  "screen.oritech_extensions.terminal.ascending": "Ascending",
+  "screen.oritech_extensions.terminal.show.all": "Show: items and fluids",
+  "screen.oritech_extensions.terminal.show.items": "Show: items",
+  "screen.oritech_extensions.terminal.show.fluids": "Show: fluids",
+  "screen.oritech_extensions.terminal.no_match": "Nothing matches",
+  "screen.oritech_extensions.terminal.clear": "Return grid to network"
 }

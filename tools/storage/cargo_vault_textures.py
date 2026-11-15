@@ -256,6 +256,34 @@ def controller_front(x, y):
     return "O"
 
 
+def crafting_front(x, y):
+    """Crafting Terminal: the controller's screen showing a 3 x 3 crafting grid and an output cell."""
+    f = frame(x, y)
+    if f:
+        return f
+    if (x, y) in ((1, 1), (14, 1), (1, 14), (14, 14)):
+        return "c"
+    if x in (1, 14) or y in (1, 14):
+        return "O"
+    if x in (2, 13) or y in (2, 12):
+        return "D"
+    if 3 <= x <= 12 and 3 <= y <= 11:
+        # 3 x 3 grid of 2 x 2 cells at x 3..9, y 4..10; output cell at x 11..12, y 6..8
+        if 3 <= x <= 9 and 4 <= y <= 10:
+            gx, gy = (x - 3) % 3, (y - 4) % 3
+            if gx == 2 or gy == 2:
+                return "2"
+            return "W" if (x, y) == (4, 5) else "T"
+        if 11 <= x <= 12 and 6 <= y <= 8:
+            return "W"
+        if x == 10 and y == 7:
+            return "t"
+        return "1" if y == 3 or x in (3, 12) else "2"
+    if y == 13 and 4 <= x <= 11:
+        return "t" if x % 2 == 0 else "b"
+    return "O"
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     draw(FRONT).save(OUT / "cargo_vault_front.png")
@@ -268,6 +296,7 @@ def main():
     draw_any(with_arrow(cells_front(DUAL_CELLS))).save(OUT / "dual_compacting_vault_front.png")
     draw(FLUID_FRONT).save(OUT / "fluid_vault_front.png")
     draw(grid(controller_front)).save(OUT / "cargo_controller_front.png")
+    draw(grid(crafting_front)).save(OUT / "crafting_terminal_front.png")
     draw(grid(fluid_side)).save(OUT / "fluid_vault_side.png")
 
 

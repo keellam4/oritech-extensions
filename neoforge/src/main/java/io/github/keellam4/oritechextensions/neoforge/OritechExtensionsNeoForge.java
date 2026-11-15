@@ -62,6 +62,7 @@ public final class OritechExtensionsNeoForge {
             event.accept(ModContent.DUAL_COMPACTING_VAULT_ITEM.get());
             event.accept(ModContent.FLUID_VAULT_ITEM.get());
             event.accept(ModContent.CARGO_CONTROLLER_ITEM.get());
+            event.accept(ModContent.CRAFTING_TERMINAL_ITEM.get());
             ModContent.VAULT_UPGRADES.values().forEach(upgrade -> event.accept(upgrade.get()));
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {

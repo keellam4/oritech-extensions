@@ -110,14 +110,26 @@ public final class ModContent {
     public static final Supplier<BlockItem> CARGO_CONTROLLER_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "cargo_controller",
             () -> new BlockItem(CARGO_CONTROLLER.get(), new Item.Properties()));
 
+    /** A terminal with a crafting grid, placed against any vault of a Cargo Wall. */
+    public static final Supplier<io.github.keellam4.oritechextensions.storage.CraftingTerminalBlock> CRAFTING_TERMINAL = PLATFORM.register(
+            BuiltInRegistries.BLOCK, "crafting_terminal", () -> new io.github.keellam4.oritechextensions.storage.CraftingTerminalBlock(
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f).sound(SoundType.METAL)));
+
+    public static final Supplier<BlockItem> CRAFTING_TERMINAL_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "crafting_terminal",
+            () -> new BlockItem(CRAFTING_TERMINAL.get(), new Item.Properties()));
+
     @SuppressWarnings("DataFlowIssue")
     public static final Supplier<BlockEntityType<io.github.keellam4.oritechextensions.storage.CargoControllerBlockEntity>> CARGO_CONTROLLER_ENTITY = PLATFORM.register(
             BuiltInRegistries.BLOCK_ENTITY_TYPE, "cargo_controller",
-            () -> BlockEntityType.Builder.of(io.github.keellam4.oritechextensions.storage.CargoControllerBlockEntity::new, CARGO_CONTROLLER.get()).build(null));
+            () -> BlockEntityType.Builder.of(io.github.keellam4.oritechextensions.storage.CargoControllerBlockEntity::new, CARGO_CONTROLLER.get(), CRAFTING_TERMINAL.get()).build(null));
 
     public static final Supplier<net.minecraft.world.inventory.MenuType<io.github.keellam4.oritechextensions.storage.TerminalMenu>> TERMINAL_MENU =
             PLATFORM.register(BuiltInRegistries.MENU, "cargo_terminal",
                     () -> PLATFORM.menuType(io.github.keellam4.oritechextensions.storage.TerminalMenu::new));
+
+    public static final Supplier<net.minecraft.world.inventory.MenuType<io.github.keellam4.oritechextensions.storage.TerminalMenu>> CRAFTING_TERMINAL_MENU =
+            PLATFORM.register(BuiltInRegistries.MENU, "crafting_terminal",
+                    () -> PLATFORM.menuType(io.github.keellam4.oritechextensions.storage.TerminalMenu::crafting));
 
     /** A Cargo Vault's contents, kept on its item. */
     public static final Supplier<DataComponentType<VaultContents>> VAULT_CONTENTS = PLATFORM.register(
