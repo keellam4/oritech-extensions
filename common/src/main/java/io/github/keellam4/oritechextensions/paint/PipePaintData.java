@@ -30,6 +30,8 @@ public final class PipePaintData extends SavedData {
     private final Map<BlockPos, Paint> paints = new HashMap<>();
     /** The same positions grouped by chunk, so sending a chunk to a player doesn't walk the whole map. */
     private final Map<Long, Set<BlockPos>> byChunk = new HashMap<>();
+    /** Painted Industrial Glass whose pane is tinted with its paint colour (painted the same colour twice). */
+    private final Set<BlockPos> tinted = new HashSet<>();
 
     public PipePaintData() {
     }
@@ -54,6 +56,7 @@ public final class PipePaintData extends SavedData {
             }
             if (PaintColors.isPainted(variant)) {
                 data.put(pos.immutable(), variant);
+                if (entry.getBoolean("tinted")) data.tinted.add(pos.immutable());
             }
         }
         return data;
@@ -67,6 +70,7 @@ public final class PipePaintData extends SavedData {
             var compound = new CompoundTag();
             compound.putLong("pos", entry.getKey().asLong());
             compound.putString("color", entry.getValue().name().toLowerCase(Locale.ROOT));
+            if (tinted.contains(entry.getKey())) compound.putBoolean("tinted", true);
             list.add(compound);
         }
         tag.put("paints", list);
@@ -102,7 +106,16 @@ public final class PipePaintData extends SavedData {
         }
     }
 
+    public boolean isTinted(BlockPos pos) {
+        return tinted.contains(pos);
+    }
+
+    public void setTinted(BlockPos pos, boolean value) {
+        if (value && paints.containsKey(pos) ? tinted.add(pos.immutable()) : tinted.remove(pos)) setDirty();
+    }
+
     public void remove(BlockPos pos) {
+        tinted.remove(pos);
         if (paints.remove(pos) == null) return;
         long key = ChunkPos.asLong(pos);
         var positions = byChunk.get(key);

@@ -154,6 +154,15 @@ public final class WorldPaintTarget implements PaintTarget {
         if (isolated) {
             for (var pos : group) before.put(pos, data.getOrDefault(pos));
         }
+        if (this == GLASS && io.github.keellam4.oritechextensions.paint.PaintColors.isPainted(variant) && !group.isEmpty()
+                && group.stream().allMatch(pos -> data.getOrDefault(pos) == variant)) {
+            // Glass that already has this colour: painting it again tints the pane (and again clears the tint).
+            boolean tint = !data.isTinted(group.get(0));
+            var toggled = group.subList(0, Math.min(group.size(), budget));
+            for (var pos : toggled) data.setTinted(pos, tint);
+            PaintTargets.syncWorld(level, toggled, variant);
+            return toggled;
+        }
         var changed = WorldPaint.apply(level, group, variant, budget);
         PaintTargets.syncWorld(level, changed, variant);
         if (isolated && !changed.isEmpty()) {

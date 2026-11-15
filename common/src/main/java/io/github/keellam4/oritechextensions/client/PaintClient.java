@@ -37,6 +37,19 @@ public final class PaintClient {
      */
     private static final Map<BlockPos, Paint> WORLD_PAINT = new ConcurrentHashMap<>();
 
+    /** Painted glass whose pane is tinted. */
+    private static final java.util.Set<BlockPos> TINTED = ConcurrentHashMap.newKeySet();
+
+    public static boolean isTinted(BlockPos pos) {
+        return TINTED.contains(pos);
+    }
+
+    /** The see-through tint sprite for a paint colour (oritech_extensions:block/glass_tint_<colour>). */
+    public static net.minecraft.client.renderer.texture.TextureAtlasSprite tintSprite(Paint paint) {
+        return Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS)
+                .getSprite(io.github.keellam4.oritechextensions.OritechExtensions.id("block/glass_tint_" + paint.id()));
+    }
+
     /** The world-stored colour at {@code pos}, or null if that block is unpainted. */
     @Nullable
     public static Paint worldPaint(BlockPos pos) {
@@ -46,6 +59,7 @@ public final class PaintClient {
     /** Leaving a world: its colours must not show up at the same coordinates in the next one. */
     public static void forgetWorldPaint() {
         WORLD_PAINT.clear();
+        TINTED.clear();
     }
 
     /** Set by the clientSmokeTest run: load everything, report, then quit once the first menu is shown. */
@@ -109,7 +123,7 @@ public final class PaintClient {
 
         for (var entry : payload.entries()) {
             var pos = entry.pos();
-            var variant = PaintColors.fromId(entry.color());
+            var variant = PaintColors.fromId(entry.world() ? entry.colorId() : entry.color());
 
             if (entry.world()) {
                 if (PaintColors.isPainted(variant)) {
@@ -117,6 +131,8 @@ public final class PaintClient {
                 } else {
                     WORLD_PAINT.remove(pos);
                 }
+                if (entry.tinted() && PaintColors.isPainted(variant)) TINTED.add(pos.immutable());
+                else TINTED.remove(pos);
             } else {
                 var blockEntity = level.getBlockEntity(pos);
                 if (!PaintEvents.isPaintable(blockEntity)) continue;

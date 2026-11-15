@@ -29,8 +29,23 @@ public record PaintSyncPayload(List<Entry> entries) implements CustomPacketPaylo
             return new Entry(pos, PaintColors.toId(variant), false);
         }
 
+        /** Added to a colour id: the glass pane is tinted. */
+        public static final int TINTED = 0x100;
+
         public static Entry inWorld(BlockPos pos, Paint variant) {
             return new Entry(pos, PaintColors.toId(variant), true);
+        }
+
+        public static Entry inWorld(BlockPos pos, Paint variant, boolean tinted) {
+            return new Entry(pos, PaintColors.toId(variant) | (tinted ? TINTED : 0), true);
+        }
+
+        public boolean tinted() {
+            return (color & TINTED) != 0;
+        }
+
+        public int colorId() {
+            return color & ~TINTED;
         }
     }
 

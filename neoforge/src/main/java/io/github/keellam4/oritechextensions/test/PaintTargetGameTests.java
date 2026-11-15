@@ -240,4 +240,29 @@ public class PaintTargetGameTests {
     private static Paint colour(ServerLevel level, BlockPos pos) {
         return PipePaintData.get(level).getOrDefault(pos);
     }
+
+    /** Painting glass its own colour again tints the pane; once more clears the tint; repainting keeps it tinted. */
+    @net.minecraft.gametest.framework.GameTest(template = "empty_tall", timeoutTicks = 40)
+    public static void glassTintToggles(net.minecraft.gametest.framework.GameTestHelper helper) {
+        var a = new net.minecraft.core.BlockPos(2, 1, 2);
+        helper.setBlock(a, rearth.oritech.init.BlockContent.INDUSTRIAL_GLASS_BLOCK);
+        helper.setBlock(a.east(), rearth.oritech.init.BlockContent.INDUSTRIAL_GLASS_BLOCK);
+        var level = helper.getLevel();
+        var target = io.github.keellam4.oritechextensions.paint.targets.WorldPaintTarget.GLASS;
+        var pos = helper.absolutePos(a);
+        var data = io.github.keellam4.oritechextensions.paint.PipePaintData.get(level);
+        var white = io.github.keellam4.oritechextensions.paint.Paint.WHITE;
+        target.apply(level, target.group(level, pos), white, 100);
+        if (data.isTinted(pos)) helper.fail("the first coat paints the frame only");
+        target.apply(level, target.group(level, pos), white, 100);
+        if (!data.isTinted(pos) || !data.isTinted(pos.east())) helper.fail("a second coat of the same colour tints the whole pane");
+        target.apply(level, target.group(level, pos), io.github.keellam4.oritechextensions.paint.Paint.SCULK, 100);
+        if (!data.isTinted(pos) || data.getOrDefault(pos) != io.github.keellam4.oritechextensions.paint.Paint.SCULK) helper.fail("repainting keeps the tint");
+        target.apply(level, target.group(level, pos), io.github.keellam4.oritechextensions.paint.Paint.SCULK, 100);
+        if (data.isTinted(pos)) helper.fail("painting the same colour again clears the tint");
+        data.setTinted(pos, true);
+        data.remove(pos);
+        if (data.isTinted(pos)) helper.fail("an unpainted block can't stay tinted");
+        helper.succeed();
+    }
 }
