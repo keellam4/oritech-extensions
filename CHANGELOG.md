@@ -5,7 +5,8 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
-- **Quad Vault and Grid Vault.** Four or sixteen glass windows, one item type each, sharing the vault's space. Click the window you want to put items in or take them out. Pipes see one slot per window.
+- **Dual, Quad and Grid Vaults.** Two, four or sixteen glass windows, one item type each, sharing the vault's space. Click the window you want to put items in or take them out. Pipes see one slot per window.
+- **Compacting Vault.** Stores one item in up to three forms found from crafting recipes (nuggets, ingots and blocks; clay balls and clay; and so on). Put in or take out any form and it converts.
 - **Vault readout.** Aim at any vault's window to see its item and how many it holds out of how many fit.
 - **Cargo Vault.** Bulk storage for one item type (64 stacks by default, `cargoVaultStacks`). The item floats in the vault's glass front with its count, and the neon strip above it fills up as the vault does. Right-click to put items in (twice quickly, or with an empty hand, for every matching item), left-click the front to take a stack (sneak: one), sneak + right-click with an empty hand to lock the item type. Pipes and comparators work with it. Breaking it keeps its items and paint. Touching vaults paint together.
 - **Detailing Tool.** A paintbrush that holds Color Cartridges: right-click them onto it in your inventory (up to 64 of each colour, Rainbow included). Sneak + scroll switches colour, sneak + right-click a block picks its colour, sneak + right-click the air switches between Group, Single block and Area mode. Area mode paints everything in a box between two clicked corners (up to 32 blocks a side, `detailingToolAreaSize`). Paints everything cartridges paint, plus Oritech's own machines, at the same cost. Crafted from an adamant, a steel and a nickel ingot.

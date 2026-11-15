@@ -1,7 +1,7 @@
 ---
 title: Cargo Vault
 icon: oritech_extensions:cargo_vault
-related_items: ["oritech_extensions:cargo_vault", "oritech_extensions:quad_vault", "oritech_extensions:grid_vault", "oritech_extensions:detailing_tool"]
+related_items: ["oritech_extensions:cargo_vault", "oritech_extensions:quad_vault", "oritech_extensions:grid_vault", "oritech_extensions:dual_vault", "oritech_extensions:compacting_vault", "oritech_extensions:detailing_tool"]
 ---
 
 # Cargo Vault
@@ -28,11 +28,17 @@ A **locked** vault keeps its item type when it's empty, so it only ever takes th
 
 64 stacks of its item by default: 4,096 of an item that stacks to 64, 1,024 of one that stacks to 16. Server owners can change it with `cargoVaultStacks` in the config.
 
-## Quad and Grid Vaults
+## Dual, Quad and Grid Vaults
 
-The **Quad Vault** has 4 windows and the **Grid Vault** 16, each holding its own item type. They share the vault's space: with the default config, a Quad window holds 16 stacks and a Grid window 4. Click the window you want: right-click puts items into it, left-click takes from it. An item type only ever lives in one window, so a second stack of iron joins the iron window instead of starting a new one.
+The **Dual Vault** has 2 windows, the **Quad Vault** 4 and the **Grid Vault** 16, each holding its own item type. They share the vault's space: with the default config, a Dual window holds 32 stacks, a Quad window 16 and a Grid window 4. Click the window you want: right-click puts items into it, left-click takes from it. An item type only ever lives in one window, so a second stack of iron joins the iron window instead of starting a new one.
 
-Crafting: four Cargo Vaults in a square make a Quad Vault. Four Quad Vaults in the corners, Steel Ingots on the sides and a Processing Unit in the middle make a Grid Vault.
+Crafting: two Cargo Vaults stacked make a Dual Vault, four in a square make a Quad Vault. Four Quad Vaults in the corners, Steel Ingots on the sides and a Processing Unit in the middle make a Grid Vault.
+
+## Compacting Vault
+
+The **Compacting Vault** stores one item in up to three forms, worked out from crafting recipes the first time something goes in: iron nuggets, ingots and blocks; clay balls and clay; and so on. The wide top window shows the biggest form, the two below the smaller ones, all counting the same stock. Put in any form and take out any form: take a block and the ingot and nugget counts drop to match. It holds as much as a Cargo Vault holds of the middle form (4,096 ingots by default). An item with no such recipes is simply kept in the top window.
+
+Crafting: Steel Ingot, Piston, Steel Ingot / Motor, Cargo Vault, Motor / Steel Ingot, Piston, Steel Ingot.
 
 ## Readout
 
