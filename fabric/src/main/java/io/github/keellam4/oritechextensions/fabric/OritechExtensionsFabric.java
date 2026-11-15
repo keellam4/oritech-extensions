@@ -53,6 +53,11 @@ public final class OritechExtensionsFabric implements ModInitializer {
         ItemStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultItemStorage(vault), ModContent.CARGO_VAULT_ENTITY.get());
         ItemStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultItemStorage(vault), ModContent.COMPACTING_VAULT_ENTITY.get());
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultFluidStorage(vault), ModContent.FLUID_VAULT_ENTITY.get());
+        net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((silo, side) -> new VaultFluidStorage(silo), ModContent.SILO_CONTROLLER_ENTITY.get());
+        net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlocks((level, pos, state, blockEntity, side) -> {
+            var silo = io.github.keellam4.oritechextensions.storage.SiloParts.controllerOf(level, pos);
+            return silo == null ? null : new VaultFluidStorage(silo);
+        }, ModContent.SILO_CASING.get(), ModContent.SILO_GLASS.get());
         ServerPlayNetworking.registerGlobalReceiver(DetailingToolPayload.TYPE,
                 (payload, context) -> DetailingTool.onScroll(context.player(), payload.direction()));
 
@@ -68,6 +73,9 @@ public final class OritechExtensionsFabric implements ModInitializer {
             entries.accept(ModContent.FLUID_VAULT_ITEM.get());
             entries.accept(ModContent.CARGO_CONTROLLER_ITEM.get());
             entries.accept(ModContent.CRAFTING_TERMINAL_ITEM.get());
+            entries.accept(ModContent.SILO_CONTROLLER_ITEM.get());
+            entries.accept(ModContent.SILO_CASING_ITEM.get());
+            entries.accept(ModContent.SILO_GLASS_ITEM.get());
             ModContent.VAULT_UPGRADES.values().forEach(upgrade -> entries.accept(upgrade.get()));
         });
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> {

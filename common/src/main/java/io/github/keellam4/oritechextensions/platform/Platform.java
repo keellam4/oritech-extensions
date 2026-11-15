@@ -58,7 +58,7 @@ public interface Platform {
 
     /** Fills or empties a held fluid container (buckets, tanks) from or into the Fluid Vault. Returns whether anything happened. */
     boolean interactWithFluidItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
-                                  io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity vault);
+                                  io.github.keellam4.oritechextensions.storage.NetworkTank vault);
 
     /** Fills the fluid handler at {@code pos} (reached from {@code side}) with up to {@code max} millibuckets. Returns how much went in. */
     long insertFluid(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side,

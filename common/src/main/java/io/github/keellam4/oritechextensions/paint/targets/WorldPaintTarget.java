@@ -65,6 +65,13 @@ public final class WorldPaintTarget implements PaintTarget {
                     || block instanceof io.github.keellam4.oritechextensions.storage.CargoControllerBlock ? "cargo_vault" : null,
             Config::maxPaintGroupSize, 1);
 
+    /** Fluid Silo casing, glass and controller: one click paints the whole silo. */
+    public static final WorldPaintTarget SILO = new WorldPaintTarget(
+            block -> block instanceof io.github.keellam4.oritechextensions.storage.SiloParts.Casing
+                    || block instanceof io.github.keellam4.oritechextensions.storage.SiloParts.Glass
+                    || block instanceof io.github.keellam4.oritechextensions.storage.SiloControllerBlock ? "fluid_silo" : null,
+            Config::maxPaintGroupSize, 1);
+
     /** Pipe Boosters: one block per click, and a new booster doesn't take over its neighbours' colour. */
     public static final WorldPaintTarget PIPE_BOOSTER = new WorldPaintTarget(
             block -> block == BlockContent.PIPE_BOOSTER_BLOCK ? "pipe_booster" : null, () -> 1, 1, false, false);

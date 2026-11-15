@@ -10,6 +10,9 @@
     "oritech_extensions:dual_compacting_vault",
     "oritech_extensions:fluid_vault",
     "oritech_extensions:cargo_controller",
-    "oritech_extensions:crafting_terminal"
+    "oritech_extensions:crafting_terminal",
+    "oritech_extensions:silo_casing",
+    "oritech_extensions:silo_glass",
+    "oritech_extensions:silo_controller"
   ]
 }

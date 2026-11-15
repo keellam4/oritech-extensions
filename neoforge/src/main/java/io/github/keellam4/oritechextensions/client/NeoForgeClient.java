@@ -61,6 +61,7 @@ public final class NeoForgeClient {
         event.registerBlockEntityRenderer(ModContent.CARGO_VAULT_ENTITY.get(), CargoVaultRenderer::new);
         event.registerBlockEntityRenderer(ModContent.COMPACTING_VAULT_ENTITY.get(), CargoVaultRenderer::new);
         event.registerBlockEntityRenderer(ModContent.FLUID_VAULT_ENTITY.get(), CargoVaultRenderer::new);
+        event.registerBlockEntityRenderer(ModContent.SILO_CONTROLLER_ENTITY.get(), NeoSiloRenderer::new);
     }
 
     /**

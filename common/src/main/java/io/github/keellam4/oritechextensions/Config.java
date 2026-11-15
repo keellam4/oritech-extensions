@@ -55,6 +55,10 @@ public class Config {
             .comment("How many buckets one Fluid Vault holds before capacity upgrades.")
             .defineInRange("fluidVaultBuckets", 256, 1, 100000);
 
+    public static final ModConfigSpec.IntValue SILO_BUCKETS_PER_BLOCK = BUILDER
+            .comment("How many buckets a Fluid Silo holds per block of its size (a 3 x 3 x 5 silo is 45 blocks).")
+            .defineInRange("siloBucketsPerBlock", 1000, 1, 100000);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     /** How many extension blocks may be attached to one door. Safe to call before the config has loaded. */
@@ -89,5 +93,9 @@ public class Config {
 
     public static int fluidVaultBuckets() {
         return SPEC.isLoaded() ? FLUID_VAULT_BUCKETS.get() : FLUID_VAULT_BUCKETS.getDefault();
+    }
+
+    public static int siloBucketsPerBlock() {
+        return SPEC.isLoaded() ? SILO_BUCKETS_PER_BLOCK.get() : SILO_BUCKETS_PER_BLOCK.getDefault();
     }
 }

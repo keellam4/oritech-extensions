@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SNS",
+    "N N",
+    "SNS"
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "N": {
+      "item": "oritech:nickel_ingot"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:silo_casing",
+    "count": 8
+  }
+}

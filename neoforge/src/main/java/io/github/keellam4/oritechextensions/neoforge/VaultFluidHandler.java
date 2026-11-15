@@ -1,11 +1,11 @@
 package io.github.keellam4.oritechextensions.neoforge;
 
-import io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity;
+import io.github.keellam4.oritechextensions.storage.NetworkTank;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
-/** Lets pipes, buckets and other mods reach a Fluid Vault: one tank. */
-public record VaultFluidHandler(FluidVaultBlockEntity vault) implements IFluidHandler {
+/** Lets pipes, buckets and other mods reach a Fluid Vault or Fluid Silo: one tank. */
+public record VaultFluidHandler(NetworkTank vault) implements IFluidHandler {
 
     @Override
     public int getTanks() {

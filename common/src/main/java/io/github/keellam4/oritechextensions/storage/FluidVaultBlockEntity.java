@@ -17,7 +17,7 @@ import net.minecraft.world.level.material.Fluids;
  * The Fluid Vault: a tank for one fluid, with the same look, readout, paint and upgrades as the item vaults.
  * Amounts are millibuckets. It holds no items, so the item side of {@link CargoVaultBlockEntity} stays empty.
  */
-public class FluidVaultBlockEntity extends CargoVaultBlockEntity {
+public class FluidVaultBlockEntity extends CargoVaultBlockEntity implements NetworkTank {
 
     private Fluid fluid = Fluids.EMPTY;
     private long amount;
@@ -221,5 +221,10 @@ public class FluidVaultBlockEntity extends CargoVaultBlockEntity {
     public void removeComponentsFromTag(CompoundTag tag) {
         super.removeComponentsFromTag(tag);
         tag.remove("fluid");
+    }
+
+    @Override
+    public boolean tankRemoved() {
+        return isRemoved();
     }
 }

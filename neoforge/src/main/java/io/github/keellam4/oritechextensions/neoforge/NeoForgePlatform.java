@@ -105,7 +105,7 @@ public final class NeoForgePlatform implements Platform {
 
     @Override
     public boolean interactWithFluidItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
-                                         io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity vault) {
+                                         io.github.keellam4.oritechextensions.storage.NetworkTank vault) {
         var held = player.getItemInHand(hand);
         if (player.level().isClientSide()) return net.neoforged.neoforge.fluids.FluidUtil.getFluidHandler(held).isPresent();
         return net.neoforged.neoforge.fluids.FluidUtil.interactWithFluidHandler(player, hand, new VaultFluidHandler(vault));

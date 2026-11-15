@@ -102,7 +102,7 @@ public final class FabricPlatform implements Platform {
 
     @Override
     public boolean interactWithFluidItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
-                                         io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity vault) {
+                                         io.github.keellam4.oritechextensions.storage.NetworkTank vault) {
         if (player.level().isClientSide()) {
             return net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext.forPlayerInteraction(player, hand)
                     .find(net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.ITEM) != null;

@@ -28,7 +28,8 @@
       "io.github.keellam4.oritechextensions.test.CargoVaultGameTests",
       "io.github.keellam4.oritechextensions.test.VaultUpgradeGameTests",
       "io.github.keellam4.oritechextensions.test.FluidVaultGameTests",
-      "io.github.keellam4.oritechextensions.test.CargoControllerGameTests"
+      "io.github.keellam4.oritechextensions.test.CargoControllerGameTests",
+      "io.github.keellam4.oritechextensions.test.FluidSiloGameTests"
     ]
   },
   "mixins": [

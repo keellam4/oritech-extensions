@@ -123,6 +123,34 @@ public final class ModContent {
             BuiltInRegistries.BLOCK_ENTITY_TYPE, "cargo_controller",
             () -> BlockEntityType.Builder.of(io.github.keellam4.oritechextensions.storage.CargoControllerBlockEntity::new, CARGO_CONTROLLER.get(), CRAFTING_TERMINAL.get()).build(null));
 
+    // ---------------------------------------------------------------- Fluid Silo
+
+    public static final Supplier<io.github.keellam4.oritechextensions.storage.SiloParts.Casing> SILO_CASING = PLATFORM.register(BuiltInRegistries.BLOCK, "silo_casing",
+            () -> new io.github.keellam4.oritechextensions.storage.SiloParts.Casing(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f).sound(SoundType.METAL)));
+
+    public static final Supplier<BlockItem> SILO_CASING_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "silo_casing",
+            () -> new BlockItem(SILO_CASING.get(), new Item.Properties()));
+
+    public static final Supplier<io.github.keellam4.oritechextensions.storage.SiloParts.Glass> SILO_GLASS = PLATFORM.register(BuiltInRegistries.BLOCK, "silo_glass",
+            () -> new io.github.keellam4.oritechextensions.storage.SiloParts.Glass(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f)
+                    .sound(SoundType.GLASS).noOcclusion().isViewBlocking((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false).isRedstoneConductor((state, level, pos) -> false)));
+
+    public static final Supplier<BlockItem> SILO_GLASS_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "silo_glass",
+            () -> new BlockItem(SILO_GLASS.get(), new Item.Properties()));
+
+    public static final Supplier<io.github.keellam4.oritechextensions.storage.SiloControllerBlock> SILO_CONTROLLER = PLATFORM.register(
+            BuiltInRegistries.BLOCK, "silo_controller", () -> new io.github.keellam4.oritechextensions.storage.SiloControllerBlock(
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f).sound(SoundType.METAL)));
+
+    public static final Supplier<io.github.keellam4.oritechextensions.storage.SiloControllerItem> SILO_CONTROLLER_ITEM = PLATFORM.register(
+            BuiltInRegistries.ITEM, "silo_controller",
+            () -> new io.github.keellam4.oritechextensions.storage.SiloControllerItem(SILO_CONTROLLER.get(), new Item.Properties().stacksTo(1)));
+
+    public static final Supplier<BlockEntityType<io.github.keellam4.oritechextensions.storage.SiloControllerBlockEntity>> SILO_CONTROLLER_ENTITY = PLATFORM.register(
+            BuiltInRegistries.BLOCK_ENTITY_TYPE, "silo_controller",
+            () -> BlockEntityType.Builder.of(io.github.keellam4.oritechextensions.storage.SiloControllerBlockEntity::new, SILO_CONTROLLER.get()).build(null));
+
     public static final Supplier<net.minecraft.world.inventory.MenuType<io.github.keellam4.oritechextensions.storage.TerminalMenu>> TERMINAL_MENU =
             PLATFORM.register(BuiltInRegistries.MENU, "cargo_terminal",
                     () -> PLATFORM.menuType(io.github.keellam4.oritechextensions.storage.TerminalMenu::new));

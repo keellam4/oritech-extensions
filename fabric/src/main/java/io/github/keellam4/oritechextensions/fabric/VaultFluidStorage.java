@@ -1,7 +1,7 @@
 package io.github.keellam4.oritechextensions.fabric;
 
 import io.github.keellam4.oritechextensions.storage.FluidContents;
-import io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity;
+import io.github.keellam4.oritechextensions.storage.NetworkTank;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
@@ -9,14 +9,14 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 
-/** Lets pipes, buckets and other mods reach a Fluid Vault through Fabric's transfer API (droplets: 81 per millibucket). */
+/** Lets pipes, buckets and other mods reach a Fluid Vault or Fluid Silo through Fabric's transfer API (droplets: 81 per millibucket). */
 public final class VaultFluidStorage extends SnapshotParticipant<FluidContents> implements SingleSlotStorage<FluidVariant> {
 
     static final long DROPLETS_PER_MB = FluidConstants.BUCKET / 1000;
 
-    private final FluidVaultBlockEntity vault;
+    private final NetworkTank vault;
 
-    public VaultFluidStorage(FluidVaultBlockEntity vault) {
+    public VaultFluidStorage(NetworkTank vault) {
         this.vault = vault;
     }
 
