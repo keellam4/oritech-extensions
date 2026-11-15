@@ -1,0 +1,112 @@
+name: Announce on Discord
+
+# Posts a release announcement to Discord as a rich embed: the version, the changelog section, which loaders and
+# Minecraft version, and download links. Runs after the Release workflow succeeds, or by hand for an existing tag
+# (Actions → Announce on Discord → Run workflow), which is handy for testing.
+#
+# One-time setup:
+#   1. Discord: channel settings → Integrations → Webhooks → New Webhook → Copy Webhook URL.
+#   2. GitHub: Settings → Secrets and variables → Actions → New repository secret, name DISCORD_RELEASE_WEBHOOK.
+#   3. If the channel also gets GitHub's own "New release published" messages, untick "Releases" in that webhook
+#      (repository Settings → Webhooks) so each release is announced once.
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to announce, for example v0.4.1+fabric
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  announce:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.event.workflow_run.head_branch }}
+      WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.event.workflow_run.head_branch }}
+
+      - name: Post the announcement
+        run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "::warning::DISCORD_RELEASE_WEBHOOK isn't set; nothing posted."
+            exit 0
+          fi
+          gh release view "$TAG" --json url,isPrerelease,publishedAt > release.json
+          python3 - <<'PY'
+          import json, os, re, urllib.request
+
+          tag = os.environ["TAG"]
+          release = json.load(open("release.json"))
+          props = dict(line.split("=", 1) for line in open("gradle.properties", encoding="utf-8")
+                       if "=" in line and not line.startswith("#"))
+          minecraft = props.get("minecraft_version", "?").strip()
+          neoforge_version = props.get("mod_version", "").strip()
+          fabric_version = props.get("fabric_mod_version", "").strip()
+          name = tag.removeprefix("v")
+          if name.endswith("+fabric"):
+              version, loaders = name.removesuffix("+fabric"), ["Fabric"]
+          else:
+              version = name.split("+")[0]
+              loaders = ["NeoForge"] + (["Fabric"] if os.path.isdir("fabric") and fabric_version == neoforge_version else [])
+          if "+mc" in name:
+              minecraft = name.split("+mc", 1)[1]
+
+          # The changelog section for this tag (same lookup as the Release workflow).
+          text = open("CHANGELOG.md", encoding="utf-8").read()
+          section = ""
+          for candidate in dict.fromkeys([name, version]):
+              match = re.search(rf"^## \[{re.escape(candidate)}\][^\n]*\n(.*?)(?=^## |\Z)", text, re.S | re.M)
+              if match:
+                  section = match.group(1).strip()
+                  break
+
+          # Discord embeds don't show headings: make "### Added" bold, and keep it under the size limit.
+          lines = []
+          for line in section.splitlines():
+              heading = re.match(r"^#{2,4}\s+(.*)", line)
+              lines.append(f"**{heading.group(1)}**" if heading else line)
+          description = "\n".join(lines).strip() or "See the release page for details."
+          limit = 3800
+          if len(description) > limit:
+              description = description[:limit].rsplit("\n", 1)[0] + f"\n\n…[read the full changelog]({release['url']})"
+
+          repo = os.environ.get("GITHUB_REPOSITORY", "keellam4/oritech-extensions")
+          icon = f"https://raw.githubusercontent.com/{repo}/main/common/src/main/resources/icon.png"
+          modrinth_version = f"{version}+fabric" if loaders == ["Fabric"] else version
+          downloads = " · ".join([
+              f"[Modrinth](https://modrinth.com/mod/oritech-extensions/version/{modrinth_version})",
+              "[CurseForge](https://www.curseforge.com/minecraft/mc-mods/oritech-extensions/files)",
+              f"[GitHub]({release['url']})",
+          ])
+          embed = {
+              "title": f"Oritech Extensions {version}" + (" for Fabric" if loaders == ["Fabric"] else ""),
+              "url": release["url"],
+              "description": description,
+              "color": 0xE0913A,
+              "thumbnail": {"url": icon},
+              "fields": [
+                  {"name": "Minecraft", "value": minecraft, "inline": True},
+                  {"name": "Loaders", "value": " + ".join(loaders), "inline": True},
+                  {"name": "Channel", "value": "Beta" if release["isPrerelease"] else "Release", "inline": True},
+                  {"name": "Download", "value": downloads, "inline": False},
+              ],
+              "footer": {"text": repo},
+              "timestamp": release["publishedAt"],
+          }
+          payload = {"username": "Oritech Extensions", "avatar_url": icon, "embeds": [embed],
+                     "allowed_mentions": {"parse": []}}
+          request = urllib.request.Request(os.environ["WEBHOOK"], data=json.dumps(payload).encode(),
+                                           headers={"Content-Type": "application/json", "User-Agent": "oritech-extensions-release"})
+          with urllib.request.urlopen(request) as response:
+              print("Discord answered", response.status)
+          PY
