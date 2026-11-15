@@ -90,6 +90,19 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (stack.getItem() instanceof VaultUpgradeItem) {
+            // Holding an upgrade: put it straight into its slot.
+            if (!level.isClientSide()) {
+                int moved = vault.installUpgrade(stack);
+                if (moved > 0) {
+                    if (!player.getAbilities().instabuild) stack.shrink(moved);
+                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.ITEM_FRAME_ADD_ITEM, net.minecraft.sounds.SoundSource.BLOCKS, 0.7f, 1.2f);
+                } else {
+                    player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.oritech_extensions.cargo_vault.upgrade_full"), true);
+                }
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide());
+        }
         if (slotAt(state, pos, hit) < 0) {
             // Side or top: the upgrade screen.
             if (!level.isClientSide()) openUpgrades(vault, player);
@@ -105,9 +118,7 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault)) return InteractionResult.PASS;
         if (!level.isClientSide()) {
-            if (player.isShiftKeyDown()) {
-                CargoVault.toggleLock(vault, player);
-            } else if (slotAt(state, pos, hit) < 0) {
+            if (player.isShiftKeyDown() || slotAt(state, pos, hit) < 0) {
                 openUpgrades(vault, player);
             } else {
                 CargoVault.insertAll(level, vault, player);

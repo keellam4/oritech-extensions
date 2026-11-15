@@ -21,7 +21,8 @@ import java.util.WeakHashMap;
  * <ul>
  *     <li>Right-click with items: put the held stack in. Right-click again quickly: put in every matching item.</li>
  *     <li>Right-click with an empty hand: put in every matching item from the inventory.</li>
- *     <li>Sneak + right-click with an empty hand: lock the item type, so an empty vault keeps it.</li>
+ *     <li>Sneak + right-click with an empty hand, or right-click a side: the upgrade screen (with the lock).</li>
+ *     <li>Right-click with an upgrade: put it in its slot.</li>
  *     <li>Left-click the front: take a stack from the window under the crosshair. Sneak + left-click: take one.
  *     Break it from another side, or from the front once it's empty.</li>
  * </ul>

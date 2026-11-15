@@ -47,23 +47,26 @@ public class CargoVaultBlockEntity extends BlockEntity {
     /** The vault's size in stacks as the server sees it; synced so the client's gauges and readout match the server config. */
     private int syncedVaultStacks = -1;
 
-    /** The upgrade screen's four slots. */
+    /** The upgrade screen's slots, one per {@link VaultUpgrade.Kind}. */
     private final net.minecraft.world.SimpleContainer upgrades = new net.minecraft.world.SimpleContainer(UPGRADE_SLOTS) {
         @Override
         public int getMaxStackSize() {
-            return 1;
+            return VaultUpgrade.Kind.CAPACITY.limit();
         }
 
         @Override
         public boolean canPlaceItem(int slot, ItemStack stack) {
-            return stack.getItem() instanceof VaultUpgradeItem;
+            return stack.getItem() instanceof VaultUpgradeItem item && item.upgrade().kind().slot() == slot;
         }
     };
+    /** Sides (bits of {@link VaultSide}) the Pull and Push upgrades work on. */
+    private int pullSides = VaultSide.BACK.bit();
+    private int pushSides = VaultSide.BACK.bit();
     private int multiplier = 1;
     private final java.util.EnumSet<VaultUpgrade> installed = java.util.EnumSet.noneOf(VaultUpgrade.class);
     private int lastSignal;
 
-    public static final int UPGRADE_SLOTS = 4;
+    public static final int UPGRADE_SLOTS = VaultUpgrade.Kind.values().length;
 
     public CargoVaultBlockEntity(BlockPos pos, BlockState state) {
         this(ModContent.CARGO_VAULT_ENTITY.get(), pos, state);
@@ -116,7 +119,7 @@ public class CargoVaultBlockEntity extends BlockEntity {
         return installed.contains(upgrade);
     }
 
-    /** Capacity multiplier from the capacity upgrades: their multipliers add up (1 with none). */
+    /** Capacity multiplier from the capacity upgrades: their multipliers add up, so five Electrum make ×20 (1 with none). */
     public int multiplier() {
         return multiplier;
     }
@@ -124,7 +127,8 @@ public class CargoVaultBlockEntity extends BlockEntity {
     private static int multiplierOf(net.minecraft.world.Container container, int skipSlot) {
         int sum = 0;
         for (int i = 0; i < container.getContainerSize(); i++) {
-            if (i != skipSlot && container.getItem(i).getItem() instanceof VaultUpgradeItem item) sum += item.upgrade().multiplier();
+            var stack = container.getItem(i);
+            if (i != skipSlot && stack.getItem() instanceof VaultUpgradeItem item) sum += item.upgrade().multiplier() * stack.getCount();
         }
         return Math.max(1, sum);
     }
@@ -146,7 +150,47 @@ public class CargoVaultBlockEntity extends BlockEntity {
         changed();
     }
 
-    /** Whether taking the upgrade out of {@code slot} still leaves room for everything inside. */
+    public int pullSides() {
+        return pullSides;
+    }
+
+    public int pushSides() {
+        return pushSides;
+    }
+
+    /** Turns Pull ({@code push} false) or Push on or off for one side. */
+    public void toggleSide(boolean push, VaultSide side) {
+        if (push) pushSides ^= side.bit();
+        else pullSides ^= side.bit();
+        setChanged();
+    }
+
+    /** Puts an upgrade straight into its slot (right-clicking the vault with it). Returns how many went in. */
+    public int installUpgrade(ItemStack stack) {
+        if (!(stack.getItem() instanceof VaultUpgradeItem item)) return 0;
+        var kind = item.upgrade().kind();
+        var current = upgrades.getItem(kind.slot());
+        if (!current.isEmpty() && !ItemStack.isSameItemSameComponents(current, stack)) return 0;
+        int moved = Math.min(stack.getCount(), kind.limit() - current.getCount());
+        if (moved <= 0) return 0;
+        upgrades.setItem(kind.slot(), stack.copyWithCount(current.getCount() + moved));
+        return moved;
+    }
+
+    /** Older saves kept upgrades in any slot: move each to its kind's slot. */
+    private void sortUpgrades() {
+        for (int i = 0; i < UPGRADE_SLOTS; i++) {
+            var stack = upgrades.getItem(i);
+            if (!(stack.getItem() instanceof VaultUpgradeItem item)) continue;
+            int target = item.upgrade().kind().slot();
+            if (target != i && upgrades.getItem(target).isEmpty()) {
+                upgrades.getItems().set(target, stack);
+                upgrades.getItems().set(i, ItemStack.EMPTY);
+            }
+        }
+    }
+
+    /** Whether taking the upgrades out of {@code slot} still leaves room for everything inside. */
     public boolean canRemoveUpgrade(int slot) {
         if (!(upgrades.getItem(slot).getItem() instanceof VaultUpgradeItem item) || !item.upgrade().isCapacity()) return true;
         return fitsWith(multiplierOf(upgrades, slot));
@@ -379,7 +423,7 @@ public class CargoVaultBlockEntity extends BlockEntity {
 
     // ---------------------------------------------------------------- Pull and Push
 
-    /** Server tick: Pull and Push upgrades move items with the inventory behind the vault, once a second. */
+    /** Server tick: Pull and Push upgrades move a stack with the inventories on their picked sides, once a second. */
     public static void tick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, CargoVaultBlockEntity vault) {
         if (!(level instanceof ServerLevel server) || (level.getGameTime() + pos.asLong()) % 20 != 0) return;
         boolean pull = vault.has(VaultUpgrade.PULL);
@@ -388,48 +432,41 @@ public class CargoVaultBlockEntity extends BlockEntity {
         if (vault.has(VaultUpgrade.REDSTONE) && level.hasNeighborSignal(pos)) return;
 
         var facing = state.getValue(CargoVaultBlock.FACING);
-        var behind = pos.relative(facing.getOpposite());
         var platform = io.github.keellam4.oritechextensions.platform.Platform.INSTANCE;
         if (push) {
-            for (int i = 0; i < vault.slots(); i++) {
-                var offer = vault.extract(i, 64, true);
-                if (offer.isEmpty()) continue;
-                int moved = platform.insertItem(server, behind, facing, offer, false);
-                if (moved > 0) {
-                    vault.extract(i, moved, false);
-                    break;
+            push:
+            for (var side : VaultSide.values()) {
+                if ((vault.pushSides & side.bit()) == 0) continue;
+                var direction = side.toDirection(facing);
+                var target = pos.relative(direction);
+                for (int i = 0; i < vault.slots(); i++) {
+                    var offer = vault.extract(i, 64, true);
+                    if (offer.isEmpty()) continue;
+                    int moved = platform.insertItem(server, target, direction.getOpposite(), offer, false);
+                    if (moved > 0) {
+                        vault.extract(i, moved, false);
+                        break push;
+                    }
                 }
             }
         }
         if (pull && vault.hasAnyItemType()) {
-            var taken = platform.extractItem(server, behind, facing, stack -> vault.slotOf(stack) >= 0 && vault.roomFor(stack) > 0, 64, true);
-            if (!taken.isEmpty()) {
+            for (var side : VaultSide.values()) {
+                if ((vault.pullSides & side.bit()) == 0) continue;
+                var direction = side.toDirection(facing);
+                var target = pos.relative(direction);
+                var taken = platform.extractItem(server, target, direction.getOpposite(),
+                        stack -> vault.slotOf(stack) >= 0 && vault.roomFor(stack) > 0, 64, true);
+                if (taken.isEmpty()) continue;
                 int fits = Math.min(taken.getCount(), vault.roomFor(taken));
-                if (fits > 0) {
-                    var real = platform.extractItem(server, behind, facing, stack -> ItemStack.isSameItemSameComponents(stack, taken), fits, false);
-                    if (!real.isEmpty()) vault.insert(real, false);
+                if (fits <= 0) continue;
+                var real = platform.extractItem(server, target, direction.getOpposite(), stack -> ItemStack.isSameItemSameComponents(stack, taken), fits, false);
+                if (!real.isEmpty()) {
+                    vault.insert(real, false);
+                    break;
                 }
             }
         }
-    }
-
-    // ---------------------------------------------------------------- paint on the item
-
-    @Nullable
-    public Paint takePlacedPaint() {
-        var paint = placedPaint;
-        placedPaint = null;
-        return paint;
-    }
-
-    public void rememberPaint(Paint paint) {
-        brokenPaint = paint;
-    }
-
-    private Paint currentPaint() {
-        if (brokenPaint != null) return brokenPaint;
-        if (level instanceof ServerLevel server) return PipePaintData.get(server).getOrDefault(worldPosition);
-        return Paint.ORANGE;
     }
 
     // ---------------------------------------------------------------- saving and syncing
@@ -439,6 +476,8 @@ public class CargoVaultBlockEntity extends BlockEntity {
         super.saveAdditional(tag, registries);
         writeContents(tag, registries);
         tag.put("upgrades", upgrades.createTag(registries));
+        tag.putInt("pull_sides", pullSides);
+        tag.putInt("push_sides", pushSides);
     }
 
     @Override
@@ -447,8 +486,11 @@ public class CargoVaultBlockEntity extends BlockEntity {
         load(VaultContents.CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), tag.get("vault"))
                 .result().orElse(VaultContents.EMPTY));
         syncedVaultStacks = tag.contains("vault_stacks", Tag.TAG_INT) ? tag.getInt("vault_stacks") : -1;
+        if (tag.contains("pull_sides", Tag.TAG_INT)) pullSides = tag.getInt("pull_sides");
+        if (tag.contains("push_sides", Tag.TAG_INT)) pushSides = tag.getInt("push_sides");
         if (tag.contains("upgrades", Tag.TAG_LIST)) {
             upgrades.fromTag(tag.getList("upgrades", Tag.TAG_COMPOUND), registries);
+            sortUpgrades();
             upgradesChanged(false);
         }
     }
