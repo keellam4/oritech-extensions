@@ -75,6 +75,12 @@ public final class NeoForgePlatform implements Platform {
     }
 
     @Override
+    public net.minecraft.world.item.CreativeModeTab creativeTab(net.minecraft.network.chat.Component title,
+            java.util.function.Supplier<net.minecraft.world.item.ItemStack> icon, net.minecraft.world.item.CreativeModeTab.DisplayItemsGenerator items) {
+        return net.minecraft.world.item.CreativeModeTab.builder().title(title).icon(icon).displayItems(items).build();
+    }
+
+    @Override
     public <T extends net.minecraft.world.inventory.AbstractContainerMenu> net.minecraft.world.inventory.MenuType<T> menuType(
             java.util.function.BiFunction<Integer, net.minecraft.world.entity.player.Inventory, T> factory) {
         return net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create((id, inventory, data) -> factory.apply(id, inventory));

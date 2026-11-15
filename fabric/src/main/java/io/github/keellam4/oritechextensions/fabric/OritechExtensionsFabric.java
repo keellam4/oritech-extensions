@@ -62,35 +62,6 @@ public final class OritechExtensionsFabric implements ModInitializer {
         ServerPlayNetworking.registerGlobalReceiver(DetailingToolPayload.TYPE,
                 (payload, context) -> DetailingTool.onScroll(context.player(), payload.direction()));
 
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> entries.accept(ModContent.HANGAR_DOOR_EXTENSION_ITEM.get()));
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.BUILDING_BLOCKS).register(entries -> entries.accept(ModContent.HANGAR_DOOR_EXTENSION_ITEM.get()));
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> {
-            entries.accept(ModContent.CARGO_VAULT_ITEM.get());
-            entries.accept(ModContent.DUAL_VAULT_ITEM.get());
-            entries.accept(ModContent.QUAD_VAULT_ITEM.get());
-            entries.accept(ModContent.GRID_VAULT_ITEM.get());
-            entries.accept(ModContent.COMPACTING_VAULT_ITEM.get());
-            entries.accept(ModContent.DUAL_COMPACTING_VAULT_ITEM.get());
-            entries.accept(ModContent.FLUID_VAULT_ITEM.get());
-            entries.accept(ModContent.CARGO_CONTROLLER_ITEM.get());
-            entries.accept(ModContent.CRAFTING_TERMINAL_ITEM.get());
-            entries.accept(ModContent.SILO_CONTROLLER_ITEM.get());
-            entries.accept(ModContent.SILO_CASING_ITEM.get());
-            entries.accept(ModContent.SILO_GLASS_ITEM.get());
-            entries.accept(ModContent.PARTITION_UPGRADE_1.get());
-            entries.accept(ModContent.PARTITION_UPGRADE_2.get());
-            entries.accept(ModContent.PARTITION_MATRIX.get());
-            entries.accept(ModContent.INDUCTION_PYLON_ITEM.get());
-            entries.accept(ModContent.INDUCTION_PYLON_OBELISK_ITEM.get());
-            entries.accept(ModContent.INDUCTION_PYLON_RINGS_ITEM.get());
-            ModContent.VAULT_UPGRADES.values().forEach(upgrade -> entries.accept(upgrade.get()));
-        });
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> {
-            entries.accept(ModContent.GUIDE.get());
-            entries.accept(ModContent.DETAILING_TOOL.get());
-            entries.accept(ModContent.RAINBOW_CARTRIDGE.get());
-        });
-
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             var stack = player.getItemInHand(hand);
             PaintEvents.onRightClickBlock(level, player, stack);

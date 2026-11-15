@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "oritech_extensions:transparent_fluid_pipe"
+    }
+  ],
+  "result": {
+    "id": "oritech:fluid_pipe",
+    "count": 1
+  }
+}

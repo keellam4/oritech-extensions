@@ -101,6 +101,7 @@
       "textures": [
         "oritech:block/item_pipe",
         "oritech:block/transparent_item_pipe",
+        "oritech_extensions:block/transparent_fluid_pipe",
         "oritech:block/item_pipe_duct_block",
         "oritech:block/fluid_pipe_duct_block"
       ],
@@ -484,6 +485,11 @@
       "type": "minecraft:single",
       "resource": "oritech_extensions:rainbow/oritech/block/transparent_item_pipe",
       "sprite": "oritech:block/transparent_item_pipe_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/transparent_fluid_pipe",
+      "sprite": "oritech_extensions:block/transparent_fluid_pipe_paint_rainbow"
     },
     {
       "type": "minecraft:single",

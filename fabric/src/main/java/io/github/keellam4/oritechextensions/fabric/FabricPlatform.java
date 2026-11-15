@@ -64,6 +64,12 @@ public final class FabricPlatform implements Platform {
     }
 
     @Override
+    public net.minecraft.world.item.CreativeModeTab creativeTab(net.minecraft.network.chat.Component title,
+            java.util.function.Supplier<net.minecraft.world.item.ItemStack> icon, net.minecraft.world.item.CreativeModeTab.DisplayItemsGenerator items) {
+        return net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup.builder().title(title).icon(icon).displayItems(items).build();
+    }
+
+    @Override
     public <T extends net.minecraft.world.inventory.AbstractContainerMenu> net.minecraft.world.inventory.MenuType<T> menuType(
             java.util.function.BiFunction<Integer, net.minecraft.world.entity.player.Inventory, T> factory) {
         return new net.minecraft.world.inventory.MenuType<>(factory::apply, net.minecraft.world.flag.FeatureFlags.VANILLA_SET);

@@ -251,4 +251,49 @@ public final class ModContent {
     /** Forces the fields above to register. */
     public static void init() {
     }
+
+    // ---------------------------------------------------------------- Transparent Fluid Pipe
+
+    public static final Supplier<io.github.keellam4.oritechextensions.pipes.TransparentFluidPipeBlock> TRANSPARENT_FLUID_PIPE = PLATFORM.register(
+            BuiltInRegistries.BLOCK, "transparent_fluid_pipe", () -> new io.github.keellam4.oritechextensions.pipes.TransparentFluidPipeBlock(
+                    BlockBehaviour.Properties.ofFullCopy(rearth.oritech.init.BlockContent.TRANSPARENT_ITEM_PIPE)));
+
+    public static final Supplier<io.github.keellam4.oritechextensions.pipes.TransparentFluidPipeConnectionBlock> TRANSPARENT_FLUID_PIPE_CONNECTION = PLATFORM.register(
+            BuiltInRegistries.BLOCK, "transparent_fluid_pipe_connection", () -> new io.github.keellam4.oritechextensions.pipes.TransparentFluidPipeConnectionBlock(
+                    BlockBehaviour.Properties.ofFullCopy(rearth.oritech.init.BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION)));
+
+    public static final Supplier<BlockItem> TRANSPARENT_FLUID_PIPE_ITEM = PLATFORM.register(BuiltInRegistries.ITEM, "transparent_fluid_pipe",
+            () -> new BlockItem(TRANSPARENT_FLUID_PIPE.get(), new Item.Properties()));
+
+    // ---------------------------------------------------------------- creative tab
+
+    /** The mod's own creative tab (JEI and EMI list what's in it). */
+    public static final Supplier<net.minecraft.world.item.CreativeModeTab> CREATIVE_TAB = PLATFORM.register(BuiltInRegistries.CREATIVE_MODE_TAB, "main",
+            () -> PLATFORM.creativeTab(net.minecraft.network.chat.Component.translatable("itemGroup.oritech_extensions"),
+                    () -> new net.minecraft.world.item.ItemStack(CARGO_VAULT_ITEM.get()), (parameters, output) -> {
+                        output.accept(GUIDE.get());
+                        output.accept(DETAILING_TOOL.get());
+                        output.accept(RAINBOW_CARTRIDGE.get());
+                        output.accept(HANGAR_DOOR_EXTENSION_ITEM.get());
+                        output.accept(TRANSPARENT_FLUID_PIPE_ITEM.get());
+                        output.accept(CARGO_VAULT_ITEM.get());
+                        output.accept(DUAL_VAULT_ITEM.get());
+                        output.accept(QUAD_VAULT_ITEM.get());
+                        output.accept(GRID_VAULT_ITEM.get());
+                        output.accept(COMPACTING_VAULT_ITEM.get());
+                        output.accept(DUAL_COMPACTING_VAULT_ITEM.get());
+                        output.accept(FLUID_VAULT_ITEM.get());
+                        output.accept(CARGO_CONTROLLER_ITEM.get());
+                        output.accept(CRAFTING_TERMINAL_ITEM.get());
+                        VAULT_UPGRADES.values().forEach(upgrade -> output.accept(upgrade.get()));
+                        output.accept(SILO_CONTROLLER_ITEM.get());
+                        output.accept(SILO_CASING_ITEM.get());
+                        output.accept(SILO_GLASS_ITEM.get());
+                        output.accept(PARTITION_UPGRADE_1.get());
+                        output.accept(PARTITION_UPGRADE_2.get());
+                        output.accept(PARTITION_MATRIX.get());
+                        output.accept(INDUCTION_PYLON_ITEM.get());
+                        output.accept(INDUCTION_PYLON_OBELISK_ITEM.get());
+                        output.accept(INDUCTION_PYLON_RINGS_ITEM.get());
+                    }));
 }

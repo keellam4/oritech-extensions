@@ -240,4 +240,20 @@ public class PipePaintGameTests {
 
         helper.succeed();
     }
+
+    /** The Transparent Fluid Pipe is an Oritech fluid pipe: its connection block gets a fluid pipe block entity, and it paints with fluid pipes. */
+    @net.minecraft.gametest.framework.GameTest(template = "empty_tall", timeoutTicks = 40)
+    public static void transparentFluidPipeIsAFluidPipe(net.minecraft.gametest.framework.GameTestHelper helper) {
+        var pos = new net.minecraft.core.BlockPos(2, 1, 2);
+        helper.setBlock(pos, io.github.keellam4.oritechextensions.ModContent.TRANSPARENT_FLUID_PIPE_CONNECTION.get());
+        if (!(helper.getBlockEntity(pos) instanceof rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity)) {
+            helper.fail("the connection block should have Oritech's fluid pipe block entity");
+        }
+        var family = io.github.keellam4.oritechextensions.paint.PipePaint.familyOf(io.github.keellam4.oritechextensions.ModContent.TRANSPARENT_FLUID_PIPE.get());
+        if (family != io.github.keellam4.oritechextensions.paint.PipePaint.Family.FLUID) helper.fail("it should paint with fluid pipes, is " + family);
+        if (!rearth.oritech.init.BlockContent.FLUID_PIPE.defaultBlockState().getBlock().getClass().isInstance(io.github.keellam4.oritechextensions.ModContent.TRANSPARENT_FLUID_PIPE.get())) {
+            helper.fail("it should be an Oritech fluid pipe");
+        }
+        helper.succeed();
+    }
 }
