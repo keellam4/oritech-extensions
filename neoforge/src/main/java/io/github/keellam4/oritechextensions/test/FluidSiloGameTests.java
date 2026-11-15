@@ -79,4 +79,18 @@ public class FluidSiloGameTests {
         if (contents.size() != 1 || contents.get(0).fluid() != Fluids.LAVA) helper.fail("the terminal should list the lava, lists " + contents);
         helper.succeed();
     }
+
+    /** Any casing or glass block finds its controller (for buckets and pipes), and one paint group is the whole silo. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void anyBlockReachesTheSilo(GameTestHelper helper) {
+        var silo = build(helper, 3);
+        var topGlass = helper.absolutePos(new BlockPos(2, 3, 1));
+        var corner = helper.absolutePos(new BlockPos(3, 3, 3));
+        if (io.github.keellam4.oritechextensions.storage.SiloParts.controllerOf(helper.getLevel(), topGlass) != silo) helper.fail("the top glass should find the controller");
+        if (io.github.keellam4.oritechextensions.storage.SiloParts.controllerOf(helper.getLevel(), corner) != silo) helper.fail("the far corner should find the controller");
+        if (io.github.keellam4.oritechextensions.storage.SiloParts.controllerOf(helper.getLevel(), corner.above()) != null) helper.fail("air above the silo isn't part of it");
+        int group = io.github.keellam4.oritechextensions.paint.targets.WorldPaintTarget.SILO.group(helper.getLevel(), topGlass).size();
+        if (group != 27) helper.fail("painting should cover the whole 3x3x3 silo, covers " + group);
+        helper.succeed();
+    }
 }
