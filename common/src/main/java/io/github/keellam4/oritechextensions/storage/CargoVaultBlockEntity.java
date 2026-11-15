@@ -469,6 +469,25 @@ public class CargoVaultBlockEntity extends BlockEntity {
         }
     }
 
+    // ---------------------------------------------------------------- paint on the item
+
+    @Nullable
+    public Paint takePlacedPaint() {
+        var paint = placedPaint;
+        placedPaint = null;
+        return paint;
+    }
+
+    public void rememberPaint(Paint paint) {
+        brokenPaint = paint;
+    }
+
+    private Paint currentPaint() {
+        if (brokenPaint != null) return brokenPaint;
+        if (level instanceof ServerLevel server) return PipePaintData.get(server).getOrDefault(worldPosition);
+        return Paint.ORANGE;
+    }
+
     // ---------------------------------------------------------------- saving and syncing
 
     @Override
