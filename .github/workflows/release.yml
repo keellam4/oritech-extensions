@@ -21,6 +21,13 @@ name: Release
 on:
   release:
     types: [published]
+  # Re-run a release for a tag that already exists (Actions → Release → Run workflow), using this workflow file
+  # from the branch you pick and the code from the tag. Useful when a release run failed before uploading.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag, for example v0.4.1+fabric
+        required: true
 
 permissions:
   contents: write
@@ -33,12 +40,12 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      TAG: ${{ github.event.release.tag_name }}
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
 
       - name: Read the Java version from build.gradle
         run: echo "JAVA=$(grep -ohP 'JavaLanguageVersion.of\(\K[0-9]+' build.gradle neoforge/build.gradle fabric/build.gradle 2>/dev/null | head -1)" >> "$GITHUB_ENV"
@@ -95,26 +102,30 @@ jobs:
           python3 - <<'PY'
           import os, re
           version = os.environ["VERSION"]
+          tag = os.environ["TAG"].removeprefix("v")
           text = open("CHANGELOG.md", encoding="utf-8").read()
           match = None
-          # "0.3.0+mc26.1" may use its own section or share the "0.3.0" one.
-          for candidate in dict.fromkeys([version, version.split("+")[0]]):
+          # "0.3.0+mc26.1" may use its own section or share the "0.3.0" one; a Fabric-only tag "0.4.1+fabric" uses
+          # the "## [0.4.1+fabric]" section.
+          for candidate in dict.fromkeys([tag, version, version.split("+")[0]]):
               match = re.search(rf"^## \[{re.escape(candidate)}\][^\n]*\n(.*?)(?=^## |\Z)", text, re.S | re.M)
               if match:
                   break
           if not match:
-              raise SystemExit(f"::error::CHANGELOG.md has no '## [{version}]' section. Rename [Unreleased] to [{version}] in the release PR.")
+              raise SystemExit(f"::error::CHANGELOG.md has no '## [{tag}]' section. Rename [Unreleased] to [{version}] in the release PR.")
           open("release-notes.md", "w", encoding="utf-8").write(match.group(1).strip() + "\n")
           PY
           cat release-notes.md
 
       - name: Build and test (NeoForge)
+        id: build_neoforge
         if: env.NEOFORGE == 'true'
         run: |
           ./gradlew :neoforge:build --stacktrace
           ./gradlew :neoforge:runGameTestServer --stacktrace
 
       - name: Build and test (Fabric)
+        id: build_fabric
         if: env.FABRIC == 'true'
         run: |
           ./gradlew :fabric:build --stacktrace
@@ -133,7 +144,7 @@ jobs:
           fi
 
       - name: Publish NeoForge file to Modrinth
-        if: env.NEOFORGE == 'true' && vars.MODRINTH_PROJECT_ID != ''
+        if: ${{ !cancelled() && steps.build_neoforge.outcome == 'success' && vars.MODRINTH_PROJECT_ID != '' }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
@@ -150,7 +161,7 @@ jobs:
 
       - name: Publish NeoForge file to CurseForge
         # Still runs when another upload failed, so one platform's problem doesn't block the other.
-        if: ${{ !cancelled() && env.NEOFORGE == 'true' && vars.CURSEFORGE_PROJECT_ID != '' }}
+        if: ${{ !cancelled() && steps.build_neoforge.outcome == 'success' && vars.CURSEFORGE_PROJECT_ID != '' }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
@@ -166,7 +177,7 @@ jobs:
           dependencies: ${{ env.DEPENDENCIES }}
 
       - name: Publish Fabric file to Modrinth
-        if: ${{ !cancelled() && env.FABRIC == 'true' && vars.MODRINTH_PROJECT_ID != '' }}
+        if: ${{ !cancelled() && steps.build_fabric.outcome == 'success' && vars.MODRINTH_PROJECT_ID != '' }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
@@ -182,7 +193,7 @@ jobs:
           dependencies: ${{ env.FABRIC_DEPENDENCIES }}
 
       - name: Publish Fabric file to CurseForge
-        if: ${{ !cancelled() && env.FABRIC == 'true' && vars.CURSEFORGE_PROJECT_ID != '' }}
+        if: ${{ !cancelled() && steps.build_fabric.outcome == 'success' && vars.CURSEFORGE_PROJECT_ID != '' }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
@@ -202,7 +213,7 @@ jobs:
         run: |
           {
             echo "### Oritech Extensions ${VERSION:-?} (Minecraft ${MINECRAFT:-?}; NeoForge: ${NEOFORGE:-?}, Fabric: ${FABRIC:-?})"
-            echo "- GitHub release: ${{ github.event.release.html_url }}"
+            echo "- GitHub release: ${{ github.event.release.html_url || format('{0}/{1}/releases/tag/{2}', github.server_url, github.repository, inputs.tag) }}"
             echo "- Modrinth: ${{ vars.MODRINTH_PROJECT_ID != '' && 'published' || 'skipped (MODRINTH_PROJECT_ID not set)' }}"
             echo "- CurseForge: ${{ vars.CURSEFORGE_PROJECT_ID != '' && 'published' || 'skipped (CURSEFORGE_PROJECT_ID not set)' }}"
           } >> "$GITHUB_STEP_SUMMARY"
