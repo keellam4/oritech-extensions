@@ -58,13 +58,20 @@ public class VaultUpgradeScreen extends AbstractContainerScreen<VaultUpgradeMenu
     @Override
     protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         graphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
-        // Faded pictures in empty upgrade slots.
         for (var kind : VaultUpgrade.Kind.values()) {
-            if (has(kind)) continue;
             int x = leftPos + VaultUpgradeMenu.UPGRADES_X + kind.slot() * 18;
             int y = topPos + VaultUpgradeMenu.UPGRADES_Y;
-            graphics.renderFakeItem(new ItemStack(ModContent.VAULT_UPGRADES.get(example(kind)).get()), x, y);
-            graphics.fill(x, y, x + 16, y + 16, 0xB01E2126);
+            if (has(kind)) {
+                // Installed: a lit frame and a light under the slot.
+                int colour = kind == VaultUpgrade.Kind.PUSH ? ORANGE : TEAL;
+                graphics.renderOutline(x - 1, y - 1, 18, 18, colour);
+                graphics.fill(x + 3, y + 18, x + 13, y + 20, colour);
+            } else {
+                // Empty: a very faint picture of what goes here, and a dark light.
+                graphics.renderFakeItem(new ItemStack(ModContent.VAULT_UPGRADES.get(example(kind)).get()), x, y);
+                graphics.fill(x, y, x + 16, y + 16, 0xE41E2126);
+                graphics.fill(x + 3, y + 18, x + 13, y + 20, 0xFF2A2E34);
+            }
         }
     }
 
@@ -171,6 +178,15 @@ public class VaultUpgradeScreen extends AbstractContainerScreen<VaultUpgradeMenu
     }
 
     private void renderSideTooltip(GuiGraphics graphics, int mouseX, int mouseY) {
+        // Empty upgrade slots say what goes in them.
+        if (hoveredSlot instanceof VaultUpgradeMenu.UpgradeSlot slot && !slot.hasItem() && menu.getCarried().isEmpty()) {
+            graphics.renderComponentTooltip(font, List.of(
+                    Component.translatable("screen.oritech_extensions.vault_upgrades.empty_slot",
+                            Component.translatable("screen.oritech_extensions.vault_upgrades.kind." + slot.kind().name().toLowerCase(java.util.Locale.ROOT))),
+                    Component.translatable("screen.oritech_extensions.vault_upgrades.slot_limit", slot.kind().limit()).withStyle(net.minecraft.ChatFormatting.GRAY)),
+                    mouseX, mouseY);
+            return;
+        }
         int id = buttonAt(mouseX, mouseY);
         if (id < 0) return;
         if (id == VaultUpgradeMenu.BUTTON_LOCK) {
