@@ -30,7 +30,11 @@ public interface NetworkTank {
     /** Saves and syncs after a change. */
     void changed();
 
-    boolean isRemoved();
+    /**
+     * Whether the tank's block is gone. (Not named isRemoved: on Fabric, Minecraft's own isRemoved has an
+     * obfuscated name at runtime, so a block entity's inherited one wouldn't implement an interface method of ours.)
+     */
+    boolean tankRemoved();
 
     /** Every fluid it holds right now. A Fluid Vault holds one; a partitioned Fluid Silo can hold several. */
     default java.util.List<FluidAmount> fluids() {

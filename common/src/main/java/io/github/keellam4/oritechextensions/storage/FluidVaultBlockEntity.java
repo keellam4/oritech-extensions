@@ -222,4 +222,9 @@ public class FluidVaultBlockEntity extends CargoVaultBlockEntity implements Netw
         super.removeComponentsFromTag(tag);
         tag.remove("fluid");
     }
+
+    @Override
+    public boolean tankRemoved() {
+        return isRemoved();
+    }
 }

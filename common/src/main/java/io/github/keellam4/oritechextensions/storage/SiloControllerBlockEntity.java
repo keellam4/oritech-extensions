@@ -344,4 +344,9 @@ public class SiloControllerBlockEntity extends BlockEntity implements NetworkTan
         tag.remove("silo");
         tag.remove("fluid");
     }
+
+    @Override
+    public boolean tankRemoved() {
+        return isRemoved();
+    }
 }
