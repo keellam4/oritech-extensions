@@ -1,13 +1,13 @@
 ---
-title: Paintable Glass, Reactors and Accelerators
+title: Paintable Glass, Reactors, Accelerators and Supports
 icon: oritech:industrial_glass_block
-related_items: ["oritech:industrial_glass_block", "oritech:reactor_wall", "oritech:reactor_controller", "oritech:reactor_rod", "oritech:accelerator_ring", "oritech:accelerator_controller", "oritech:white_paint", "oritech:orange_paint"]
-paint_viewer: ["oritech:industrial_glass_block", "oritech:reactor_wall", "oritech:reactor_controller", "oritech:reactor_rod", "oritech:reactor_vent", "oritech:reactor_heat_pipe", "oritech:reactor_reflector", "oritech:reactor_fuel_port", "oritech:reactor_absorber_port", "oritech:reactor_energy_port", "oritech:reactor_redstone_port", "oritech:accelerator_controller", "oritech:accelerator_ring", "oritech:accelerator_motor", "oritech:accelerator_sensor", "oritech:particle_collector_block"]
+related_items: ["oritech:industrial_glass_block", "oritech:reactor_wall", "oritech:reactor_controller", "oritech:reactor_rod", "oritech:accelerator_ring", "oritech:accelerator_controller", "oritech:metal_beam_block", "oritech:metal_girder_block", "oritech:pipe_booster_block", "oritech:white_paint", "oritech:orange_paint"]
+paint_viewer: ["oritech:industrial_glass_block", "oritech:reactor_wall", "oritech:reactor_controller", "oritech:reactor_rod", "oritech:reactor_vent", "oritech:reactor_heat_pipe", "oritech:reactor_reflector", "oritech:reactor_fuel_port", "oritech:reactor_absorber_port", "oritech:reactor_energy_port", "oritech:reactor_redstone_port", "oritech:accelerator_controller", "oritech:accelerator_ring", "oritech:accelerator_motor", "oritech:accelerator_sensor", "oritech:particle_collector_block", "oritech:metal_beam_block", "oritech:metal_girder_block", "oritech:pipe_booster_block"]
 ---
 
-# Paintable Glass, Reactors and Accelerators
+# Paintable Glass, Reactors, Accelerators and Supports
 
-Color Cartridges also paint **Industrial Glass**, the **nuclear reactor** and the **particle accelerator**. One click paints the whole build, so a reactor or accelerator matches the machines around it.
+Color Cartridges also paint **Industrial Glass**, the **nuclear reactor**, the **particle accelerator**, **Metal Beams and Girders**, and **Pipe Boosters**. One click paints the whole build, so a reactor or accelerator matches the machines around it.
 
 ## What gets painted together
 
@@ -16,6 +16,8 @@ Color Cartridges also paint **Industrial Glass**, the **nuclear reactor** and th
 | Industrial Glass | All Industrial Glass touching it |
 | Any reactor block | The whole reactor: walls, controller, rods, vents, heat pipes, condensers, reflectors and every port |
 | Any accelerator block | The whole accelerator: controller, guide rings, motors, sensors and particle collectors. Parts up to 8 blocks apart in a straight line count as one accelerator, so gaps between rings are fine |
+| Metal Beam or Metal Girder | Every beam and girder touching it: a column and the girders resting on it paint as one support structure |
+| Pipe Booster | Just that booster |
 
 **Orange** clears the colour again.
 
@@ -24,12 +26,13 @@ Color Cartridges also paint **Industrial Glass**, the **nuclear reactor** and th
 - Industrial Glass: the frame. The glass itself stays clear.
 - Reactor walls: the coloured trim. Reactor parts: their coloured trim, and heat pipes all over.
 - Accelerator parts: the red-pink casing and orange trim.
+- Metal Beams and Girders: the orange trim. Pipe Boosters: the orange panels, like a Speed Addon.
 - Status lights don't change: redstone indicators, yellow markers and the cyan particle lights keep their colours, so a painted build reads the same.
 
 ## Rules
 
 - Colour is **world-only**, like pipes. Broken blocks drop unpainted.
-- A new block takes the colour of the painted blocks it joins, if they all have the same colour.
+- A new block takes the colour of the painted blocks it joins, if they all have the same colour. Pipe Boosters don't: each one is painted on its own.
 - One click paints at most 4096 blocks (`maxPaintGroupSize` in the config). Bigger builds take another click.
 
 ## Config
@@ -37,4 +40,4 @@ Color Cartridges also paint **Industrial Glass**, the **nuclear reactor** and th
 | Key | Default | Meaning |
 |---|---|---|
 | `pipePaintCostMode` | `NETWORK` | `NETWORK` = one cartridge per click, whatever the size; `PER_BLOCK` = one per block |
-| `maxPaintGroupSize` | `4096` | Most glass, reactor or accelerator blocks painted by one click |
+| `maxPaintGroupSize` | `4096` | Most glass, reactor, accelerator or support blocks painted by one click |
