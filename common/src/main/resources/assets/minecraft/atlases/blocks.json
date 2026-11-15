@@ -67,7 +67,10 @@
         "oritech:block/capacitor_ctm/center",
         "oritech:block/capacitor_ctm/horizontal",
         "oritech:block/capacitor_ctm/vertical",
-        "oritech:block/capacitor_ctm/particle"
+        "oritech:block/capacitor_ctm/particle",
+        "oritech_extensions:block/cargo_vault_front",
+        "oritech_extensions:block/cargo_vault_side",
+        "oritech_extensions:block/cargo_vault_top"
       ],
       "palette_key": "oritech_extensions:colormap/paint/extender_key",
       "permutations": {
@@ -384,6 +387,21 @@
       "type": "minecraft:single",
       "resource": "oritech_extensions:rainbow/oritech/block/capacitor_ctm/particle",
       "sprite": "oritech:block/capacitor_ctm/particle_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/cargo_vault_front",
+      "sprite": "oritech_extensions:block/cargo_vault_front_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/cargo_vault_side",
+      "sprite": "oritech_extensions:block/cargo_vault_side_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/cargo_vault_top",
+      "sprite": "oritech_extensions:block/cargo_vault_top_paint_rainbow"
     },
     {
       "type": "minecraft:single",

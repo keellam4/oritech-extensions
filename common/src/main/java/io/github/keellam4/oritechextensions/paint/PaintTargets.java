@@ -1,6 +1,7 @@
 package io.github.keellam4.oritechextensions.paint;
 
 import io.github.keellam4.oritechextensions.ModContent;
+import io.github.keellam4.oritechextensions.storage.CargoVaultBlockEntity;
 import io.github.keellam4.oritechextensions.platform.Platform;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -45,6 +46,7 @@ public final class PaintTargets {
             WorldPaintTarget.ACCELERATOR,
             WorldPaintTarget.SUPPORTS,
             WorldPaintTarget.PIPE_BOOSTER,
+            WorldPaintTarget.VAULTS,
             HangarDoorTarget.INSTANCE,
             // Datapack tags last, so a tagged block never overrides one of the built-in targets above.
             WorldPaintTarget.TAGGED,
@@ -52,7 +54,7 @@ public final class PaintTargets {
 
     private static final List<WorldPaintTarget> WORLD_TARGETS =
             List.of(WorldPaintTarget.PIPES, WorldPaintTarget.GLASS, WorldPaintTarget.REACTOR, WorldPaintTarget.ACCELERATOR,
-                    WorldPaintTarget.SUPPORTS, WorldPaintTarget.PIPE_BOOSTER, WorldPaintTarget.TAGGED, WorldPaintTarget.TAGGED_CONNECTED);
+                    WorldPaintTarget.SUPPORTS, WorldPaintTarget.PIPE_BOOSTER, WorldPaintTarget.VAULTS, WorldPaintTarget.TAGGED, WorldPaintTarget.TAGGED_CONNECTED);
 
     private PaintTargets() {
     }
@@ -182,7 +184,9 @@ public final class PaintTargets {
 
         var data = PipePaintData.get(level);
         var before = data.getOrDefault(pos);
-        var inherited = target.inheritanceColor(level, pos);
+        // A vault placed from a painted item keeps that paint; otherwise blocks take their neighbours' colour.
+        var placed = level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault ? vault.takePlacedPaint() : null;
+        var inherited = placed != null && PaintColors.isPainted(placed) ? placed : target.inheritanceColor(level, pos);
         if (inherited != null) {
             data.set(pos, inherited);
             syncWorld(level, List.of(pos), inherited);
@@ -202,6 +206,7 @@ public final class PaintTargets {
     /** Loader hook: a player broke the block at {@code pos} (before it is removed). */
     public static void onBlockBreak(ServerLevel level, BlockPos pos) {
         var data = PipePaintData.get(level);
+        if (level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault) vault.rememberPaint(data.getOrDefault(pos));
         if (!data.has(pos)) return;
 
         data.remove(pos);

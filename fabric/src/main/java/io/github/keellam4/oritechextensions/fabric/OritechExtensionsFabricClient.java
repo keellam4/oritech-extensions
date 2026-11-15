@@ -18,6 +18,7 @@ public final class OritechExtensionsFabricClient implements ClientModInitializer
     @Override
     public void onInitializeClient() {
         BlockEntityRenderers.register(ModContent.HANGAR_DOOR_EXTENSION_ENTITY.get(), HangarDoorExtensionRenderer::new);
+        BlockEntityRenderers.register(ModContent.CARGO_VAULT_ENTITY.get(), io.github.keellam4.oritechextensions.client.CargoVaultRenderer::new);
         ClientPlayNetworking.registerGlobalReceiver(PaintSyncPayload.TYPE, (payload, context) -> PaintClient.handleSync(payload));
         ItemTooltipCallback.EVENT.register((stack, tooltipContext, flag, lines) -> {
             var line = PaintClient.paintTooltip(stack);

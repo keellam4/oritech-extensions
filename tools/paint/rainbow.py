@@ -113,11 +113,18 @@ def main():
         mappings = [dict(zip(key, palette(colormap, f'{prefix}{colour}'))) for colour in CYCLE]
         for texture in source['textures']:
             namespace, path = texture.split(':')
-            data = read(f'{path}.png') if namespace == 'oritech' else None
+            if namespace == 'oritech':
+                data = read(f'{path}.png')
+            elif namespace == 'oritech_extensions':  # this mod's own textures (the Cargo Vault)
+                own = os.path.join(resources, 'assets/oritech_extensions/textures', f'{path}.png')
+                data = open(own, 'rb').read() if os.path.exists(own) else None
+            else:
+                data = None
             if data is None:
                 skipped.append(texture)
                 continue
-            image = first_frame(Image.open(io.BytesIO(data)).convert('RGBA'), read(f'{path}.png.mcmeta'))
+            image = first_frame(Image.open(io.BytesIO(data)).convert('RGBA'),
+                                read(f'{path}.png.mcmeta') if namespace == 'oritech' else None)
             out = os.path.join(resources, 'assets/oritech_extensions/textures/rainbow', namespace, f'{path}.png')
             write_animation([recolour(image, m) for m in mappings], out, FRAME_TIME, True)
             rainbow_sources.append({'type': 'minecraft:single',

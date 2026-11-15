@@ -1,4 +1,7 @@
 {
   "replace": false,
-  "values": ["oritech_extensions:hangar_door_extension"]
+  "values": [
+    "oritech_extensions:hangar_door_extension",
+    "oritech_extensions:cargo_vault"
+  ]
 }

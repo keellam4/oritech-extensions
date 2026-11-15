@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SGS",
+    "NBN",
+    "SAS"
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "G": {
+      "item": "oritech:industrial_glass_block"
+    },
+    "N": {
+      "item": "oritech:nickel_ingot"
+    },
+    "B": {
+      "item": "minecraft:barrel"
+    },
+    "A": {
+      "item": "oritech:adamant_ingot"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:cargo_vault",
+    "count": 1
+  }
+}
