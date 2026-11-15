@@ -77,7 +77,7 @@ public final class CargoNetwork {
             if (vault.isRemoved()) return false;
         }
         for (var tank : tanks) {
-            if (tank.isRemoved()) return false;
+            if (tank.tankRemoved()) return false;
         }
         return true;
     }
