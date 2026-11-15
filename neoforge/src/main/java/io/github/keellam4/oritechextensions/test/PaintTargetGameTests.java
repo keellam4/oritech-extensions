@@ -59,7 +59,8 @@ public class PaintTargetGameTests {
         if (Config.pipePaintCostMode() == Config.PipePaintCostMode.NETWORK && player.getMainHandItem().getCount() != 3) {
             helper.fail("painting three glass blocks should use one cartridge, " + player.getMainHandItem().getCount() + " of 4 left");
         }
-        if (paint(level, b, player)) helper.fail("repainted glass with the same colour");
+        // A second coat of the same colour tints the pane instead (JNI-85).
+        if (!paint(level, b, player) || !PipePaintData.get(level).isTinted(a)) helper.fail("a second coat of the same colour should tint the glass");
         helper.succeed();
     }
 
