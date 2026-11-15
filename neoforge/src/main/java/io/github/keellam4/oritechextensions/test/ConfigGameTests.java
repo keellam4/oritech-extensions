@@ -23,7 +23,9 @@ public class ConfigGameTests {
             if (stream == null) throw new IllegalStateException("en_us.json not found");
             var lang = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
             var missing = new ArrayList<String>();
-            for (var option : Config.SPEC.getValues().valueMap().keySet()) {
+            for (var field : Config.class.getFields()) {
+                if (!(field.get(null) instanceof net.neoforged.neoforge.common.ModConfigSpec.ConfigValue<?> value)) continue;
+                var option = String.join(".", value.getPath());
                 for (var key : new String[]{"oritech_extensions.configuration." + option, "oritech_extensions.configuration." + option + ".tooltip"}) {
                     if (!lang.has(key)) missing.add(key);
                 }
