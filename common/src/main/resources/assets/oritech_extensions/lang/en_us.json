@@ -181,5 +181,8 @@
   "screen.oritech_extensions.silo.lock": "Lock: %s",
   "screen.oritech_extensions.silo.lock.help": "Keep this fluid's place when it runs empty.",
   "screen.oritech_extensions.silo.void": "Void overflow: %s",
-  "screen.oritech_extensions.silo.void.help": "Delete this fluid when there's no room, instead of backing up the pipe."
+  "screen.oritech_extensions.silo.void.help": "Delete this fluid when there's no room, instead of backing up the pipe.",
+  "itemGroup.oritech_extensions": "Oritech Extensions",
+  "block.oritech_extensions.transparent_fluid_pipe": "Transparent Fluid Pipe",
+  "block.oritech_extensions.transparent_fluid_pipe_connection": "Transparent Fluid Pipe"
 }

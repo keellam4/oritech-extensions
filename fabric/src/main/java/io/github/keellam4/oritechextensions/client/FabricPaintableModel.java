@@ -57,6 +57,24 @@ final class FabricPaintableModel extends ForwardingBakedModel {
         } finally {
             context.popTransform();
         }
+        if (PaintClient.isTinted(pos)) emitTint(context, paint);
+    }
+
+    /** Painted glass with a tinted pane: a see-through face on each side, a hair inside the frame, in the translucent layer. */
+    private static void emitTint(RenderContext context, Paint paint) {
+        var renderer = net.fabricmc.fabric.api.renderer.v1.RendererAccess.INSTANCE.getRenderer();
+        if (renderer == null) return;
+        var material = renderer.materialFinder().blendMode(net.fabricmc.fabric.api.renderer.v1.material.BlendMode.TRANSLUCENT).find();
+        var sprite = PaintClient.tintSprite(paint);
+        var emitter = context.getEmitter();
+        for (var side : net.minecraft.core.Direction.values()) {
+            emitter.square(side, 0, 0, 1, 1, 0.002f);
+            emitter.cullFace(side);
+            emitter.material(material);
+            emitter.spriteBake(sprite, MutableQuadView.BAKE_LOCK_UV);
+            emitter.color(-1, -1, -1, -1);
+            emitter.emit();
+        }
     }
 
     /** The block entity's paint (machine addons), else the world-stored paint (pipes, glass, reactors, tagged blocks). */

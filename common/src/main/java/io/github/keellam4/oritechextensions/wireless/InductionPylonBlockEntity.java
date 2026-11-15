@@ -108,6 +108,7 @@ public class InductionPylonBlockEntity extends BlockEntity {
             charging = List.copyOf(charged);
             sync();
         }
+        InductionPylonBlock.setPower(level, worldPosition, !charged.isEmpty() ? 2 : energy > 0 ? 1 : 0);
     }
 
     /** Charges one player from up to {@code budget} of the stored energy. Returns the energy used. */

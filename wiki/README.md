@@ -25,6 +25,20 @@ It uses the [moddedmc.wiki](https://moddedmc.wiki) layout (`sinytra-wiki.json`),
 
 - [Oritech Extensions Guide](content/guide.mdx)
 - [Hangar Door Extension](content/hangar_door_extension.mdx)
+- [Cargo Vault](content/cargo_vault.mdx)
+- [Dual Vault](content/dual_vault.mdx)
+- [Quad Vault](content/quad_vault.mdx)
+- [Grid Vault](content/grid_vault.mdx)
+- [Compacting Vault](content/compacting_vault.mdx)
+- [Dual Compacting Vault](content/dual_compacting_vault.mdx)
+- [Fluid Vault](content/fluid_vault.mdx)
+- [Cargo Controller](content/cargo_controller.mdx)
+- [Crafting Terminal](content/crafting_terminal.mdx)
+- [Silo Controller](content/silo_controller.mdx)
+- [Silo Casing](content/silo_casing.mdx)
+- [Silo Glass](content/silo_glass.mdx)
+- [Induction Pylon](content/induction_pylon.mdx)
+- [Transparent Fluid Pipe](content/transparent_fluid_pipe.mdx)
 
 **Developers** (`developers/`, website only, left out of the in-game book): building, versions, the paint system, modpack notes, releasing
 

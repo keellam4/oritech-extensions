@@ -5,6 +5,12 @@ Each style is drawn as one 16 x 32 front view, then cut into the bottom and top 
 boxes (plinth, column, orb, rings, ...) whose faces show the matching part of that drawing, so the pylon looks
 the same from all four sides. Pixels inside a box that the drawing leaves empty are filled with dark steel.
 
+The teal energy parts live in a separate overlay, drawn as a skin just outside the boxes, so the steel and
+orange base can be painted while the energy keeps animating:
+- no overlay when the pylon has no power (the base's energy parts are dark),
+- a slow pulse when it's powered,
+- bright bands racing up the pylon while it's charging someone.
+
     python3 tools/wireless/pylon_assets.py
 """
 import json
@@ -101,21 +107,68 @@ def rgba(key):
     return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4)) + (255,)
 
 
-def picture(fn, boxes):
+TEAL = {"t", "T", "W"}
+OFF = {"t": "g", "T": "3", "W": "a"}
+
+
+def picture(fn, boxes, energy):
+    """The front view. energy: "base" (energy parts dark, everything else), or "overlay" (only the energy parts)."""
     image = Image.new("RGBA", (16, 32), (0, 0, 0, 0))
     for row in range(32):
         y = 31 - row  # height above the bottom, for this pixel row
         for x in range(16):
             key = fn(x, row)
             inside = any(x0 <= x < x1 and y0 <= y < y1 for x0, y0, x1, y1 in boxes)
+            if energy == "overlay":
+                if key in TEAL:
+                    image.putpixel((x, row), rgba(key))
+                continue
             if key:
-                image.putpixel((x, row), rgba(key))
+                image.putpixel((x, row), rgba(OFF.get(key, key)))
             elif inside:
                 image.putpixel((x, row), rgba("a"))
     return image
 
 
-def elements(boxes, half):
+def scaled(colour, factor):
+    r, g, b, a = colour
+    return (min(255, int(r * factor)), min(255, int(g * factor)), min(255, int(b * factor)), a)
+
+
+def frames(overlay, mode):
+    """Animation frames (each 16 x 32) for the overlay: "idle" pulses, "active" sends bands up the pylon."""
+    out = []
+    count = 8
+    for frame in range(count):
+        image = Image.new("RGBA", (16, 32), (0, 0, 0, 0))
+        for row in range(32):
+            y = 31 - row
+            for x in range(16):
+                colour = overlay.getpixel((x, row))
+                if colour[3] == 0:
+                    continue
+                if mode == "idle":
+                    factor = 0.6 + 0.4 * math.sin(frame / count * 2 * math.pi)
+                    image.putpixel((x, row), scaled(colour, factor))
+                else:
+                    centre = frame / count * 40 - 4
+                    if abs(y - centre) < 2.5 or abs(y - centre + 20) < 2.5:
+                        image.putpixel((x, row), (200, 255, 250, 255))
+                    else:
+                        image.putpixel((x, row), scaled(colour, 0.85))
+        out.append(image)
+    return out
+
+
+def strip(images, half):
+    """One half (0 bottom, 1 top) of every frame, stacked into an animated texture."""
+    sheet = Image.new("RGBA", (16, 16 * len(images)), (0, 0, 0, 0))
+    for i, image in enumerate(images):
+        sheet.paste(image.crop((0, 16 - half * 16, 16, 32 - half * 16)), (0, 16 * i))
+    return sheet
+
+
+def elements(boxes, half, grow=0.0, texture="#tex"):
     """Model elements for one half (0 = bottom, 1 = top), with face UVs into that half's texture."""
     low, high = half * 16, half * 16 + 16
     out = []
@@ -126,10 +179,11 @@ def elements(boxes, half):
         ya, yb = a - low, b - low
         side = [x0, 16 - yb, x1, 16 - ya]
         cap = [x0, 16 - yb, x1, min(16, 16 - yb + max(1, x1 - x0))]
-        faces = {d: {"uv": side, "texture": "#tex"} for d in ("north", "south", "east", "west")}
-        faces["up"] = {"uv": cap, "texture": "#tex"}
-        faces["down"] = {"uv": cap, "texture": "#tex"}
-        out.append({"from": [x0, ya, x0], "to": [x1, yb, x1], "faces": faces})
+        faces = {d: {"uv": side, "texture": texture} for d in ("north", "south", "east", "west")}
+        faces["up"] = {"uv": cap, "texture": texture}
+        faces["down"] = {"uv": cap, "texture": texture}
+        g = grow
+        out.append({"from": [x0 - g, max(0, ya - g), x0 - g], "to": [x1 + g, min(16, yb + g), x1 + g], "faces": faces})
     return out
 
 
@@ -137,21 +191,37 @@ def main():
     textures = ROOT / "textures/block"
     textures.mkdir(parents=True, exist_ok=True)
     for style, (name, fn) in STYLES.items():
-        image = picture(fn, BOXES[style])
-        image.crop((0, 16, 16, 32)).save(textures / f"{name}_bottom.png")
-        image.crop((0, 0, 16, 16)).save(textures / f"{name}_top.png")
+        base = picture(fn, BOXES[style], "base")
+        overlay = picture(fn, BOXES[style], "overlay")
+        base.crop((0, 16, 16, 32)).save(textures / f"{name}_bottom.png")
+        base.crop((0, 0, 16, 16)).save(textures / f"{name}_top.png")
+        for mode, frametime in (("idle", 3), ("active", 1)):
+            images = frames(overlay, mode)
+            for half, part in ((0, "bottom"), (1, "top")):
+                strip(images, half).save(textures / f"{name}_{part}_{mode}.png")
+                (textures / f"{name}_{part}_{mode}.png.mcmeta").write_text(json.dumps({"animation": {"frametime": frametime}}) + "\n")
+
+        full = base.copy()
+        full.alpha_composite(overlay)
         icon = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-        icon.alpha_composite(image.resize((8, 16), Image.NEAREST), (4, 0))
+        icon.alpha_composite(full.resize((8, 16), Image.NEAREST), (4, 0))
         (ROOT / "textures/item").mkdir(parents=True, exist_ok=True)
         icon.save(ROOT / f"textures/item/{name}.png")
-        for half, part in ((0, "bottom"), (1, "top")):
-            model = {"parent": "minecraft:block/block", "render_type": "minecraft:cutout", "ambientocclusion": False,
-                     "textures": {"tex": f"oritech_extensions:block/{name}_{part}", "particle": f"oritech_extensions:block/{name}_bottom"},
-                     "elements": elements(BOXES[style], half)}
-            (ROOT / f"models/block/{name}_{part}.json").write_text(json.dumps(model, indent=2) + "\n")
-        (ROOT / f"blockstates/{name}.json").write_text(json.dumps({"variants": {
-            "half=lower": {"model": f"oritech_extensions:block/{name}_bottom"},
-            "half=upper": {"model": f"oritech_extensions:block/{name}_top"}}}, indent=2) + "\n")
+
+        variants = {}
+        for half, part, state in ((0, "bottom", "lower"), (1, "top", "upper")):
+            for power, mode in ((0, None), (1, "idle"), (2, "active")):
+                textures_ = {"tex": f"oritech_extensions:block/{name}_{part}", "particle": f"oritech_extensions:block/{name}_bottom"}
+                els = elements(BOXES[style], half)
+                if mode:
+                    textures_["glow"] = f"oritech_extensions:block/{name}_{part}_{mode}"
+                    els += elements(BOXES[style], half, grow=0.02, texture="#glow")
+                model_name = f"{name}_{part}" + ("" if mode == "idle" else "_off" if mode is None else "_active")
+                model = {"parent": "minecraft:block/block", "render_type": "minecraft:cutout", "ambientocclusion": False,
+                         "textures": textures_, "elements": els}
+                (ROOT / f"models/block/{model_name}.json").write_text(json.dumps(model, indent=2) + "\n")
+                variants[f"half={state},power={power}"] = {"model": f"oritech_extensions:block/{model_name}"}
+        (ROOT / f"blockstates/{name}.json").write_text(json.dumps({"variants": variants}, indent=2) + "\n")
         (ROOT / f"models/item/{name}.json").write_text(json.dumps(
             {"parent": "minecraft:item/generated", "textures": {"layer0": f"oritech_extensions:item/{name}"}}, indent=2) + "\n")
 

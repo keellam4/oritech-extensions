@@ -82,7 +82,13 @@
         "oritech_extensions:block/crafting_terminal_front",
         "oritech_extensions:block/silo_casing",
         "oritech_extensions:block/silo_glass",
-        "oritech_extensions:block/silo_controller_front"
+        "oritech_extensions:block/silo_controller_front",
+        "oritech_extensions:block/induction_pylon_bottom",
+        "oritech_extensions:block/induction_pylon_top",
+        "oritech_extensions:block/induction_pylon_obelisk_bottom",
+        "oritech_extensions:block/induction_pylon_obelisk_top",
+        "oritech_extensions:block/induction_pylon_rings_bottom",
+        "oritech_extensions:block/induction_pylon_rings_top"
       ],
       "palette_key": "oritech_extensions:colormap/paint/extender_key",
       "permutations": {
@@ -101,6 +107,7 @@
       "textures": [
         "oritech:block/item_pipe",
         "oritech:block/transparent_item_pipe",
+        "oritech_extensions:block/transparent_fluid_pipe",
         "oritech:block/item_pipe_duct_block",
         "oritech:block/fluid_pipe_duct_block"
       ],
@@ -477,6 +484,36 @@
     },
     {
       "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/induction_pylon_bottom",
+      "sprite": "oritech_extensions:block/induction_pylon_bottom_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/induction_pylon_top",
+      "sprite": "oritech_extensions:block/induction_pylon_top_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/induction_pylon_obelisk_bottom",
+      "sprite": "oritech_extensions:block/induction_pylon_obelisk_bottom_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/induction_pylon_obelisk_top",
+      "sprite": "oritech_extensions:block/induction_pylon_obelisk_top_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/induction_pylon_rings_bottom",
+      "sprite": "oritech_extensions:block/induction_pylon_rings_bottom_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/induction_pylon_rings_top",
+      "sprite": "oritech_extensions:block/induction_pylon_rings_top_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
       "resource": "oritech_extensions:rainbow/oritech/block/item_pipe",
       "sprite": "oritech:block/item_pipe_paint_rainbow"
     },
@@ -484,6 +521,11 @@
       "type": "minecraft:single",
       "resource": "oritech_extensions:rainbow/oritech/block/transparent_item_pipe",
       "sprite": "oritech:block/transparent_item_pipe_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/transparent_fluid_pipe",
+      "sprite": "oritech_extensions:block/transparent_fluid_pipe_paint_rainbow"
     },
     {
       "type": "minecraft:single",

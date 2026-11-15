@@ -35,8 +35,9 @@ public final class OritechExtensionsNeoForge {
     public OritechExtensionsNeoForge(IEventBus modBus, ModContainer container) {
         ModContent.init();
         NeoForgePlatform.registerAll(modBus);
-        modBus.addListener(OritechExtensionsNeoForge::addCreative);
         modBus.addListener(OritechExtensionsNeoForge::registerPayloads);
+        modBus.addListener((net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent event) -> event.modify(
+                rearth.oritech.init.BlockEntitiesContent.FLUID_PIPE_ENTITY, ModContent.TRANSPARENT_FLUID_PIPE_CONNECTION.get()));
         modBus.addListener(OritechExtensionsNeoForge::registerCapabilities);
         container.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
@@ -47,38 +48,6 @@ public final class OritechExtensionsNeoForge {
         game.addListener(OritechExtensionsNeoForge::onBlockBreak);
         game.addListener(OritechExtensionsNeoForge::onBlockDrops);
         game.addListener(OritechExtensionsNeoForge::onChunkSent);
-    }
-
-    private static void addCreative(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS || event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
-            event.accept(ModContent.HANGAR_DOOR_EXTENSION_ITEM.get());
-        }
-        if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
-            event.accept(ModContent.CARGO_VAULT_ITEM.get());
-            event.accept(ModContent.DUAL_VAULT_ITEM.get());
-            event.accept(ModContent.QUAD_VAULT_ITEM.get());
-            event.accept(ModContent.GRID_VAULT_ITEM.get());
-            event.accept(ModContent.COMPACTING_VAULT_ITEM.get());
-            event.accept(ModContent.DUAL_COMPACTING_VAULT_ITEM.get());
-            event.accept(ModContent.FLUID_VAULT_ITEM.get());
-            event.accept(ModContent.CARGO_CONTROLLER_ITEM.get());
-            event.accept(ModContent.CRAFTING_TERMINAL_ITEM.get());
-            event.accept(ModContent.SILO_CONTROLLER_ITEM.get());
-            event.accept(ModContent.SILO_CASING_ITEM.get());
-            event.accept(ModContent.SILO_GLASS_ITEM.get());
-            event.accept(ModContent.PARTITION_UPGRADE_1.get());
-            event.accept(ModContent.PARTITION_UPGRADE_2.get());
-            event.accept(ModContent.PARTITION_MATRIX.get());
-            event.accept(ModContent.INDUCTION_PYLON_ITEM.get());
-            event.accept(ModContent.INDUCTION_PYLON_OBELISK_ITEM.get());
-            event.accept(ModContent.INDUCTION_PYLON_RINGS_ITEM.get());
-            ModContent.VAULT_UPGRADES.values().forEach(upgrade -> event.accept(upgrade.get()));
-        }
-        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
-            event.accept(ModContent.GUIDE.get());
-            event.accept(ModContent.DETAILING_TOOL.get());
-            event.accept(ModContent.RAINBOW_CARTRIDGE.get());
-        }
     }
 
     private static void registerPayloads(RegisterPayloadHandlersEvent event) {

@@ -38,6 +38,9 @@ import org.jetbrains.annotations.Nullable;
 public class InductionPylonBlock extends Block implements EntityBlock {
 
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
+    /** 0 = no power, 1 = powered, 2 = charging someone. Picks the energy animation and the light level. */
+    public static final net.minecraft.world.level.block.state.properties.IntegerProperty POWER =
+            net.minecraft.world.level.block.state.properties.IntegerProperty.create("power", 0, 2);
     private static final VoxelShape SHAPE = Shapes.box(1 / 16.0, 0, 1 / 16.0, 15 / 16.0, 1, 15 / 16.0);
 
     private final PylonStyle style;
@@ -45,7 +48,7 @@ public class InductionPylonBlock extends Block implements EntityBlock {
     public InductionPylonBlock(PylonStyle style, Properties properties) {
         super(properties);
         this.style = style;
-        registerDefaultState(stateDefinition.any().setValue(HALF, DoubleBlockHalf.LOWER));
+        registerDefaultState(stateDefinition.any().setValue(HALF, DoubleBlockHalf.LOWER).setValue(POWER, 0));
     }
 
     public PylonStyle style() {
@@ -59,7 +62,7 @@ public class InductionPylonBlock extends Block implements EntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(HALF);
+        builder.add(HALF, POWER);
     }
 
     @Override
@@ -113,6 +116,34 @@ public class InductionPylonBlock extends Block implements EntityBlock {
             }
         }
         return super.playerWillDestroy(level, pos, state, player);
+    }
+
+    /** Shows a new power state on both halves. */
+    public static void setPower(Level level, BlockPos lower, int power) {
+        var state = level.getBlockState(lower);
+        if (!(state.getBlock() instanceof InductionPylonBlock) || state.getValue(POWER) == power) return;
+        level.setBlock(lower, state.setValue(POWER, power), Block.UPDATE_CLIENTS);
+        var upper = level.getBlockState(lower.above());
+        if (upper.getBlock() instanceof InductionPylonBlock) level.setBlock(lower.above(), upper.setValue(POWER, power), Block.UPDATE_CLIENTS);
+    }
+
+    /** Sparks at the tip: now and then when powered, a shower while charging. */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, net.minecraft.util.RandomSource random) {
+        if (state.getValue(HALF) != DoubleBlockHalf.UPPER) return;
+        int power = state.getValue(POWER);
+        double x = pos.getX() + 0.5, y = pos.getY() + 0.85, z = pos.getZ() + 0.5;
+        if (power == 2) {
+            for (int i = 0; i < 3; i++) {
+                level.addParticle(net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK, x + (random.nextDouble() - 0.5) * 0.4,
+                        y + random.nextDouble() * 0.3, z + (random.nextDouble() - 0.5) * 0.4,
+                        (random.nextDouble() - 0.5) * 0.3, random.nextDouble() * 0.2, (random.nextDouble() - 0.5) * 0.3);
+            }
+        } else if (power == 1 && random.nextInt(6) == 0) {
+            level.addParticle(net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK, x, y + 0.1, z, 0, 0.05, 0);
+        } else if (power == 0 && random.nextInt(40) == 0) {
+            level.addParticle(net.minecraft.core.particles.ParticleTypes.SMOKE, x, y, z, 0, 0.02, 0);
+        }
     }
 
     // ---------------------------------------------------------------- block entity

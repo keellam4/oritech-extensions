@@ -4,19 +4,20 @@
   "ambientocclusion": false,
   "textures": {
     "tex": "oritech_extensions:block/induction_pylon_obelisk_bottom",
-    "particle": "oritech_extensions:block/induction_pylon_obelisk_bottom"
+    "particle": "oritech_extensions:block/induction_pylon_obelisk_bottom",
+    "glow": "oritech_extensions:block/induction_pylon_obelisk_bottom_idle"
   },
   "elements": [
     {
       "from": [
-        1,
+        1.0,
         0,
-        1
+        1.0
       ],
       "to": [
-        15,
+        15.0,
         16,
-        15
+        15.0
       ],
       "faces": {
         "north": {
@@ -72,6 +73,74 @@
             14
           ],
           "texture": "#tex"
+        }
+      }
+    },
+    {
+      "from": [
+        0.98,
+        0,
+        0.98
+      ],
+      "to": [
+        15.02,
+        16,
+        15.02
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1,
+            0,
+            15,
+            16
+          ],
+          "texture": "#glow"
+        },
+        "south": {
+          "uv": [
+            1,
+            0,
+            15,
+            16
+          ],
+          "texture": "#glow"
+        },
+        "east": {
+          "uv": [
+            1,
+            0,
+            15,
+            16
+          ],
+          "texture": "#glow"
+        },
+        "west": {
+          "uv": [
+            1,
+            0,
+            15,
+            16
+          ],
+          "texture": "#glow"
+        },
+        "up": {
+          "uv": [
+            1,
+            0,
+            15,
+            14
+          ],
+          "texture": "#glow"
+        },
+        "down": {
+          "uv": [
+            1,
+            0,
+            15,
+            14
+          ],
+          "texture": "#glow"
         }
       }
     }

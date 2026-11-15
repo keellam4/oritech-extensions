@@ -39,7 +39,9 @@ public final class PipePaint {
         }
         if (block == BlockContent.FLUID_PIPE || block == BlockContent.FLUID_PIPE_CONNECTION
                 || block == BlockContent.FRAMED_FLUID_PIPE || block == BlockContent.FRAMED_FLUID_PIPE_CONNECTION
-                || block == BlockContent.FLUID_PIPE_DUCT_BLOCK) {
+                || block == BlockContent.FLUID_PIPE_DUCT_BLOCK
+                || block instanceof io.github.keellam4.oritechextensions.pipes.TransparentFluidPipeBlock
+                || block instanceof io.github.keellam4.oritechextensions.pipes.TransparentFluidPipeConnectionBlock) {
             return Family.FLUID;
         }
         if (block == BlockContent.ENERGY_PIPE || block == BlockContent.ENERGY_PIPE_CONNECTION

@@ -1,4 +1,18 @@
 {
   "guide.mdx": "Oritech Extensions Guide",
-  "hangar_door_extension.mdx": "Hangar Door Extension"
+  "hangar_door_extension.mdx": "Hangar Door Extension",
+  "cargo_vault.mdx": "Cargo Vault",
+  "dual_vault.mdx": "Dual Vault",
+  "quad_vault.mdx": "Quad Vault",
+  "grid_vault.mdx": "Grid Vault",
+  "compacting_vault.mdx": "Compacting Vault",
+  "dual_compacting_vault.mdx": "Dual Compacting Vault",
+  "fluid_vault.mdx": "Fluid Vault",
+  "cargo_controller.mdx": "Cargo Controller",
+  "crafting_terminal.mdx": "Crafting Terminal",
+  "silo_controller.mdx": "Silo Controller",
+  "silo_casing.mdx": "Silo Casing",
+  "silo_glass.mdx": "Silo Glass",
+  "induction_pylon.mdx": "Induction Pylon",
+  "transparent_fluid_pipe.mdx": "Transparent Fluid Pipe"
 }

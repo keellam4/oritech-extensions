@@ -72,6 +72,10 @@ public final class WorldPaintTarget implements PaintTarget {
                     || block instanceof io.github.keellam4.oritechextensions.storage.SiloControllerBlock ? "fluid_silo" : null,
             Config::maxPaintGroupSize, 1);
 
+    /** Induction Pylons: both halves of one pylon paint together. */
+    public static final WorldPaintTarget PYLON = new WorldPaintTarget(
+            block -> block instanceof io.github.keellam4.oritechextensions.wireless.InductionPylonBlock ? "induction_pylon" : null, () -> 2, 1, false, false);
+
     /** Pipe Boosters: one block per click, and a new booster doesn't take over its neighbours' colour. */
     public static final WorldPaintTarget PIPE_BOOSTER = new WorldPaintTarget(
             block -> block == BlockContent.PIPE_BOOSTER_BLOCK ? "pipe_booster" : null, () -> 1, 1, false, false);
@@ -149,6 +153,15 @@ public final class WorldPaintTarget implements PaintTarget {
         var before = new LinkedHashMap<BlockPos, Paint>();
         if (isolated) {
             for (var pos : group) before.put(pos, data.getOrDefault(pos));
+        }
+        if (this == GLASS && io.github.keellam4.oritechextensions.paint.PaintColors.isPainted(variant) && !group.isEmpty()
+                && group.stream().allMatch(pos -> data.getOrDefault(pos) == variant)) {
+            // Glass that already has this colour: painting it again tints the pane (and again clears the tint).
+            boolean tint = !data.isTinted(group.get(0));
+            var toggled = group.subList(0, Math.min(group.size(), budget));
+            for (var pos : toggled) data.setTinted(pos, tint);
+            PaintTargets.syncWorld(level, toggled, variant);
+            return toggled;
         }
         var changed = WorldPaint.apply(level, group, variant, budget);
         PaintTargets.syncWorld(level, changed, variant);

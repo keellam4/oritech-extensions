@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ppp",
+    "scs",
+    "ppp"
+  ],
+  "key": {
+    "p": {
+      "item": "oritech:fluid_pipe"
+    },
+    "s": {
+      "tag": "c:glass_blocks"
+    },
+    "c": {
+      "tag": "c:ingots/nickel"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:transparent_fluid_pipe",
+    "count": 6
+  }
+}

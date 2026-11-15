@@ -193,7 +193,12 @@ def load_recipes() -> dict[str, dict]:
                 break
             items.append(ing["item"])
         result = data.get("result", {})
-        out[result.get("id", "")] = {"file": rel(f), "items": sorted(items) if items is not None else None,
+        result_id = result.get("id", "")
+        previous = out.get(result_id)
+        # Several recipes can make one item (the pylon's style switches); document the one named after the item.
+        if previous and Path(previous["file"]).stem == result_id.split(":")[-1]:
+            continue
+        out[result_id] = {"file": rel(f), "items": sorted(items) if items is not None else None,
                                      "count": result.get("count", 1), "shapeless": kind.endswith("shapeless")}
     return out
 

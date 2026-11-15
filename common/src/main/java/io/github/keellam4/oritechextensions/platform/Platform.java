@@ -39,6 +39,10 @@ public interface Platform {
     void sendToServer(CustomPacketPayload payload);
 
     /** A menu type whose client side is made with {@code factory} (no extra data). */
+    /** A creative tab of this mod's own (registered by the caller). */
+    net.minecraft.world.item.CreativeModeTab creativeTab(net.minecraft.network.chat.Component title,
+            java.util.function.Supplier<net.minecraft.world.item.ItemStack> icon, net.minecraft.world.item.CreativeModeTab.DisplayItemsGenerator items);
+
     <T extends net.minecraft.world.inventory.AbstractContainerMenu> net.minecraft.world.inventory.MenuType<T> menuType(
             java.util.function.BiFunction<Integer, net.minecraft.world.entity.player.Inventory, T> factory);
 

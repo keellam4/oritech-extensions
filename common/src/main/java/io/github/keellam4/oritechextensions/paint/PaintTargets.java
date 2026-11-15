@@ -48,6 +48,7 @@ public final class PaintTargets {
             WorldPaintTarget.PIPE_BOOSTER,
             WorldPaintTarget.VAULTS,
             WorldPaintTarget.SILO,
+            WorldPaintTarget.PYLON,
             HangarDoorTarget.INSTANCE,
             // Datapack tags last, so a tagged block never overrides one of the built-in targets above.
             WorldPaintTarget.TAGGED,
@@ -55,7 +56,7 @@ public final class PaintTargets {
 
     private static final List<WorldPaintTarget> WORLD_TARGETS =
             List.of(WorldPaintTarget.PIPES, WorldPaintTarget.GLASS, WorldPaintTarget.REACTOR, WorldPaintTarget.ACCELERATOR,
-                    WorldPaintTarget.SUPPORTS, WorldPaintTarget.PIPE_BOOSTER, WorldPaintTarget.VAULTS, WorldPaintTarget.SILO, WorldPaintTarget.TAGGED, WorldPaintTarget.TAGGED_CONNECTED);
+                    WorldPaintTarget.SUPPORTS, WorldPaintTarget.PIPE_BOOSTER, WorldPaintTarget.VAULTS, WorldPaintTarget.SILO, WorldPaintTarget.PYLON, WorldPaintTarget.TAGGED, WorldPaintTarget.TAGGED_CONNECTED);
 
     private PaintTargets() {
     }
@@ -190,6 +191,16 @@ public final class PaintTargets {
         var inherited = placed != null && PaintColors.isPainted(placed) ? placed : target.inheritanceColor(level, pos);
         if (inherited != null) {
             data.set(pos, inherited);
+            if (target == WorldPaintTarget.GLASS) {
+                // New glass next to tinted glass of the same colour is tinted too.
+                for (var direction : net.minecraft.core.Direction.values()) {
+                    var neighbour = pos.relative(direction);
+                    if (data.isTinted(neighbour) && data.getOrDefault(neighbour) == inherited) {
+                        data.setTinted(pos, true);
+                        break;
+                    }
+                }
+            }
             syncWorld(level, List.of(pos), inherited);
         } else if (data.has(pos)) {
             // Left over from a block that was removed without being broken by hand (an explosion, a piston).
@@ -222,7 +233,7 @@ public final class PaintTargets {
 
         var entries = new ArrayList<PaintSyncPayload.Entry>(positions.size());
         for (var pos : positions) {
-            entries.add(PaintSyncPayload.Entry.inWorld(pos, data.getOrDefault(pos)));
+            entries.add(PaintSyncPayload.Entry.inWorld(pos, data.getOrDefault(pos), data.isTinted(pos)));
         }
         Platform.INSTANCE.sendToPlayer(player, new PaintSyncPayload(entries));
     }
@@ -230,9 +241,10 @@ public final class PaintTargets {
     /** Tells every player who can see {@code positions} that they now have {@code variant} (ORANGE = cleared). */
     public static void syncWorld(ServerLevel level, List<BlockPos> positions, Paint variant) {
         if (positions.isEmpty()) return;
+        var data = PipePaintData.get(level);
         var entries = new ArrayList<PaintSyncPayload.Entry>(positions.size());
         for (var pos : positions) {
-            entries.add(PaintSyncPayload.Entry.inWorld(pos, variant));
+            entries.add(PaintSyncPayload.Entry.inWorld(pos, variant, data.isTinted(pos)));
         }
         var payload = new PaintSyncPayload(entries);
 

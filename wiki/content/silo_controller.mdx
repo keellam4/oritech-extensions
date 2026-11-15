@@ -1,0 +1,24 @@
+---
+title: Silo Controller
+id: oritech_extensions:silo_controller
+icon: oritech_extensions:silo_controller
+related_items: ["oritech_extensions:silo_controller", "oritech_extensions:silo_casing", "oritech_extensions:silo_glass", "oritech_extensions:partition_upgrade"]
+---
+
+# Silo Controller
+
+The heart of a Fluid Silo: a solid 3 × 3 column of Silo Casing and Silo Glass, 3 to 9 blocks tall, with this controller in the bottom layer. It holds 1,000 buckets per block of the silo.
+
+## Using it
+
+- Right-click it for its screen: the fluids, their limits, reserves, locks and void overflow, and the partition upgrade slot (4, 9 or any number of fluids).
+- Buckets and fluid pipes work on any block of the silo; touching a Cargo Wall, it joins the network.
+- A mined controller keeps its fluids, settings and upgrade.
+
+## Recipe
+
+<CraftingRecipe
+    slots={['oritech:steel_ingot', 'oritech:processing_unit', 'oritech:steel_ingot', 'oritech_extensions:silo_casing', 'oritech_extensions:fluid_vault', 'oritech_extensions:silo_casing', 'oritech:steel_ingot', 'oritech:fluid_pipe', 'oritech:steel_ingot']}
+    result="oritech_extensions:silo_controller"
+    count={1}
+/>
