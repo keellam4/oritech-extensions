@@ -11,18 +11,18 @@ import java.util.ArrayList;
 /** The Cargo Wall's Fluid Vaults as one fluid storage; filling goes to the vault holding the fluid first. */
 public final class ControllerFluidStorage extends CombinedStorage<FluidVariant, VaultFluidStorage> {
 
-    private final java.util.List<io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity> tanks;
+    private final java.util.List<io.github.keellam4.oritechextensions.storage.NetworkTank> tanks;
 
     public ControllerFluidStorage(CargoControllerBlockEntity controller) {
         this(controller.network().tanks());
     }
 
-    private ControllerFluidStorage(java.util.List<io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity> tanks) {
+    private ControllerFluidStorage(java.util.List<io.github.keellam4.oritechextensions.storage.NetworkTank> tanks) {
         super(parts(tanks));
         this.tanks = tanks;
     }
 
-    private static java.util.List<VaultFluidStorage> parts(java.util.List<io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity> tanks) {
+    private static java.util.List<VaultFluidStorage> parts(java.util.List<io.github.keellam4.oritechextensions.storage.NetworkTank> tanks) {
         var parts = new ArrayList<VaultFluidStorage>();
         for (var tank : tanks) parts.add(new VaultFluidStorage(tank));
         return parts;

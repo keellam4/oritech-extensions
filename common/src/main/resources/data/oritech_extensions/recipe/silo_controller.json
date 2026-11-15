@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "CVC",
+    "SFS"
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "P": {
+      "item": "oritech:processing_unit"
+    },
+    "C": {
+      "item": "oritech_extensions:silo_casing"
+    },
+    "V": {
+      "item": "oritech_extensions:fluid_vault"
+    },
+    "F": {
+      "item": "oritech:fluid_pipe"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:silo_controller",
+    "count": 1
+  }
+}

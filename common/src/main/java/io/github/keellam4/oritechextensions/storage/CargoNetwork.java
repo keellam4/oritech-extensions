@@ -26,16 +26,16 @@ public final class CargoNetwork {
     public static final CargoNetwork EMPTY = new CargoNetwork(List.of(), List.of());
 
     private final List<CargoVaultBlockEntity> vaults;
-    private final List<FluidVaultBlockEntity> tanks;
+    private final List<NetworkTank> tanks;
 
-    private CargoNetwork(List<CargoVaultBlockEntity> vaults, List<FluidVaultBlockEntity> tanks) {
+    private CargoNetwork(List<CargoVaultBlockEntity> vaults, List<NetworkTank> tanks) {
         this.vaults = vaults;
         this.tanks = tanks;
     }
 
     public static CargoNetwork discover(Level level, BlockPos controller) {
         var found = new ArrayList<CargoVaultBlockEntity>();
-        var tanks = new ArrayList<FluidVaultBlockEntity>();
+        var tanks = new ArrayList<NetworkTank>();
         var seen = new HashSet<BlockPos>();
         var queue = new ArrayDeque<BlockPos>();
         seen.add(controller);
@@ -48,6 +48,9 @@ public final class CargoNetwork {
                 if (level.getBlockEntity(next) instanceof FluidVaultBlockEntity tank) {
                     tanks.add(tank);
                     queue.add(next);
+                } else if (level.getBlockEntity(next) instanceof SiloControllerBlockEntity silo) {
+                    // A Fluid Silo joins as one big tank; the network doesn't spread through it.
+                    tanks.add(silo);
                 } else if (level.getBlockEntity(next) instanceof CargoVaultBlockEntity vault) {
                     found.add(vault);
                     queue.add(next);
@@ -61,7 +64,7 @@ public final class CargoNetwork {
         return vaults;
     }
 
-    public List<FluidVaultBlockEntity> tanks() {
+    public List<NetworkTank> tanks() {
         return tanks;
     }
 
@@ -81,7 +84,7 @@ public final class CargoNetwork {
 
     // ---------------------------------------------------------------- fluids
 
-    /** Fills the network's Fluid Vaults: the one holding this fluid first, then an empty one. Returns millibuckets taken. */
+    /** Fills the network's Fluid Vaults and Silos: the one holding this fluid first, then an empty one. Returns millibuckets taken. */
     public long fill(net.minecraft.world.level.material.Fluid fluid, long max, boolean simulate) {
         long remaining = max;
         for (var tank : tanks) {

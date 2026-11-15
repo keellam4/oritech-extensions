@@ -137,5 +137,13 @@
   "screen.oritech_extensions.terminal.show.items": "Show: items",
   "screen.oritech_extensions.terminal.show.fluids": "Show: fluids",
   "screen.oritech_extensions.terminal.no_match": "Nothing matches",
-  "screen.oritech_extensions.terminal.clear": "Return grid to network"
+  "screen.oritech_extensions.terminal.clear": "Return grid to network",
+  "block.oritech_extensions.silo_casing": "Silo Casing",
+  "block.oritech_extensions.silo_glass": "Silo Glass",
+  "block.oritech_extensions.silo_controller": "Silo Controller",
+  "message.oritech_extensions.silo.not_formed": "Not formed: build a solid 3 × 3 column of Silo Casing and Silo Glass, 3 to 9 blocks tall, with this controller in the bottom layer.",
+  "message.oritech_extensions.silo.status": "Fluid Silo 3×3×%s · %s · %s / %s B",
+  "message.oritech_extensions.silo.empty": "Empty",
+  "tooltip.oritech_extensions.silo.holds": "Holds %s: %s B",
+  "tooltip.oritech_extensions.silo.help": "Put it in the bottom layer of a 3 × 3 silo of Silo Casing and Glass, 3 to 9 tall."
 }

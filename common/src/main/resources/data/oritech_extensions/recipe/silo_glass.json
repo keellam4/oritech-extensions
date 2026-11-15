@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " G ",
+    "GCG",
+    " G "
+  ],
+  "key": {
+    "G": {
+      "item": "oritech:industrial_glass_block"
+    },
+    "C": {
+      "item": "oritech_extensions:silo_casing"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:silo_glass",
+    "count": 4
+  }
+}
