@@ -1,0 +1,56 @@
+---
+title: Detailing Tool
+icon: oritech_extensions:detailing_tool
+related_items: ["oritech_extensions:detailing_tool", "oritech_extensions:rainbow_cartridge", "oritech:orange_paint", "oritech:diamond_paint", "oritech:sculk_paint"]
+---
+
+# Detailing Tool
+
+The Detailing Tool is a paintbrush that holds your Color Cartridges. Load it once, then paint without swapping cartridges in and out of your hotbar. It paints everything a cartridge paints, plus Oritech's own machines, and adds two ways to paint that cartridges can't: one block at a time, or a whole area.
+
+The glass window in the handle and the bristles show the colour that's selected.
+
+## Crafting
+
+Shaped, diagonal like the tool: an **Adamant Ingot** at the top right, a **Steel Ingot** in the middle and a **Nickel Ingot** at the bottom left.
+
+## Loading paint
+
+Works like a bundle, in your inventory:
+
+- **Right-click cartridges onto the tool** (or the tool onto cartridges) to load them. One cartridge is one charge.
+- The tool holds up to **64 charges of each colour**, and every colour at once, Rainbow included.
+- **Right-click the tool with an empty cursor** to take the selected colour's cartridges back out.
+
+The tooltip lists what's loaded; the bar under the item shows how much of the selected colour is left.
+
+## Controls
+
+| Action | What it does |
+|---|---|
+| Right-click a block | Paint, by mode |
+| Sneak + scroll | Switch to the next or previous loaded colour |
+| Sneak + right-click a block | Eyedropper: pick that block's colour |
+| Sneak + right-click the air | Switch mode |
+
+The mode, colour and charges show above the hotbar when they change.
+
+## Modes
+
+- **Group**: paints like a cartridge. A pipe network, a glass wall, a reactor or a touching support structure is painted in one click.
+- **Single block**: paints only the block you click, even in the middle of a pipe network or a glass wall. Handy for marking one pipe, or a stripe in a wall.
+- **Area**: right-click one corner, then the opposite corner. Everything paintable in the box is painted. Each group inside the box (a pipe network, a glass wall) costs one charge and only its blocks inside the box are painted. Right-click the air to forget the first corner. The box can be up to 32 blocks on each side (`detailingToolAreaSize` in the config).
+
+## Cost
+
+The same as Color Cartridges: one charge per click, or one per block when the config's paint cost mode is `PER_BLOCK`. Repainting a block the same colour is free. In creative mode the tool never runs out.
+
+## What it paints
+
+- [Machine addons and extenders](paintable_addons)
+- [Every pipe network](paintable_pipes)
+- [Industrial Glass, reactors, accelerators, Metal Beams and Girders, and Pipe Boosters](paintable_structures)
+- Industrial Hangar Doors (click the door or an extension)
+- **Oritech's own machines**, like Oritech's cartridges do. Clicking any part of a multiblock machine paints the machine. Oritech machines can't be rainbow.
+
+The tool respects spawn protection, adventure mode and claim mods.

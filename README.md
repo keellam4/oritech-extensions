@@ -13,7 +13,7 @@ Small add-ons for [Oritech](https://github.com/Rearth/Oritech) on NeoForge and F
 ## Features
 
 - **Hangar Door Extensions**: make Oritech's Industrial Hangar Door longer than 3 blocks (16 by default, configurable). Extensions open, close and paint with the door.
-- **Paint more of Oritech**: Color Cartridges also paint machine addons, every pipe network (item, fluid, energy, superconductor, with framed and duct versions), Industrial Glass, Metal Beams and Girders, Pipe Boosters, whole nuclear reactors and whole particle accelerators. A craftable **Rainbow Color Cartridge** makes any of them cycle through the colours.
+- **Paint more of Oritech**: Color Cartridges also paint machine addons, every pipe network (item, fluid, energy, superconductor, with framed and duct versions), Industrial Glass, Metal Beams and Girders, Pipe Boosters, whole nuclear reactors and whole particle accelerators. A craftable **Rainbow Color Cartridge** makes any of them cycle through the colours, and the **Detailing Tool** holds your cartridges and paints groups, single blocks or whole areas.
 - **Oritech Extensions Guide**: a craftable book that opens this mod's wiki in-game.
 
 ## Documentation
