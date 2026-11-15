@@ -75,6 +75,35 @@ public final class NeoForgePlatform implements Platform {
     }
 
     @Override
+    public <T extends net.minecraft.world.inventory.AbstractContainerMenu> net.minecraft.world.inventory.MenuType<T> menuType(
+            java.util.function.BiFunction<Integer, net.minecraft.world.entity.player.Inventory, T> factory) {
+        return net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create((id, inventory, data) -> factory.apply(id, inventory));
+    }
+
+    @Override
+    public int insertItem(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side,
+                          net.minecraft.world.item.ItemStack stack, boolean simulate) {
+        var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, side);
+        if (handler == null || stack.isEmpty()) return 0;
+        var rest = net.neoforged.neoforge.items.ItemHandlerHelper.insertItemStacked(handler, stack.copy(), simulate);
+        return stack.getCount() - rest.getCount();
+    }
+
+    @Override
+    public net.minecraft.world.item.ItemStack extractItem(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side,
+                                                          java.util.function.Predicate<net.minecraft.world.item.ItemStack> filter, int max, boolean simulate) {
+        var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, pos, side);
+        if (handler == null || max <= 0) return net.minecraft.world.item.ItemStack.EMPTY;
+        for (int slot = 0; slot < handler.getSlots(); slot++) {
+            var inSlot = handler.getStackInSlot(slot);
+            if (inSlot.isEmpty() || !filter.test(inSlot)) continue;
+            var taken = handler.extractItem(slot, max, simulate);
+            if (!taken.isEmpty()) return taken;
+        }
+        return net.minecraft.world.item.ItemStack.EMPTY;
+    }
+
+    @Override
     public void sendToServer(CustomPacketPayload payload) {
         PacketDistributor.sendToServer(payload);
     }

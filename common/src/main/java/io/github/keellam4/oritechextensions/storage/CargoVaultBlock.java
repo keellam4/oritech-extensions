@@ -28,6 +28,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public class CargoVaultBlock extends HorizontalDirectionalBlock implements EntityBlock {
 
+    /** Set while a Redstone upgrade is installed: the vault then gives off a signal as strong as it is full. */
+    public static final net.minecraft.world.level.block.state.properties.BooleanProperty REDSTONE =
+            net.minecraft.world.level.block.state.properties.BooleanProperty.create("redstone");
+
     private final VaultLayout layout;
     private final MapCodec<CargoVaultBlock> codec;
 
@@ -35,7 +39,7 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
         super(properties);
         this.layout = layout;
         this.codec = simpleCodec(p -> new CargoVaultBlock(p, layout));
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(REDSTONE, false));
     }
 
     @Override
@@ -58,7 +62,7 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, REDSTONE);
     }
 
     @Override
@@ -86,6 +90,11 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (slotAt(state, pos, hit) < 0) {
+            // Side or top: the upgrade screen.
+            if (!level.isClientSide()) openUpgrades(vault, player);
+            return ItemInteractionResult.sidedSuccess(level.isClientSide());
+        }
         // An item the vault can't take: let it be used normally (placing a block against the vault, say).
         if (!vault.accepts(stack)) return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
         if (!level.isClientSide()) CargoVault.insertHeld(vault, player, hand, slotAt(state, pos, hit));
@@ -98,11 +107,40 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
         if (!level.isClientSide()) {
             if (player.isShiftKeyDown()) {
                 CargoVault.toggleLock(vault, player);
+            } else if (slotAt(state, pos, hit) < 0) {
+                openUpgrades(vault, player);
             } else {
                 CargoVault.insertAll(level, vault, player);
             }
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
+    }
+
+    private static void openUpgrades(CargoVaultBlockEntity vault, Player player) {
+        player.openMenu(new net.minecraft.world.SimpleMenuProvider(
+                (id, inventory, p) -> new VaultUpgradeMenu(id, inventory, vault),
+                vault.getBlockState().getBlock().getName()));
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+        if (level.isClientSide()) return null;
+        return (tickLevel, tickPos, tickState, entity) -> {
+            if (entity instanceof CargoVaultBlockEntity vault) CargoVaultBlockEntity.tick(tickLevel, tickPos, tickState, vault);
+        };
+    }
+
+    @Override
+    protected boolean isSignalSource(BlockState state) {
+        return state.getValue(REDSTONE);
+    }
+
+    @Override
+    protected int getSignal(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos, Direction direction) {
+        if (!state.getValue(REDSTONE) || !(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault)) return 0;
+        return vault.signal();
     }
 
     @Override
@@ -112,7 +150,6 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
 
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
-        if (!(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault) || vault.isEmpty()) return 0;
-        return 1 + (int) Math.floor(vault.fill() * 14);
+        return level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault ? vault.signal() : 0;
     }
 }

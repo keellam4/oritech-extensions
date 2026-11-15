@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " O ",
+    "OEO",
+    " O "
+  ],
+  "key": {
+    "O": {
+      "item": "minecraft:obsidian"
+    },
+    "E": {
+      "item": "oritech:enderic_compound"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:void_upgrade",
+    "count": 1
+  }
+}

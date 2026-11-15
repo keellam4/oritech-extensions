@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " I ",
+    "ICI",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "item": "oritech:energite_ingot"
+    },
+    "C": {
+      "item": "oritech_extensions:electrum_capacity_upgrade"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:energite_capacity_upgrade",
+    "count": 1
+  }
+}

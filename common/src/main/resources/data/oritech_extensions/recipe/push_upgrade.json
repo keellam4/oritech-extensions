@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " D ",
+    "SMS"
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:dropper"
+    },
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "M": {
+      "item": "oritech:motor"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:push_upgrade",
+    "count": 1
+  }
+}

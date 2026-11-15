@@ -54,6 +54,7 @@ public final class OritechExtensionsFabric implements ModInitializer {
             entries.accept(ModContent.GRID_VAULT_ITEM.get());
             entries.accept(ModContent.COMPACTING_VAULT_ITEM.get());
             entries.accept(ModContent.DUAL_COMPACTING_VAULT_ITEM.get());
+            ModContent.VAULT_UPGRADES.values().forEach(upgrade -> entries.accept(upgrade.get()));
         });
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> {
             entries.accept(ModContent.GUIDE.get());

@@ -70,6 +70,13 @@ public final class ModContent {
     public static final Supplier<CargoVaultItem> COMPACTING_VAULT_ITEM = vaultItem("compacting_vault", COMPACTING_VAULT);
     public static final Supplier<CargoVaultItem> DUAL_COMPACTING_VAULT_ITEM = vaultItem("dual_compacting_vault", DUAL_COMPACTING_VAULT);
 
+    /** Upgrade cards for the vaults' upgrade screens, one per {@link VaultUpgrade}. */
+    public static final java.util.Map<io.github.keellam4.oritechextensions.storage.VaultUpgrade, Supplier<io.github.keellam4.oritechextensions.storage.VaultUpgradeItem>> VAULT_UPGRADES = upgrades();
+
+    public static final Supplier<net.minecraft.world.inventory.MenuType<io.github.keellam4.oritechextensions.storage.VaultUpgradeMenu>> VAULT_UPGRADE_MENU =
+            PLATFORM.register(BuiltInRegistries.MENU, "vault_upgrades",
+                    () -> PLATFORM.menuType(io.github.keellam4.oritechextensions.storage.VaultUpgradeMenu::new));
+
     @SuppressWarnings("DataFlowIssue")
     public static final Supplier<BlockEntityType<CargoVaultBlockEntity>> CARGO_VAULT_ENTITY = PLATFORM.register(
             BuiltInRegistries.BLOCK_ENTITY_TYPE, "cargo_vault",
@@ -113,6 +120,16 @@ public final class ModContent {
 
     private static Supplier<CargoVaultItem> vaultItem(String name, Supplier<CargoVaultBlock> block) {
         return PLATFORM.register(BuiltInRegistries.ITEM, name, () -> new CargoVaultItem(block.get(), new Item.Properties().stacksTo(1)));
+    }
+
+    private static java.util.Map<io.github.keellam4.oritechextensions.storage.VaultUpgrade, Supplier<io.github.keellam4.oritechextensions.storage.VaultUpgradeItem>> upgrades() {
+        var map = new java.util.EnumMap<io.github.keellam4.oritechextensions.storage.VaultUpgrade, Supplier<io.github.keellam4.oritechextensions.storage.VaultUpgradeItem>>(
+                io.github.keellam4.oritechextensions.storage.VaultUpgrade.class);
+        for (var upgrade : io.github.keellam4.oritechextensions.storage.VaultUpgrade.values()) {
+            map.put(upgrade, PLATFORM.register(BuiltInRegistries.ITEM, upgrade.id(),
+                    () -> new io.github.keellam4.oritechextensions.storage.VaultUpgradeItem(upgrade, new Item.Properties().stacksTo(16))));
+        }
+        return java.util.Collections.unmodifiableMap(map);
     }
 
     private ModContent() {

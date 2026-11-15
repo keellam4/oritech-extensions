@@ -49,8 +49,18 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
     /** Units the vault holds: as many as a Cargo Vault holds of the second form (the middle one, or the smaller of two). */
     private long capacityUnits() {
         int reference = !forms[1].isEmpty() ? 1 : 0;
+        return capacityUnits(multiplier());
+    }
+
+    private long capacityUnits(int multiplier) {
+        int reference = !forms[1].isEmpty() ? 1 : 0;
         int perStack = forms[reference].isEmpty() ? 64 : forms[reference].getMaxStackSize();
-        return (long) Config.cargoVaultStacks() * perStack * Math.max(1, ratios[reference]);
+        return (long) vaultStacks() * perStack * Math.max(1, ratios[reference]) * multiplier;
+    }
+
+    @Override
+    protected boolean fitsWith(int multiplier) {
+        return units <= capacityUnits(multiplier);
     }
 
     @Override
@@ -70,7 +80,7 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
 
     @Override
     public int capacity(int slot, ItemStack type) {
-        if (forms[slot].isEmpty()) return hasForms() ? 0 : Config.cargoVaultStacks() * (type.isEmpty() ? 64 : type.getMaxStackSize());
+        if (forms[slot].isEmpty()) return hasForms() ? 0 : vaultStacks() * (type.isEmpty() ? 64 : type.getMaxStackSize()) * multiplier();
         return (int) Math.min(Integer.MAX_VALUE, capacityUnits() / ratios[slot]);
     }
 
@@ -104,7 +114,7 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
                 units = moved * ratio;
                 changed();
             }
-            return moved;
+            return has(VaultUpgrade.VOID) ? stack.getCount() : moved;
         }
         int slot = slotOf(stack);
         if (slot < 0) return 0;
@@ -114,12 +124,19 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
             units += moved * ratios[slot];
             changed();
         }
-        return moved;
+        return has(VaultUpgrade.VOID) ? stack.getCount() : moved;
     }
 
-    private static long chainCapacity(Chain chain) {
+    private long chainCapacity(Chain chain) {
         int reference = chain.forms().size() > 1 ? 1 : 0;
-        return (long) Config.cargoVaultStacks() * chain.forms().get(reference).getMaxStackSize() * chain.ratios().get(reference);
+        return (long) vaultStacks() * chain.forms().get(reference).getMaxStackSize() * chain.ratios().get(reference) * multiplier();
+    }
+
+    @Override
+    public int roomFor(ItemStack stack) {
+        int slot = slotOf(stack);
+        if (slot < 0) return 0;
+        return (int) Math.max(0, Math.min(Integer.MAX_VALUE, (capacityUnits() - units) / ratios[slot]));
     }
 
     @Override
