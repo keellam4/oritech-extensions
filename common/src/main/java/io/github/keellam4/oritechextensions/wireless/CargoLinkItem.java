@@ -134,7 +134,7 @@ public class CargoLinkItem extends Item {
         @Override
         public boolean stillValid(Player player) {
             var stack = player.getItemInHand(hand);
-            return stack.getItem() instanceof CargoLinkItem && target.equals(target(stack))
+            return stack.getItem() instanceof CargoLinkItem && target.equals(CargoLinkItem.target(stack))
                     && player.level().dimension() == target.dimension()
                     && player.position().distanceTo(target.pos().getCenter()) <= range;
         }
