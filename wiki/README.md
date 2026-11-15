@@ -42,6 +42,9 @@ It uses the [moddedmc.wiki](https://moddedmc.wiki) layout (`sinytra-wiki.json`),
 - [Cargo Link](content/cargo_link.mdx)
 - [Uplink Mast](content/uplink_mast.mdx)
 - [Antenna Segment](content/antenna_segment.mdx)
+- [Infinite Range Upgrade](content/infinite_range_upgrade.mdx)
+- [Dimensional Upgrade](content/dimensional_upgrade.mdx)
+- [Network Anchor](content/network_anchor.mdx)
 
 **Developers** (`developers/`, website only, left out of the in-game book): building, versions, the paint system, modpack notes, releasing
 
