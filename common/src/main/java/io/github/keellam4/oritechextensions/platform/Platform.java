@@ -35,6 +35,9 @@ public interface Platform {
 
     void sendToPlayersTrackingChunk(ServerLevel level, ChunkPos chunk, CustomPacketPayload payload);
 
+    /** Client only: sends {@code payload} to the server. */
+    void sendToServer(CustomPacketPayload payload);
+
     boolean isModLoaded(String modId);
 
     /** True on the game client (also while it hosts a singleplayer world), false on a dedicated server. */

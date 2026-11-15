@@ -6,6 +6,9 @@ import io.github.keellam4.oritechextensions.OritechExtensions;
 import io.github.keellam4.oritechextensions.paint.PaintEvents;
 import io.github.keellam4.oritechextensions.paint.PaintSyncPayload;
 import io.github.keellam4.oritechextensions.paint.PaintTargets;
+import io.github.keellam4.oritechextensions.tool.DetailingTool;
+import io.github.keellam4.oritechextensions.tool.DetailingToolPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -46,6 +49,7 @@ public final class OritechExtensionsNeoForge {
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModContent.GUIDE.get());
+            event.accept(ModContent.DETAILING_TOOL.get());
             event.accept(ModContent.RAINBOW_CARTRIDGE.get());
         }
     }
@@ -53,11 +57,16 @@ public final class OritechExtensionsNeoForge {
     private static void registerPayloads(RegisterPayloadHandlersEvent event) {
         event.registrar(PaintSyncPayload.VERSION).playToClient(PaintSyncPayload.TYPE, PaintSyncPayload.STREAM_CODEC,
                 (payload, context) -> ClientHooks.handleSync(payload));
+        event.registrar(DetailingToolPayload.VERSION).playToServer(DetailingToolPayload.TYPE, DetailingToolPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> {
+                    if (context.player() instanceof ServerPlayer player) DetailingTool.onScroll(player, payload.direction());
+                }));
     }
 
     private static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         PaintEvents.onRightClickBlock(event.getLevel(), event.getEntity(), event.getItemStack());
-        var result = PaintTargets.onRightClickBlock(event.getLevel(), event.getPos(), event.getEntity(), event.getHand(), event.getItemStack());
+        var result = DetailingTool.onRightClickBlock(event.getLevel(), event.getPos(), event.getEntity(), event.getHand(), event.getItemStack());
+        if (result == null) result = PaintTargets.onRightClickBlock(event.getLevel(), event.getPos(), event.getEntity(), event.getHand(), event.getItemStack());
         if (result != null) {
             event.setCanceled(true);
             event.setCancellationResult(result);

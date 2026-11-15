@@ -75,6 +75,11 @@ public final class NeoForgePlatform implements Platform {
     }
 
     @Override
+    public void sendToServer(CustomPacketPayload payload) {
+        PacketDistributor.sendToServer(payload);
+    }
+
+    @Override
     public void sendToPlayersTrackingChunk(ServerLevel level, ChunkPos chunk, CustomPacketPayload payload) {
         PacketDistributor.sendToPlayersTrackingChunk(level, chunk, payload);
     }

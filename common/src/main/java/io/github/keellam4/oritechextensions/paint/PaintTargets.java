@@ -112,8 +112,7 @@ public final class PaintTargets {
      * Paints whatever is at {@code pos} with the cartridge in {@code stack}, together with its group.
      * Mirrors Oritech's ColorCartridgeItem: splash sound, gust particles.
      * <p>
-     * Cost: one cartridge for a single block. For a group it follows the config: one for the whole group,
-     * or one per block (painting stops when the stack runs out).
+     * Cost: see {@link #paintGroup}.
      *
      * @return false if the block can't be painted, or nothing would change (no cartridge is used).
      */
@@ -126,22 +125,43 @@ public final class PaintTargets {
         if (group.isEmpty()) return false;
 
         boolean free = player.getAbilities().instabuild;
-        boolean perBlock = group.size() > 1 && Config.pipePaintCostMode() == Config.PipePaintCostMode.PER_BLOCK;
-        int budget = perBlock && !free ? stack.getCount() : Integer.MAX_VALUE;
-
-        var changed = target.apply(level, group, paint, budget);
-        if (changed.isEmpty()) return false;
+        var painted = paintGroup(level, target, group, paint, free ? Integer.MAX_VALUE : stack.getCount());
+        if (painted == null) return false;
 
         if (!free) {
-            stack.shrink(perBlock ? changed.size() : 1);
+            stack.shrink(painted.cost());
             player.setItemInHand(hand, stack);
         }
+        paintEffects(level, pos);
+        return true;
+    }
 
+    /** What one paint action did: how many blocks changed and how many cartridges (or tool charges) it costs. */
+    public record Painted(int changed, int cost) {
+    }
+
+    /**
+     * Paints {@code group} through {@code target} with at most {@code available} cartridges' worth of paint.
+     * Cost: one for a single block. For a group it follows the config: one for the whole group, or one per block
+     * (painting stops when the paint runs out).
+     *
+     * @return what changed, or null if nothing did.
+     */
+    @Nullable
+    public static Painted paintGroup(ServerLevel level, PaintTarget target, List<BlockPos> group, Paint paint, int available) {
+        if (group.isEmpty() || available <= 0) return null;
+        boolean perBlock = group.size() > 1 && Config.pipePaintCostMode() == Config.PipePaintCostMode.PER_BLOCK;
+        var changed = target.apply(level, group, paint, perBlock ? available : Integer.MAX_VALUE);
+        if (changed.isEmpty()) return null;
+        return new Painted(changed.size(), perBlock ? changed.size() : 1);
+    }
+
+    /** Oritech's Color Cartridge feedback: splash sound and a gust of particles. */
+    public static void paintEffects(ServerLevel level, BlockPos pos) {
         level.playSound(null, pos, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 1f, 0.6f);
         var at = pos.getCenter();
         level.sendParticles(ParticleTypes.GUST, at.x, at.y, at.z, 1,
                 level.random.nextFloat(), level.random.nextFloat(), level.random.nextFloat(), 0.15f);
-        return true;
     }
 
     // ---------------------------------------------------------------- paint that lives in the world

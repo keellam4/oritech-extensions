@@ -2,6 +2,8 @@ package io.github.keellam4.oritechextensions;
 
 import io.github.keellam4.oritechextensions.guide.GuideBookItem;
 import io.github.keellam4.oritechextensions.paint.RainbowCartridgeItem;
+import io.github.keellam4.oritechextensions.tool.DetailingToolItem;
+import io.github.keellam4.oritechextensions.tool.ToolContents;
 import io.github.keellam4.oritechextensions.hangar.HangarDoorExtensionBlock;
 import io.github.keellam4.oritechextensions.hangar.HangarDoorExtensionBlockEntity;
 import io.github.keellam4.oritechextensions.paint.PaintColors;
@@ -37,6 +39,10 @@ public final class ModContent {
     public static final Supplier<RainbowCartridgeItem> RAINBOW_CARTRIDGE = PLATFORM.register(BuiltInRegistries.ITEM,
             "rainbow_cartridge", () -> new RainbowCartridgeItem(new Item.Properties()));
 
+    /** Holds Color Cartridges and paints everything this mod and Oritech can paint. */
+    public static final Supplier<DetailingToolItem> DETAILING_TOOL = PLATFORM.register(BuiltInRegistries.ITEM,
+            "detailing_tool", () -> new DetailingToolItem(new Item.Properties().stacksTo(1)));
+
     @SuppressWarnings("DataFlowIssue")
     public static final Supplier<BlockEntityType<HangarDoorExtensionBlockEntity>> HANGAR_DOOR_EXTENSION_ENTITY = PLATFORM.register(
             BuiltInRegistries.BLOCK_ENTITY_TYPE, "hangar_door_extension",
@@ -47,6 +53,13 @@ public final class ModContent {
             BuiltInRegistries.DATA_COMPONENT_TYPE, "paint", () -> DataComponentType.<Paint>builder()
                     .persistent(PaintColors.CODEC)
                     .networkSynchronized(PaintColors.STREAM_CODEC)
+                    .build());
+
+    /** What a Detailing Tool holds: paint charges, selected colour, mode, first corner of an area. */
+    public static final Supplier<DataComponentType<ToolContents>> TOOL_CONTENTS = PLATFORM.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE, "tool_contents", () -> DataComponentType.<ToolContents>builder()
+                    .persistent(ToolContents.CODEC)
+                    .networkSynchronized(ToolContents.STREAM_CODEC)
                     .build());
 
     private ModContent() {

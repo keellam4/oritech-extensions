@@ -64,6 +64,12 @@ public final class FabricPlatform implements Platform {
     }
 
     @Override
+    public void sendToServer(CustomPacketPayload payload) {
+        // Only called on the client; the class is only loaded when this runs.
+        net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(payload);
+    }
+
+    @Override
     public void sendToPlayersTrackingChunk(ServerLevel level, ChunkPos chunk, CustomPacketPayload payload) {
         for (var player : PlayerLookup.tracking(level, chunk)) {
             ServerPlayNetworking.send(player, payload);

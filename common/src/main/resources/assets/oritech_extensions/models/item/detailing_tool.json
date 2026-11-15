@@ -1,0 +1,68 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "oritech_extensions:item/detailing_tool"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "custom_model_data": 1
+      },
+      "model": "oritech_extensions:item/detailing_tool_orange"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 2
+      },
+      "model": "oritech_extensions:item/detailing_tool_diamond"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 3
+      },
+      "model": "oritech_extensions:item/detailing_tool_camo"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 4
+      },
+      "model": "oritech_extensions:item/detailing_tool_fluxite"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 5
+      },
+      "model": "oritech_extensions:item/detailing_tool_white"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 6
+      },
+      "model": "oritech_extensions:item/detailing_tool_industrial"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 7
+      },
+      "model": "oritech_extensions:item/detailing_tool_netherite"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 8
+      },
+      "model": "oritech_extensions:item/detailing_tool_redstone"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 9
+      },
+      "model": "oritech_extensions:item/detailing_tool_sculk"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 10
+      },
+      "model": "oritech_extensions:item/detailing_tool_rainbow"
+    }
+  ]
+}
