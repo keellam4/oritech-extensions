@@ -30,7 +30,8 @@
       "io.github.keellam4.oritechextensions.test.FluidVaultGameTests",
       "io.github.keellam4.oritechextensions.test.CargoControllerGameTests",
       "io.github.keellam4.oritechextensions.test.FluidSiloGameTests",
-      "io.github.keellam4.oritechextensions.test.InductionPylonGameTests"
+      "io.github.keellam4.oritechextensions.test.InductionPylonGameTests",
+      "io.github.keellam4.oritechextensions.test.ConfigGameTests"
     ]
   },
   "mixins": [
