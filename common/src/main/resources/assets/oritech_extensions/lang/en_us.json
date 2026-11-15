@@ -113,5 +113,12 @@
   "tooltip.oritech_extensions.fluid_vault.empty": "Empty. Holds lots of one fluid.",
   "tooltip.oritech_extensions.fluid_vault.help": "Right-click with a bucket or tank to fill or empty it. Sneak + right-click for upgrades.",
   "oritech_extensions.configuration.fluidVaultBuckets": "Fluid Vault Size",
-  "oritech_extensions.configuration.fluidVaultBuckets.tooltip": "How many buckets one Fluid Vault holds before capacity upgrades."
+  "oritech_extensions.configuration.fluidVaultBuckets.tooltip": "How many buckets one Fluid Vault holds before capacity upgrades.",
+  "screen.oritech_extensions.vault_upgrades.empty_slot": "Empty: %s goes here",
+  "screen.oritech_extensions.vault_upgrades.slot_limit": "Takes up to %s.",
+  "screen.oritech_extensions.vault_upgrades.kind.capacity": "a Capacity Upgrade",
+  "screen.oritech_extensions.vault_upgrades.kind.void": "a Void Upgrade",
+  "screen.oritech_extensions.vault_upgrades.kind.pull": "a Pull Upgrade",
+  "screen.oritech_extensions.vault_upgrades.kind.push": "a Push Upgrade",
+  "screen.oritech_extensions.vault_upgrades.kind.redstone": "a Redstone Upgrade"
 }
