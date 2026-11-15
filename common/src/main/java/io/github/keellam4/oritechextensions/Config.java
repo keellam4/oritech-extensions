@@ -42,6 +42,10 @@ public class Config {
                     "they are painted or placed.")
             .define("pipePaintIsolation", true);
 
+    public static final ModConfigSpec.IntValue DETAILING_TOOL_AREA_SIZE = BUILDER
+            .comment("The longest side, in blocks, of an area the Detailing Tool paints in Area mode.")
+            .defineInRange("detailingToolAreaSize", 32, 1, 128);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     /** How many extension blocks may be attached to one door. Safe to call before the config has loaded. */
@@ -64,5 +68,9 @@ public class Config {
 
     public static int maxPaintGroupSize() {
         return SPEC.isLoaded() ? MAX_PAINT_GROUP_SIZE.get() : MAX_PAINT_GROUP_SIZE.getDefault();
+    }
+
+    public static int detailingToolAreaSize() {
+        return SPEC.isLoaded() ? DETAILING_TOOL_AREA_SIZE.get() : DETAILING_TOOL_AREA_SIZE.getDefault();
     }
 }

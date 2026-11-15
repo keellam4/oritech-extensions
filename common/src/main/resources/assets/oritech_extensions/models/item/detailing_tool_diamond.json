@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "oritech_extensions:item/detailing_tool_diamond"
+  }
+}

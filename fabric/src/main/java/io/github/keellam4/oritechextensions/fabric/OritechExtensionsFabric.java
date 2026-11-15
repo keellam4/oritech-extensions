@@ -7,6 +7,9 @@ import io.github.keellam4.oritechextensions.OritechExtensions;
 import io.github.keellam4.oritechextensions.paint.PaintEvents;
 import io.github.keellam4.oritechextensions.paint.PaintSyncPayload;
 import io.github.keellam4.oritechextensions.paint.PaintTargets;
+import io.github.keellam4.oritechextensions.tool.DetailingTool;
+import io.github.keellam4.oritechextensions.tool.DetailingToolPayload;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -29,18 +32,23 @@ public final class OritechExtensionsFabric implements ModInitializer {
         // Forge Config API Port gives Fabric the same config file and format as NeoForge.
         NeoForgeConfigRegistry.INSTANCE.register(OritechExtensions.MODID, ModConfig.Type.COMMON, Config.SPEC);
         PayloadTypeRegistry.playS2C().register(PaintSyncPayload.TYPE, PaintSyncPayload.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(DetailingToolPayload.TYPE, DetailingToolPayload.STREAM_CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(DetailingToolPayload.TYPE,
+                (payload, context) -> DetailingTool.onScroll(context.player(), payload.direction()));
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> entries.accept(ModContent.HANGAR_DOOR_EXTENSION_ITEM.get()));
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.BUILDING_BLOCKS).register(entries -> entries.accept(ModContent.HANGAR_DOOR_EXTENSION_ITEM.get()));
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> {
             entries.accept(ModContent.GUIDE.get());
+            entries.accept(ModContent.DETAILING_TOOL.get());
             entries.accept(ModContent.RAINBOW_CARTRIDGE.get());
         });
 
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
             var stack = player.getItemInHand(hand);
             PaintEvents.onRightClickBlock(level, player, stack);
-            var result = PaintTargets.onRightClickBlock(level, hit.getBlockPos(), player, hand, stack);
+            var result = DetailingTool.onRightClickBlock(level, hit.getBlockPos(), player, hand, stack);
+            if (result == null) result = PaintTargets.onRightClickBlock(level, hit.getBlockPos(), player, hand, stack);
             return result != null ? result : InteractionResult.PASS;
         });
 

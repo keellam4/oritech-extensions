@@ -23,7 +23,8 @@
       "io.github.keellam4.oritechextensions.test.PaintTargetGameTests",
       "io.github.keellam4.oritechextensions.test.PipeIsolationGameTests",
       "io.github.keellam4.oritechextensions.test.PipePaintGameTests",
-      "io.github.keellam4.oritechextensions.test.RainbowGameTests"
+      "io.github.keellam4.oritechextensions.test.RainbowGameTests",
+      "io.github.keellam4.oritechextensions.test.DetailingToolGameTests"
     ]
   },
   "mixins": [
