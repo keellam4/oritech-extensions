@@ -60,12 +60,15 @@ public final class ModContent {
     public static final Supplier<CargoVaultBlock> GRID_VAULT = vault("grid_vault", VaultLayout.GRID);
     /** One item in up to three forms (nugget, ingot, block): stored once, taken out in any form. */
     public static final Supplier<CargoVaultBlock> COMPACTING_VAULT = vault("compacting_vault", VaultLayout.COMPACTING);
+    /** One item in two forms, for items that compact only once. */
+    public static final Supplier<CargoVaultBlock> DUAL_COMPACTING_VAULT = vault("dual_compacting_vault", VaultLayout.COMPACTING_DUAL);
 
     public static final Supplier<CargoVaultItem> CARGO_VAULT_ITEM = vaultItem("cargo_vault", CARGO_VAULT);
     public static final Supplier<CargoVaultItem> DUAL_VAULT_ITEM = vaultItem("dual_vault", DUAL_VAULT);
     public static final Supplier<CargoVaultItem> QUAD_VAULT_ITEM = vaultItem("quad_vault", QUAD_VAULT);
     public static final Supplier<CargoVaultItem> GRID_VAULT_ITEM = vaultItem("grid_vault", GRID_VAULT);
     public static final Supplier<CargoVaultItem> COMPACTING_VAULT_ITEM = vaultItem("compacting_vault", COMPACTING_VAULT);
+    public static final Supplier<CargoVaultItem> DUAL_COMPACTING_VAULT_ITEM = vaultItem("dual_compacting_vault", DUAL_COMPACTING_VAULT);
 
     @SuppressWarnings("DataFlowIssue")
     public static final Supplier<BlockEntityType<CargoVaultBlockEntity>> CARGO_VAULT_ENTITY = PLATFORM.register(
@@ -75,7 +78,7 @@ public final class ModContent {
     @SuppressWarnings("DataFlowIssue")
     public static final Supplier<BlockEntityType<CompactingVaultBlockEntity>> COMPACTING_VAULT_ENTITY = PLATFORM.register(
             BuiltInRegistries.BLOCK_ENTITY_TYPE, "compacting_vault",
-            () -> BlockEntityType.Builder.of(CompactingVaultBlockEntity::new, COMPACTING_VAULT.get()).build(null));
+            () -> BlockEntityType.Builder.of(CompactingVaultBlockEntity::new, COMPACTING_VAULT.get(), DUAL_COMPACTING_VAULT.get()).build(null));
 
     /** A Cargo Vault's contents, kept on its item. */
     public static final Supplier<DataComponentType<VaultContents>> VAULT_CONTENTS = PLATFORM.register(

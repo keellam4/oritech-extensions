@@ -19,29 +19,34 @@ import java.util.Optional;
  * (nugget ↔ ingot ↔ block, or 2 × 2 ones like clay ball ↔ clay). The stock is kept once, in units of the smallest
  * form, and every window shows how much of its form that is. Put in or take out any form; the vault converts.
  * <p>
- * Slot 0 (the wide top window) is the biggest form, slot 1 the middle one, slot 2 the smallest. A chain of two
- * forms uses slots 0 and 1; an item with no compacting recipes works like a Cargo Vault in slot 0.
+ * Slot 0 (the top window) is the biggest form, then smaller ones. The Compacting Vault has three slots, the Dual
+ * Compacting Vault two. A shorter chain leaves the last slots empty; an item with no compacting recipes works like a
+ * Cargo Vault in slot 0.
  */
 public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
 
-    private static final int SLOTS = 3;
+    private final int slotCount;
 
     /** Count-1 templates, biggest form first; empty where the chain is shorter. */
-    private final ItemStack[] forms = {ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY};
+    private final ItemStack[] forms;
     /** How many of the smallest form one item of each slot's form is worth. */
-    private final int[] ratios = {0, 0, 0};
+    private final int[] ratios;
     /** Stock in units of the smallest form. */
     private int units;
 
     public CompactingVaultBlockEntity(BlockPos pos, BlockState state) {
         super(ModContent.COMPACTING_VAULT_ENTITY.get(), pos, state);
+        slotCount = state.getBlock() instanceof CargoVaultBlock vault ? vault.slots() : 3;
+        forms = new ItemStack[slotCount];
+        java.util.Arrays.fill(forms, ItemStack.EMPTY);
+        ratios = new int[slotCount];
     }
 
     private boolean hasForms() {
         return !forms[0].isEmpty();
     }
 
-    /** Units the vault holds: as many as a Cargo Vault holds of the middle form (or the only form). */
+    /** Units the vault holds: as many as a Cargo Vault holds of the second form (the middle one, or the smaller of two). */
     private long capacityUnits() {
         int reference = !forms[1].isEmpty() ? 1 : 0;
         int perStack = forms[reference].isEmpty() ? 64 : forms[reference].getMaxStackSize();
@@ -50,7 +55,7 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
 
     @Override
     public int slots() {
-        return SLOTS;
+        return slotCount;
     }
 
     @Override
@@ -86,13 +91,13 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
         if (stack.isEmpty()) return 0;
         if (!hasForms()) {
             if (isLocked() || !(level instanceof ServerLevel server)) return 0;
-            var chain = Chain.of(server, stack);
+            var chain = Chain.of(server, stack, slotCount);
             int index = chain.forms().indexOf(chain.forms().stream().filter(f -> ItemStack.isSameItemSameComponents(f, stack)).findFirst().orElseThrow());
             long capacity = chainCapacity(chain);
             int ratio = chain.ratios().get(index);
             int moved = (int) Math.min(stack.getCount(), capacity / ratio);
             if (moved > 0 && !simulate) {
-                for (int i = 0; i < SLOTS; i++) {
+                for (int i = 0; i < slotCount; i++) {
                     forms[i] = i < chain.forms().size() ? chain.forms().get(i).copyWithCount(1) : ItemStack.EMPTY;
                     ratios[i] = i < chain.ratios().size() ? chain.ratios().get(i) : 0;
                 }
@@ -133,7 +138,7 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
 
     private void clear() {
         units = 0;
-        for (int i = 0; i < SLOTS; i++) {
+        for (int i = 0; i < slotCount; i++) {
             forms[i] = ItemStack.EMPTY;
             ratios[i] = 0;
         }
@@ -165,9 +170,9 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
 
     @Override
     public VaultContents contents() {
-        var slots = new ArrayList<VaultContents.Slot>(SLOTS);
-        var ratioList = new ArrayList<Integer>(SLOTS);
-        for (int i = 0; i < SLOTS; i++) {
+        var slots = new ArrayList<VaultContents.Slot>(slotCount);
+        var ratioList = new ArrayList<Integer>(slotCount);
+        for (int i = 0; i < slotCount; i++) {
             slots.add(new VaultContents.Slot(forms[i], count(i)));
             ratioList.add(ratios[i]);
         }
@@ -178,7 +183,7 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
     protected void load(VaultContents contents) {
         setLockedQuietly(contents.locked());
         units = 0;
-        for (int i = 0; i < SLOTS; i++) {
+        for (int i = 0; i < slotCount; i++) {
             var slot = contents.slot(i);
             forms[i] = slot.item();
             ratios[i] = i < contents.ratios().size() ? contents.ratios().get(i) : (slot.isEmpty() ? 0 : 1);
@@ -191,23 +196,39 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
     /** The forms of an item, biggest first, and what each is worth in the smallest form. */
     record Chain(List<ItemStack> forms, List<Integer> ratios) {
 
-        static Chain of(ServerLevel level, ItemStack start) {
+        /**
+         * Up to {@code maxForms} forms around {@code start}. With three, one step down from the starting item and
+         * then up (ingot: nugget, ingot, block). With two, up first (ingot, block), down only if there's no up.
+         */
+        static Chain of(ServerLevel level, ItemStack start, int maxForms) {
             var smallestFirst = new ArrayList<ItemStack>();
             var factors = new ArrayList<Integer>(); // factors.get(i): how many of form i make form i + 1
             smallestFirst.add(start.copyWithCount(1));
 
-            // Down from the starting item (ingot → nuggets), then up (ingot → block), up to three forms.
-            while (smallestFirst.size() < SLOTS) {
+            boolean downFirst = maxForms >= 3;
+            for (int pass = 0; pass < 2; pass++) {
+                boolean goDown = (pass == 0) == downFirst;
+                while (smallestFirst.size() < maxForms) {
+                    if (goDown) {
+                        var down = down(level, smallestFirst.get(0));
+                        if (down.isEmpty() || contains(smallestFirst, down.get().item())) break;
+                        smallestFirst.add(0, down.get().item());
+                        factors.add(0, down.get().factor());
+                        if (downFirst) break; // one step down, then the rest up
+                    } else {
+                        var up = up(level, smallestFirst.get(smallestFirst.size() - 1));
+                        if (up.isEmpty() || contains(smallestFirst, up.get().item())) break;
+                        smallestFirst.add(up.get().item());
+                        factors.add(up.get().factor());
+                    }
+                }
+            }
+            // Three forms but only one step up was possible: try further down too (block, ingot, nugget from a block).
+            while (smallestFirst.size() < maxForms) {
                 var down = down(level, smallestFirst.get(0));
                 if (down.isEmpty() || contains(smallestFirst, down.get().item())) break;
                 smallestFirst.add(0, down.get().item());
                 factors.add(0, down.get().factor());
-            }
-            while (smallestFirst.size() < SLOTS) {
-                var up = up(level, smallestFirst.get(smallestFirst.size() - 1));
-                if (up.isEmpty() || contains(smallestFirst, up.get().item())) break;
-                smallestFirst.add(up.get().item());
-                factors.add(up.get().factor());
             }
 
             var ratiosSmallestFirst = new ArrayList<Integer>();

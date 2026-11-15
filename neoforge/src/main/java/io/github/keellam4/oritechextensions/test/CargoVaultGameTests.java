@@ -225,6 +225,21 @@ public class CargoVaultGameTests {
         helper.succeed();
     }
 
+    /** A Dual Compacting Vault keeps two forms: iron ingots and blocks, no nuggets. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void dualCompactingKeepsTwoForms(GameTestHelper helper) {
+        var vault = place(helper, new BlockPos(2, 1, 2), ModContent.DUAL_COMPACTING_VAULT.get());
+        if (vault.slots() != 2) helper.fail("a Dual Compacting Vault should have 2 slots, has " + vault.slots());
+        vault.insert(new ItemStack(Items.IRON_INGOT, 20), false);
+        if (!vault.item(0).is(Items.IRON_BLOCK) || !vault.item(1).is(Items.IRON_INGOT)) {
+            helper.fail("forms should be block and ingot; are " + vault.item(0) + ", " + vault.item(1));
+            return;
+        }
+        if (vault.count(0) != 2 || vault.count(1) != 20) helper.fail("20 ingots should read 2 / 20");
+        if (vault.insert(new ItemStack(Items.IRON_NUGGET, 1), true) != 0) helper.fail("took nuggets, which it has no window for");
+        helper.succeed();
+    }
+
     /** Clicks map to windows as seen from the front: top left is slot 0, bottom right the last one. */
     @GameTest(template = TEMPLATE, timeoutTicks = 20)
     public static void frontClicksPickWindows(GameTestHelper helper) {

@@ -19,7 +19,7 @@ public class CargoVaultItem extends BlockItem {
 
     private String slotWord() {
         if (!(getBlock() instanceof CargoVaultBlock vault)) return "single";
-        if (vault.layout() == VaultLayout.COMPACTING) return "compacting";
+        if (vault.layout().compacting()) return "compacting";
         return vault.slots() > 1 ? "multi" : "single";
     }
 

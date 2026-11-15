@@ -148,6 +148,16 @@ DUAL_CELLS = [(1, 2, 15, 7, 3, 1, 13), (1, 10, 15, 15, 3, 9, 13)]
 COMPACTING_CELLS = [(1, 2, 15, 7, 3, 1, 13), (1, 10, 7, 15, 2, 9, 6), (9, 10, 15, 15, 10, 9, 14)]
 
 
+def with_arrow(rows):
+    """Compacting fronts: a small steel arrow on the bar between the top and bottom windows."""
+    rows = [list(r) for r in rows]
+    for x in range(6, 10):
+        rows[7][x] = "b"
+    for x in (7, 8):
+        rows[8][x] = "c"
+    return ["".join(r) for r in rows]
+
+
 def cells_front(cells, size=16):
     """A front with frame, separators, and for each window a dim gauge row and dark glass."""
     grid_ = [[None] * size for _ in range(size)]
@@ -207,7 +217,8 @@ def main():
     draw_any(multi_front(16, 2)).save(OUT / "quad_vault_front.png")
     draw_any(multi_front(32, 4)).save(OUT / "grid_vault_front.png")
     draw_any(cells_front(DUAL_CELLS)).save(OUT / "dual_vault_front.png")
-    draw_any(cells_front(COMPACTING_CELLS)).save(OUT / "compacting_vault_front.png")
+    draw_any(with_arrow(cells_front(COMPACTING_CELLS))).save(OUT / "compacting_vault_front.png")
+    draw_any(with_arrow(cells_front(DUAL_CELLS))).save(OUT / "dual_compacting_vault_front.png")
 
 
 if __name__ == "__main__":

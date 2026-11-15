@@ -19,7 +19,9 @@ public enum VaultLayout {
     /** Grid Vault: 4 × 4 windows (a 32 px texture). */
     GRID(16),
     /** Compacting Vault: a wide window on top for the biggest form, two below for the smaller ones. */
-    COMPACTING(3);
+    COMPACTING(3),
+    /** Dual Compacting Vault: two forms, the bigger one on top (same windows as the Dual Vault). */
+    COMPACTING_DUAL(2);
 
     /** One slot's window: the glass the item floats in and the strip that shows how full it is. */
     public record Cell(float glassU0, float glassV0, float glassU1, float glassV1,
@@ -37,6 +39,11 @@ public enum VaultLayout {
     VaultLayout(int slots) {
         this.slots = slots;
         this.cells = makeCells(slots);
+    }
+
+    /** Whether this vault stores one item in several forms. */
+    public boolean compacting() {
+        return this == COMPACTING || this == COMPACTING_DUAL;
     }
 
     public int slots() {
@@ -76,7 +83,7 @@ public enum VaultLayout {
     public int slotAt(double u, double v) {
         return switch (this) {
             case SINGLE -> 0;
-            case DUAL -> v < 0.5 ? 0 : 1;
+            case DUAL, COMPACTING_DUAL -> v < 0.5 ? 0 : 1;
             case COMPACTING -> v < 0.5 ? 0 : u < 0.5 ? 1 : 2;
             case QUAD, GRID -> {
                 int perSide = this == QUAD ? 2 : 4;

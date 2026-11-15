@@ -74,7 +74,8 @@
         "oritech_extensions:block/quad_vault_front",
         "oritech_extensions:block/grid_vault_front",
         "oritech_extensions:block/dual_vault_front",
-        "oritech_extensions:block/compacting_vault_front"
+        "oritech_extensions:block/compacting_vault_front",
+        "oritech_extensions:block/dual_compacting_vault_front"
       ],
       "palette_key": "oritech_extensions:colormap/paint/extender_key",
       "permutations": {
@@ -426,6 +427,11 @@
       "type": "minecraft:single",
       "resource": "oritech_extensions:rainbow/oritech_extensions/block/compacting_vault_front",
       "sprite": "oritech_extensions:block/compacting_vault_front_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/dual_compacting_vault_front",
+      "sprite": "oritech_extensions:block/dual_compacting_vault_front_paint_rainbow"
     },
     {
       "type": "minecraft:single",

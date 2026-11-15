@@ -79,7 +79,7 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return layout == VaultLayout.COMPACTING ? new CompactingVaultBlockEntity(pos, state) : new CargoVaultBlockEntity(pos, state);
+        return layout.compacting() ? new CompactingVaultBlockEntity(pos, state) : new CargoVaultBlockEntity(pos, state);
     }
 
     @Override

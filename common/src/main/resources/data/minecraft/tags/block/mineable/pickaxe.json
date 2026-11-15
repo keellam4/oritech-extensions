@@ -6,6 +6,7 @@
     "oritech_extensions:quad_vault",
     "oritech_extensions:grid_vault",
     "oritech_extensions:dual_vault",
-    "oritech_extensions:compacting_vault"
+    "oritech_extensions:compacting_vault",
+    "oritech_extensions:dual_compacting_vault"
   ]
 }

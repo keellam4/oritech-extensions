@@ -72,5 +72,6 @@
   "hud.oritech_extensions.vault.locked": "Locked",
   "block.oritech_extensions.dual_vault": "Dual Vault",
   "block.oritech_extensions.compacting_vault": "Compacting Vault",
-  "tooltip.oritech_extensions.cargo_vault.empty.compacting": "Empty. Stores one item in up to three forms, like nuggets, ingots and blocks."
+  "tooltip.oritech_extensions.cargo_vault.empty.compacting": "Empty. Stores one item in up to three forms, like nuggets, ingots and blocks.",
+  "block.oritech_extensions.dual_compacting_vault": "Dual Compacting Vault"
 }
