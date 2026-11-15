@@ -1,0 +1,26 @@
+---
+title: Cargo Vault
+id: oritech_extensions:cargo_vault
+icon: oritech_extensions:cargo_vault
+related_items: ["oritech_extensions:cargo_vault", "oritech_extensions:cargo_controller", "oritech_extensions:detailing_tool"]
+---
+
+# Cargo Vault
+
+Holds a lot of one item type (64 stacks by default). The item floats in the glass front with its count, and the neon strip above it fills as the vault does.
+
+## Using it
+
+- Right-click with items to put them in; right-click twice quickly, or with an empty hand, to put in every matching item you carry.
+- Left-click the front to take a stack; sneak + left-click for one.
+- Sneak + right-click with an empty hand (or right-click a side) for the upgrade screen and the lock.
+- Touching vaults form a Cargo Wall: one Cargo Controller links them, and one cartridge paints them all.
+- Breaking it keeps its items, upgrades and paint.
+
+## Recipe
+
+<CraftingRecipe
+    slots={['oritech:steel_ingot', 'oritech:industrial_glass_block', 'oritech:steel_ingot', 'oritech:nickel_ingot', 'minecraft:barrel', 'oritech:nickel_ingot', 'oritech:steel_ingot', 'oritech:adamant_ingot', 'oritech:steel_ingot']}
+    result="oritech_extensions:cargo_vault"
+    count={1}
+/>

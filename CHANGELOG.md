@@ -5,6 +5,11 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
+- **Transparent Fluid Pipe.** A see-through fluid pipe with a line through its centre, so it's easy to tell from the transparent item pipe. It joins Oritech fluid pipe networks and paints with them.
+- **Tinted glass.** Paint Industrial Glass the colour it already has to tint the pane with that colour (Rainbow too); paint it again to clear the tint.
+- **Induction Pylon animations.** The pylon is dark without power, pulses when powered, and races with light and sparks while charging. Pylons can now be painted.
+- **Creative tab.** Everything from Oritech Extensions is in its own creative tab, which JEI and EMI list.
+- **In-game wiki pages** for every new block, under Items & Blocks.
 - **Fluid Silo partitions.** Partition upgrades in the Silo Controller let one silo hold several fluids sharing its space (4, 9, or any number with the Partition Matrix). Right-click the controller for its screen: each fluid can have a limit, reserved space, a lock that keeps its place when empty, and void overflow. The fluids show through the glass in layers by density.
 - **Induction Pylon.** A two-block pylon that wirelessly charges the energy items players carry within 8 blocks: armour first, then Curios slots, held items and the inventory. Charging is fully efficient at the pylon and half as efficient at the edge of its range, and a teal arc shows who it's charging. It charges its owner, the owner's team, or everyone. Comes in three styles (Tesla Spire, Coil Obelisk, Ring Pylon); put one alone in a crafting grid to switch. Config: `pylonRange`, `pylonRate`, `pylonBuffer`.
 - **Fluid Silo.** A multiblock tank: a solid 3 × 3 column of Silo Casing and Silo Glass, 3 to 9 blocks tall, with a Silo Controller in the bottom layer. Holds 1,000 buckets per block (27,000 to 81,000 buckets, `siloBucketsPerBlock`), and the fluid shows through the glass. Buckets and fluid pipes work on any block of the silo. Its controller joins a Cargo network when it touches a vault or controller. A broken silo keeps its fluid, and a mined controller carries it. One click paints the whole silo.

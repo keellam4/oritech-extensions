@@ -1,0 +1,23 @@
+---
+title: Crafting Terminal
+id: oritech_extensions:crafting_terminal
+icon: oritech_extensions:crafting_terminal
+related_items: ["oritech_extensions:crafting_terminal", "oritech_extensions:cargo_controller"]
+---
+
+# Crafting Terminal
+
+A Cargo Controller terminal with a 3 × 3 crafting grid. Place it against any vault of a Cargo Wall.
+
+## Using it
+
+- After each craft the grid refills itself from the wall; shift-click the result to craft as many as the wall has ingredients for.
+- The orange X puts the grid back into the wall; so does closing the screen.
+
+## Recipe
+
+<CraftingRecipe
+    slots={['oritech:steel_ingot', 'oritech:processing_unit', 'oritech:steel_ingot', 'minecraft:crafting_table', 'oritech_extensions:cargo_controller', 'minecraft:crafting_table', 'oritech:steel_ingot', 'oritech:magnetic_coil', 'oritech:steel_ingot']}
+    result="oritech_extensions:crafting_terminal"
+    count={1}
+/>

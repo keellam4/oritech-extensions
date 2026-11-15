@@ -1,0 +1,23 @@
+---
+title: Cargo Controller
+id: oritech_extensions:cargo_controller
+icon: oritech_extensions:cargo_controller
+related_items: ["oritech_extensions:cargo_controller", "oritech_extensions:crafting_terminal", "oritech_extensions:cargo_vault"]
+---
+
+# Cargo Controller
+
+Placed against a Cargo Wall, it links every touching vault (up to 1,024) into one inventory, Fluid Vaults and Fluid Silos included.
+
+## Using it
+
+- Pipes: connect to the controller instead of each vault. Items go to the vault already holding them, then to one with room, so a full window never jams a pipe.
+- Right-click for the terminal: search (@mod searches by mod), sort, filter items or fluids, take and put in items, fill and empty buckets.
+
+## Recipe
+
+<CraftingRecipe
+    slots={['oritech:steel_ingot', 'oritech:processing_unit', 'oritech:steel_ingot', 'oritech:magnetic_coil', 'oritech_extensions:cargo_vault', 'oritech:magnetic_coil', 'oritech:steel_ingot', 'oritech:item_pipe', 'oritech:steel_ingot']}
+    result="oritech_extensions:cargo_controller"
+    count={1}
+/>

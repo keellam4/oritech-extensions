@@ -1,0 +1,27 @@
+---
+title: Induction Pylon
+id: oritech_extensions:induction_pylon
+icon: oritech_extensions:induction_pylon
+related_items: ["oritech_extensions:induction_pylon", "oritech_extensions:induction_pylon_obelisk", "oritech_extensions:induction_pylon_rings"]
+---
+
+# Induction Pylon
+
+A two-block pylon that wirelessly charges the energy items players carry within 8 blocks: armour first, then Curios slots, held items and the inventory. Feed energy into the bottom block.
+
+## Using it
+
+- Charging is fully efficient at the pylon and half as efficient at the edge of its range.
+- A teal arc shows who it's charging. It glows and pulses when powered, and races with light while charging.
+- Right-click to see its energy; sneak + right-click (owner) to choose who it charges: owner, team or everyone.
+- Three styles: Tesla Spire, Coil Obelisk and Ring Pylon. Put one alone in a crafting grid to switch.
+
+## Recipe
+
+<CraftingRecipe
+    slots={['', 'oritech:enderic_lens', '', 'oritech:steel_ingot', 'oritech:charger_block', 'oritech:steel_ingot', 'oritech:steel_ingot', 'oritech:magnetic_coil', 'oritech:steel_ingot']}
+    result="oritech_extensions:induction_pylon"
+    count={1}
+/>
+
+Put a pylon alone in a crafting grid to turn it into the next style.
