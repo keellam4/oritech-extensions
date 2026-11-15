@@ -17,5 +17,7 @@
   "oritech_extensions.configuration.pipePaintCostMode": "Paint Cost Mode",
   "oritech_extensions.configuration.pipePaintCostMode.tooltip": "NETWORK: one cartridge paints a whole pipe network, reactor, accelerator or glass wall. PER_BLOCK: one cartridge per block.",
   "oritech_extensions.configuration.maxPaintGroupSize": "Max Blocks per Paint Click",
-  "oritech_extensions.configuration.maxPaintGroupSize.tooltip": "Most Industrial Glass, reactor or accelerator blocks one click paints. Pipe networks have no limit."
+  "oritech_extensions.configuration.maxPaintGroupSize.tooltip": "Most Industrial Glass, reactor or accelerator blocks one click paints. Pipe networks have no limit.",
+  "oritech_extensions.configuration.pipePaintIsolation": "Colour-Isolated Pipes",
+  "oritech_extensions.configuration.pipePaintIsolation.tooltip": "Painted item and fluid pipes only connect to pipes of the same colour. Unpainted pipes still connect to every colour."
 }

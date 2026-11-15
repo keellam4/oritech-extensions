@@ -4,6 +4,9 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 
 ## [Unreleased]
 
+### Fixed
+- The config screen showed a raw key instead of a name for the colour-isolated pipes option.
+
 ## [0.4.0+mc26.1] - Beta (Minecraft 26.1.2)
 
 ### Added
