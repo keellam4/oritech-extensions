@@ -52,6 +52,49 @@ public class CargoControllerBlock extends HorizontalDirectionalBlock implements 
         return new CargoControllerBlockEntity(pos, state);
     }
 
+    @Nullable
+    @Override
+    public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state,
+                                                                                                     net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+        if (level.isClientSide()) return null;
+        return (l, pos, s, entity) -> {
+            if (entity instanceof CargoControllerBlockEntity controller) CargoControllerBlockEntity.serverTick(l, pos, s, controller);
+        };
+    }
+
+    /** Right-click with a Network Anchor: install it (the network's chunks stay loaded). */
+    @Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                                                 Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+        if (!stack.is(io.github.keellam4.oritechextensions.ModContent.NETWORK_ANCHOR.get())) return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (!(level.getBlockEntity(pos) instanceof CargoControllerBlockEntity controller)) return net.minecraft.world.ItemInteractionResult.FAIL;
+        if (!level.isClientSide()) {
+            if (controller.anchored()) {
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.oritech_extensions.anchor.already"), true);
+            } else if (!io.github.keellam4.oritechextensions.Config.allowNetworkChunkLoading()) {
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.oritech_extensions.anchor.disabled")
+                        .withStyle(net.minecraft.ChatFormatting.RED), true);
+            } else {
+                controller.setAnchored(true);
+                if (!player.getAbilities().instabuild) stack.shrink(1);
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.oritech_extensions.anchor.installed")
+                        .withStyle(net.minecraft.ChatFormatting.AQUA), true);
+            }
+        }
+        return net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide());
+    }
+
+    /** Broken: let go of the chunks and drop the anchor. */
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
+        if (!state.is(newState.getBlock()) && level.getBlockEntity(pos) instanceof CargoControllerBlockEntity controller && controller.anchored()) {
+            controller.setAnchored(false);
+            net.minecraft.world.Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                    new net.minecraft.world.item.ItemStack(io.github.keellam4.oritechextensions.ModContent.NETWORK_ANCHOR.get()));
+        }
+        super.onRemove(state, level, pos, newState, moved);
+    }
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof CargoControllerBlockEntity controller) {

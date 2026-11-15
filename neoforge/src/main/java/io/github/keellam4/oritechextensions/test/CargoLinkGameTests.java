@@ -101,4 +101,44 @@ public class CargoLinkGameTests {
         if (energy <= 0) helper.fail("the pylon should charge the Link");
         helper.succeed();
     }
+
+    /** Upgrades: Infinite Range ignores distance, Dimensional also other dimensions; they cost more energy. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void rangeUpgrades(GameTestHelper helper) {
+        var controller = wall(helper);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var link = new ItemStack(ModContent.CARGO_LINK.get());
+        var target = GlobalPos.of(helper.getLevel().dimension(), controller.getBlockPos());
+        CargoLinkItem.bind(link, target);
+        player.setItemInHand(InteractionHand.MAIN_HAND, link);
+        player.setPos(Vec3.atCenterOf(controller.getBlockPos()).add(5000, 0, 0));
+        if (!new CargoLinkItem.Access(InteractionHand.MAIN_HAND, target, Integer.MAX_VALUE).stillValid(player)) helper.fail("infinite range works 5000 blocks away");
+        var elsewhere = GlobalPos.of(net.minecraft.world.level.Level.NETHER, controller.getBlockPos());
+        CargoLinkItem.bind(link, elsewhere);
+        if (new CargoLinkItem.Access(InteractionHand.MAIN_HAND, elsewhere, Integer.MAX_VALUE, false).stillValid(player)) helper.fail("infinite range stays in its dimension");
+        if (!new CargoLinkItem.Access(InteractionHand.MAIN_HAND, elsewhere, Integer.MAX_VALUE, true).stillValid(player)) helper.fail("dimensional works across dimensions");
+        var cheap = new ItemStack(ModContent.CARGO_LINK.get());
+        var dear = new ItemStack(ModContent.CARGO_LINK.get());
+        dear.set(ModContent.LINK_UPGRADE.get(), io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem.DIMENSIONAL);
+        CargoLinkItem.setEnergy(cheap, 10_000);
+        CargoLinkItem.setEnergy(dear, 10_000);
+        CargoLinkItem.spend(cheap, 10);
+        CargoLinkItem.spend(dear, 10);
+        if (10_000 - CargoLinkItem.energy(dear) != 4 * (10_000 - CargoLinkItem.energy(cheap))) helper.fail("dimensional transfers cost four times as much");
+        helper.succeed();
+    }
+
+    /** A Network Anchor keeps the network's chunks loaded, and lets go when removed. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void networkAnchorLoadsChunks(GameTestHelper helper) {
+        var controller = wall(helper);
+        var level = helper.getLevel();
+        controller.setAnchored(true);
+        CargoControllerBlockEntity.serverTick(level, controller.getBlockPos(), controller.getBlockState(), controller);
+        long chunk = net.minecraft.world.level.ChunkPos.asLong(controller.getBlockPos());
+        if (!controller.forcedChunks().contains(chunk) || !level.getForcedChunks().contains(chunk)) helper.fail("the controller's chunk should be force-loaded");
+        controller.setAnchored(false);
+        if (level.getForcedChunks().contains(chunk)) helper.fail("removing the anchor should release the chunk");
+        helper.succeed();
+    }
 }

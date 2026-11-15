@@ -287,6 +287,24 @@ public final class ModContent {
                     .networkSynchronized(net.minecraft.core.GlobalPos.STREAM_CODEC)
                     .build());
 
+    /** Which range upgrade the Cargo Link has (see LinkUpgradeItem). */
+    public static final Supplier<DataComponentType<Integer>> LINK_UPGRADE = PLATFORM.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE, "link_upgrade", () -> DataComponentType.<Integer>builder()
+                    .persistent(com.mojang.serialization.Codec.INT)
+                    .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.VAR_INT)
+                    .build());
+
+    public static final Supplier<io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem> INFINITE_RANGE_UPGRADE = PLATFORM.register(BuiltInRegistries.ITEM,
+            "infinite_range_upgrade", () -> new io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem(
+                    io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem.INFINITE, new Item.Properties().stacksTo(16)));
+
+    public static final Supplier<io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem> DIMENSIONAL_UPGRADE = PLATFORM.register(BuiltInRegistries.ITEM,
+            "dimensional_upgrade", () -> new io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem(
+                    io.github.keellam4.oritechextensions.wireless.LinkUpgradeItem.DIMENSIONAL, new Item.Properties().stacksTo(16)));
+
+    public static final Supplier<io.github.keellam4.oritechextensions.wireless.NetworkAnchorItem> NETWORK_ANCHOR = PLATFORM.register(BuiltInRegistries.ITEM,
+            "network_anchor", () -> new io.github.keellam4.oritechextensions.wireless.NetworkAnchorItem(new Item.Properties().stacksTo(16)));
+
     public static final Supplier<io.github.keellam4.oritechextensions.wireless.CargoLinkItem> CARGO_LINK = PLATFORM.register(BuiltInRegistries.ITEM, "cargo_link",
             () -> new io.github.keellam4.oritechextensions.wireless.CargoLinkItem(new Item.Properties().stacksTo(1)));
 
@@ -338,6 +356,9 @@ public final class ModContent {
                         var charged = new net.minecraft.world.item.ItemStack(CARGO_LINK.get());
                         io.github.keellam4.oritechextensions.wireless.CargoLinkItem.setEnergy(charged, io.github.keellam4.oritechextensions.wireless.CargoLinkItem.CAPACITY);
                         output.accept(charged);
+                        output.accept(INFINITE_RANGE_UPGRADE.get());
+                        output.accept(DIMENSIONAL_UPGRADE.get());
+                        output.accept(NETWORK_ANCHOR.get());
                         output.accept(UPLINK_MAST_ITEM.get());
                         output.accept(ANTENNA_SEGMENT_ITEM.get());
                     }));

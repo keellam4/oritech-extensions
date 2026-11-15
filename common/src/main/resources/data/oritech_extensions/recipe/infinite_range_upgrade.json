@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "XLX",
+    "AUA",
+    "XLX"
+  ],
+  "key": {
+    "X": {
+      "item": "oritech:enderic_compound"
+    },
+    "L": {
+      "item": "oritech:enderic_lens"
+    },
+    "A": {
+      "item": "oritech_extensions:antenna_segment"
+    },
+    "U": {
+      "item": "oritech:processing_unit"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:infinite_range_upgrade",
+    "count": 1
+  }
+}

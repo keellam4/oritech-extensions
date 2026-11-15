@@ -22,8 +22,8 @@ public class SiloMenu extends AbstractContainerMenu {
 
     public static final int ROWS = 5;
     public static final int UPGRADE_X = 152;
-    public static final int UPGRADE_Y = 132;
-    public static final int INVENTORY_Y = 154;
+    public static final int UPGRADE_Y = 130;
+    public static final int INVENTORY_Y = 166;
 
     @Nullable
     private final SiloControllerBlockEntity silo;

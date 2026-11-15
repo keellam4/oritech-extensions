@@ -10,6 +10,11 @@ public class CargoControllerBlockEntity extends BlockEntity {
 
     private CargoNetwork network;
     private long discoveredAt = Long.MIN_VALUE;
+    /** A Network Anchor is installed: the chunks of every block in the network stay loaded. */
+    private boolean anchored;
+    /** The chunks this controller is keeping loaded right now. */
+    private final java.util.Set<Long> forced = new java.util.HashSet<>();
+    private int nextAnchorCheck;
 
     public CargoControllerBlockEntity(BlockPos pos, BlockState state) {
         super(ModContent.CARGO_CONTROLLER_ENTITY.get(), pos, state);
@@ -27,5 +32,87 @@ public class CargoControllerBlockEntity extends BlockEntity {
     /** Forget the network so the next use looks again (a vault next to it was placed or broken). */
     public void invalidate() {
         network = null;
+    }
+
+    // ---------------------------------------------------------------- Network Anchor (chunk loading)
+
+    public boolean anchored() {
+        return anchored;
+    }
+
+    public void setAnchored(boolean anchored) {
+        this.anchored = anchored;
+        nextAnchorCheck = 0;
+        if (!anchored) releaseChunks();
+        setChanged();
+    }
+
+    public static void serverTick(net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.level.block.state.BlockState state,
+                                  CargoControllerBlockEntity controller) {
+        if (!controller.anchored || --controller.nextAnchorCheck > 0) return;
+        controller.nextAnchorCheck = 100;
+        controller.forceNetworkChunks();
+    }
+
+    /** Keeps the chunks of the controller and every vault, tank and silo in its network loaded. */
+    private void forceNetworkChunks() {
+        if (!(level instanceof net.minecraft.server.level.ServerLevel server)) return;
+        if (!io.github.keellam4.oritechextensions.Config.allowNetworkChunkLoading()) {
+            releaseChunks();
+            return;
+        }
+        var wanted = new java.util.HashSet<Long>();
+        wanted.add(net.minecraft.world.level.ChunkPos.asLong(worldPosition));
+        var net = network();
+        for (var vault : net.vaults()) wanted.add(net.minecraft.world.level.ChunkPos.asLong(vault.getBlockPos()));
+        for (var tank : net.tanks()) {
+            if (tank instanceof net.minecraft.world.level.block.entity.BlockEntity entity) {
+                wanted.add(net.minecraft.world.level.ChunkPos.asLong(entity.getBlockPos()));
+            }
+            if (tank instanceof SiloControllerBlockEntity silo && silo.structure() != null) {
+                var origin = silo.structure().origin();
+                for (int dx = 0; dx < SiloStructure.WIDTH; dx += SiloStructure.WIDTH - 1) {
+                    for (int dz = 0; dz < SiloStructure.WIDTH; dz += SiloStructure.WIDTH - 1) {
+                        wanted.add(net.minecraft.world.level.ChunkPos.asLong(origin.offset(dx, 0, dz)));
+                    }
+                }
+            }
+        }
+        for (var chunk : forced) {
+            if (!wanted.contains(chunk)) server.setChunkForced(net.minecraft.world.level.ChunkPos.getX(chunk), net.minecraft.world.level.ChunkPos.getZ(chunk), false);
+        }
+        for (var chunk : wanted) {
+            if (!forced.contains(chunk)) server.setChunkForced(net.minecraft.world.level.ChunkPos.getX(chunk), net.minecraft.world.level.ChunkPos.getZ(chunk), true);
+        }
+        forced.clear();
+        forced.addAll(wanted);
+        setChanged();
+    }
+
+    /** Lets go of every chunk this controller was keeping loaded. */
+    public void releaseChunks() {
+        if (level instanceof net.minecraft.server.level.ServerLevel server) {
+            for (var chunk : forced) server.setChunkForced(net.minecraft.world.level.ChunkPos.getX(chunk), net.minecraft.world.level.ChunkPos.getZ(chunk), false);
+        }
+        forced.clear();
+    }
+
+    public java.util.Set<Long> forcedChunks() {
+        return java.util.Collections.unmodifiableSet(forced);
+    }
+
+    @Override
+    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        if (anchored) tag.putBoolean("anchored", true);
+        if (!forced.isEmpty()) tag.putLongArray("forced_chunks", forced.stream().mapToLong(Long::longValue).toArray());
+    }
+
+    @Override
+    protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        anchored = tag.getBoolean("anchored");
+        forced.clear();
+        for (long chunk : tag.getLongArray("forced_chunks")) forced.add(chunk);
     }
 }

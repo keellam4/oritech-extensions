@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SXS",
+    "XLX",
+    "SDS"
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "X": {
+      "item": "oritech:enderic_compound"
+    },
+    "L": {
+      "item": "oritech:enderic_lens"
+    },
+    "D": {
+      "item": "oritech:duratium_ingot"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:network_anchor",
+    "count": 1
+  }
+}

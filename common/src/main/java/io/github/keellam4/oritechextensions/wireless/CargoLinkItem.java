@@ -48,10 +48,16 @@ public class CargoLinkItem extends Item {
 
     /** Uses the battery for moving {@code items} items. False (and nothing used) if it's too low. */
     public static boolean spend(ItemStack stack, int items) {
-        int cost = items * Config.linkEnergyPerItem();
+        // Reaching further costs more: double with Infinite Range, four times with Dimensional.
+        int cost = items * Config.linkEnergyPerItem() * (1 << upgrade(stack));
         if (energy(stack) < cost) return false;
         setEnergy(stack, energy(stack) - cost);
         return true;
+    }
+
+    /** 0 = none, {@link LinkUpgradeItem#INFINITE} or {@link LinkUpgradeItem#DIMENSIONAL}. */
+    public static int upgrade(ItemStack stack) {
+        return stack.getOrDefault(ModContent.LINK_UPGRADE.get(), 0);
     }
 
     @Nullable
@@ -96,7 +102,8 @@ public class CargoLinkItem extends Item {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.link.unbound").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
-        if (target.dimension() != level.dimension()) {
+        int upgrade = upgrade(stack);
+        if (target.dimension() != level.dimension() && upgrade < LinkUpgradeItem.DIMENSIONAL) {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.link.dimension").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
@@ -105,14 +112,15 @@ public class CargoLinkItem extends Item {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.link.offline").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
-        int range = LinkRange.range(level, controller);
-        double distance = player.position().distanceTo(target.pos().getCenter());
+        int range = upgrade >= LinkUpgradeItem.INFINITE ? Integer.MAX_VALUE : LinkRange.range(level, controller);
+        boolean elsewhere = target.dimension() != level.dimension();
+        double distance = elsewhere ? 0 : player.position().distanceTo(target.pos().getCenter());
         if (distance > range) {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.link.out_of_range",
                     (int) distance, range).withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
-        var access = new Access(hand, target, range);
+        var access = new Access(hand, target, range, upgrade >= LinkUpgradeItem.DIMENSIONAL);
         player.openMenu(new SimpleMenuProvider((id, inventory, p) -> new TerminalMenu(id, inventory, controller, true).remote(access),
                 stack.getHoverName()));
         player.displayClientMessage(signal(distance, range, energy(stack)), true);
@@ -121,6 +129,10 @@ public class CargoLinkItem extends Item {
 
     /** "▮▮▮▯ 45 / 64 blocks · 120,000 RF" */
     public static Component signal(double distance, int range, int energy) {
+        if (range == Integer.MAX_VALUE) {
+            return Component.literal("\u25AE\u25AE\u25AE\u25AE").withStyle(ChatFormatting.LIGHT_PURPLE)
+                    .append(Component.translatable("message.oritech_extensions.link.signal_unlimited", String.format("%,d", energy)).withStyle(ChatFormatting.GRAY));
+        }
         int bars = LinkRange.bars(distance, range);
         var text = Component.literal("\\u25AE".repeat(bars)).withStyle(bars <= 1 ? ChatFormatting.RED : ChatFormatting.AQUA)
                 .append(Component.literal("\\u25AF".repeat(4 - bars)).withStyle(ChatFormatting.DARK_GRAY));
@@ -129,14 +141,18 @@ public class CargoLinkItem extends Item {
     }
 
     /** Keeps the remote terminal open while the Link stays in hand, linked and in range, and pays for transfers. */
-    public record Access(InteractionHand hand, GlobalPos target, int range) implements TerminalMenu.RemoteAccess {
+    public record Access(InteractionHand hand, GlobalPos target, int range, boolean anyDimension) implements TerminalMenu.RemoteAccess {
+
+        public Access(InteractionHand hand, GlobalPos target, int range) {
+            this(hand, target, range, false);
+        }
 
         @Override
         public boolean stillValid(Player player) {
             var stack = player.getItemInHand(hand);
-            return stack.getItem() instanceof CargoLinkItem && target.equals(CargoLinkItem.target(stack))
-                    && player.level().dimension() == target.dimension()
-                    && player.position().distanceTo(target.pos().getCenter()) <= range;
+            if (!(stack.getItem() instanceof CargoLinkItem) || !target.equals(CargoLinkItem.target(stack))) return false;
+            if (player.level().dimension() != target.dimension()) return anyDimension;
+            return range == Integer.MAX_VALUE || player.position().distanceTo(target.pos().getCenter()) <= range;
         }
 
         @Override
@@ -146,6 +162,21 @@ public class CargoLinkItem extends Item {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.link.battery").withStyle(ChatFormatting.RED), true);
             return false;
         }
+    }
+
+    // ---------------------------------------------------------------- installing upgrades
+
+    /** An upgrade clicked onto the Link in an inventory installs it (a better one replaces a lesser one). */
+    @Override
+    public boolean overrideOtherStackedOnMe(ItemStack link, ItemStack carried, net.minecraft.world.inventory.Slot slot,
+                                            net.minecraft.world.inventory.ClickAction action, Player player,
+                                            net.minecraft.world.entity.SlotAccess access) {
+        if (action != net.minecraft.world.inventory.ClickAction.PRIMARY || !(carried.getItem() instanceof LinkUpgradeItem upgrade)) return false;
+        if (upgrade.level() <= upgrade(link)) return false;
+        link.set(ModContent.LINK_UPGRADE.get(), upgrade.level());
+        carried.shrink(1);
+        player.playSound(net.minecraft.sounds.SoundEvents.SMITHING_TABLE_USE, 0.6f, 1.4f);
+        return true;
     }
 
     // ---------------------------------------------------------------- looks
@@ -172,6 +203,11 @@ public class CargoLinkItem extends Item {
                 ? Component.translatable("tooltip.oritech_extensions.link.unbound").withStyle(ChatFormatting.GRAY)
                 : Component.translatable("tooltip.oritech_extensions.link.bound", target.pos().getX(), target.pos().getY(), target.pos().getZ(),
                         target.dimension().location().toString()).withStyle(ChatFormatting.AQUA));
+        int upgrade = upgrade(stack);
+        if (upgrade > 0) {
+            lines.add(Component.translatable(upgrade == LinkUpgradeItem.DIMENSIONAL ? "tooltip.oritech_extensions.link_upgrade.dimensional"
+                    : "tooltip.oritech_extensions.link_upgrade.infinite").withStyle(ChatFormatting.LIGHT_PURPLE));
+        }
         lines.add(Component.translatable("tooltip.oritech_extensions.link.energy", String.format("%,d", energy(stack)), String.format("%,d", CAPACITY))
                 .withStyle(ChatFormatting.GRAY));
     }

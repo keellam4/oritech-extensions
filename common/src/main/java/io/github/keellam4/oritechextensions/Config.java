@@ -83,6 +83,10 @@ public class Config {
             .comment("Energy (RF) a Cargo Link uses per item moved (a bucket counts as 64 items).")
             .defineInRange("linkEnergyPerItem", 5, 0, 10000);
 
+    public static final ModConfigSpec.BooleanValue ALLOW_NETWORK_CHUNK_LOADING = BUILDER
+            .comment("Whether a Network Anchor in a Cargo Controller may keep the network's chunks loaded.")
+            .define("allowNetworkChunkLoading", true);
+
     public static final ModConfigSpec.IntValue SILO_BUCKETS_PER_BLOCK = BUILDER
             .comment("How many buckets a Fluid Silo holds per block of its size (a 3 x 3 x 5 silo is 45 blocks).")
             .defineInRange("siloBucketsPerBlock", 1000, 1, 100000);
@@ -153,5 +157,9 @@ public class Config {
 
     public static int linkEnergyPerItem() {
         return SPEC.isLoaded() ? LINK_ENERGY_PER_ITEM.get() : LINK_ENERGY_PER_ITEM.getDefault();
+    }
+
+    public static boolean allowNetworkChunkLoading() {
+        return SPEC.isLoaded() ? ALLOW_NETWORK_CHUNK_LOADING.get() : ALLOW_NETWORK_CHUNK_LOADING.getDefault();
     }
 }

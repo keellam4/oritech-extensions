@@ -205,5 +205,18 @@
   "oritech_extensions.configuration.linkSegmentRange": "Range per Antenna Segment",
   "oritech_extensions.configuration.linkSegmentRange.tooltip": "Blocks of range each Antenna Segment adds (up to 8 segments).",
   "oritech_extensions.configuration.linkEnergyPerItem": "Cargo Link Energy per Item",
-  "oritech_extensions.configuration.linkEnergyPerItem.tooltip": "Energy (RF) a Cargo Link uses per item moved (a bucket counts as 64 items)."
+  "oritech_extensions.configuration.linkEnergyPerItem.tooltip": "Energy (RF) a Cargo Link uses per item moved (a bucket counts as 64 items).",
+  "item.oritech_extensions.infinite_range_upgrade": "Infinite Range Upgrade",
+  "item.oritech_extensions.dimensional_upgrade": "Dimensional Upgrade",
+  "item.oritech_extensions.network_anchor": "Network Anchor",
+  "tooltip.oritech_extensions.link_upgrade.infinite": "Infinite Range: works anywhere in its wall's dimension",
+  "tooltip.oritech_extensions.link_upgrade.dimensional": "Dimensional: works anywhere, in any dimension",
+  "tooltip.oritech_extensions.link_upgrade.help": "Click it onto a Cargo Link in your inventory to install it.",
+  "tooltip.oritech_extensions.anchor": "Right-click a Cargo Controller or Crafting Terminal: its whole network stays chunk-loaded.",
+  "message.oritech_extensions.link.signal_unlimited": " unlimited range · %s RF",
+  "message.oritech_extensions.anchor.installed": "Network Anchor installed: this network stays loaded",
+  "message.oritech_extensions.anchor.already": "This network already has a Network Anchor",
+  "message.oritech_extensions.anchor.disabled": "Chunk loading is turned off on this server",
+  "oritech_extensions.configuration.allowNetworkChunkLoading": "Allow Network Anchors",
+  "oritech_extensions.configuration.allowNetworkChunkLoading.tooltip": "Whether a Network Anchor in a Cargo Controller may keep the network's chunks loaded."
 }
