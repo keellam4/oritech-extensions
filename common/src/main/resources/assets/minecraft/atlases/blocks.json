@@ -174,6 +174,366 @@
         "paint_redstone": "oritech_extensions:colormap/paint/superconductor_redstone",
         "paint_sculk": "oritech_extensions:colormap/paint/superconductor_sculk"
       }
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_speed_addon_off",
+      "sprite": "oritech:block/machine_speed_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_speed_addon_on",
+      "sprite": "oritech:block/machine_speed_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_efficiency_addon_off",
+      "sprite": "oritech:block/machine_efficiency_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_efficiency_addon_on",
+      "sprite": "oritech:block/machine_efficiency_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_ultimate_addon_off",
+      "sprite": "oritech:block/machine_ultimate_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_ultimate_addon_on",
+      "sprite": "oritech:block/machine_ultimate_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_processing_addon_off",
+      "sprite": "oritech:block/machine_processing_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_processing_addon_on",
+      "sprite": "oritech:block/machine_processing_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_capacitor_addon_off",
+      "sprite": "oritech:block/machine_capacitor_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_capacitor_addon_on",
+      "sprite": "oritech:block/machine_capacitor_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_acceptor_addon_off",
+      "sprite": "oritech:block/machine_acceptor_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_acceptor_addon_on",
+      "sprite": "oritech:block/machine_acceptor_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_fluid_addon_off",
+      "sprite": "oritech:block/machine_fluid_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_fluid_addon_on",
+      "sprite": "oritech:block/machine_fluid_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_yield_addon_off",
+      "sprite": "oritech:block/machine_yield_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_yield_addon_on",
+      "sprite": "oritech:block/machine_yield_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_hunter_addon_off",
+      "sprite": "oritech:block/machine_hunter_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_hunter_addon_on",
+      "sprite": "oritech:block/machine_hunter_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_silk_touch_addon_off",
+      "sprite": "oritech:block/machine_silk_touch_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_silk_touch_addon_on",
+      "sprite": "oritech:block/machine_silk_touch_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_burst_addon_off",
+      "sprite": "oritech:block/machine_burst_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_burst_addon_on",
+      "sprite": "oritech:block/machine_burst_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/crop_filter_addon_off",
+      "sprite": "oritech:block/crop_filter_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/crop_filter_addon_on",
+      "sprite": "oritech:block/crop_filter_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/quarry_addon_off",
+      "sprite": "oritech:block/quarry_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/quarry_addon_on",
+      "sprite": "oritech:block/quarry_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/steam_boiler_addon_off",
+      "sprite": "oritech:block/steam_boiler_addon_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/steam_boiler_addon_on",
+      "sprite": "oritech:block/steam_boiler_addon_on_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_inventory_proxy_addon",
+      "sprite": "oritech:block/machine_inventory_proxy_addon_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/fluid_pipe",
+      "sprite": "oritech:block/fluid_pipe_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/generic_pipe",
+      "sprite": "oritech:block/generic_pipe_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_wall/center",
+      "sprite": "oritech:block/reactor_wall/center_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_wall/empty",
+      "sprite": "oritech:block/reactor_wall/empty_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_wall/horizontal",
+      "sprite": "oritech:block/reactor_wall/horizontal_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_wall/vertical",
+      "sprite": "oritech:block/reactor_wall/vertical_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_wall/particle",
+      "sprite": "oritech:block/reactor_wall/particle_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_extender",
+      "sprite": "oritech:block/machine_extender_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/machine_extender_off",
+      "sprite": "oritech:block/machine_extender_off_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/capacitor_ctm/center",
+      "sprite": "oritech:block/capacitor_ctm/center_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/capacitor_ctm/horizontal",
+      "sprite": "oritech:block/capacitor_ctm/horizontal_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/capacitor_ctm/vertical",
+      "sprite": "oritech:block/capacitor_ctm/vertical_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/capacitor_ctm/particle",
+      "sprite": "oritech:block/capacitor_ctm/particle_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/item_pipe",
+      "sprite": "oritech:block/item_pipe_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/transparent_item_pipe",
+      "sprite": "oritech:block/transparent_item_pipe_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/item_pipe_duct_block",
+      "sprite": "oritech:block/item_pipe_duct_block_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/fluid_pipe_duct_block",
+      "sprite": "oritech:block/fluid_pipe_duct_block_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/industrial_glass_block/center",
+      "sprite": "oritech:block/industrial_glass_block/center_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/industrial_glass_block/empty",
+      "sprite": "oritech:block/industrial_glass_block/empty_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/industrial_glass_block/horizontal",
+      "sprite": "oritech:block/industrial_glass_block/horizontal_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/industrial_glass_block/vertical",
+      "sprite": "oritech:block/industrial_glass_block/vertical_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/industrial_glass_block/particle",
+      "sprite": "oritech:block/industrial_glass_block/particle_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_absorber_port",
+      "sprite": "oritech:block/reactor_absorber_port_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_condenser",
+      "sprite": "oritech:block/reactor_condenser_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_controller",
+      "sprite": "oritech:block/reactor_controller_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_energy_port",
+      "sprite": "oritech:block/reactor_energy_port_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_fuel_port",
+      "sprite": "oritech:block/reactor_fuel_port_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_heat_pipe",
+      "sprite": "oritech:block/reactor_heat_pipe_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_redstone_port",
+      "sprite": "oritech:block/reactor_redstone_port_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_reflector",
+      "sprite": "oritech:block/reactor_reflector_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_rod",
+      "sprite": "oritech:block/reactor_rod_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/reactor_vent",
+      "sprite": "oritech:block/reactor_vent_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/accelerator_controller",
+      "sprite": "oritech:block/accelerator_controller_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/accelerator_motor",
+      "sprite": "oritech:block/accelerator_motor_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/accelerator_ring",
+      "sprite": "oritech:block/accelerator_ring_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/accelerator_sensor",
+      "sprite": "oritech:block/accelerator_sensor_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/particle_collector_block",
+      "sprite": "oritech:block/particle_collector_block_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/metal_beam_block",
+      "sprite": "oritech:block/metal_beam_block_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/metal_girder_block",
+      "sprite": "oritech:block/metal_girder_block_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/energy_pipe",
+      "sprite": "oritech:block/energy_pipe_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/energy_pipe_duct_block",
+      "sprite": "oritech:block/energy_pipe_duct_block_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/superconductor",
+      "sprite": "oritech:block/superconductor_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech/block/superconductor_duct_block",
+      "sprite": "oritech:block/superconductor_duct_block_paint_rainbow"
     }
   ]
 }

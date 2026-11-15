@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.reactor.BaseReactorBlock;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import java.util.List;
 import java.util.function.Function;
@@ -126,14 +126,14 @@ public final class WorldPaintTarget implements PaintTarget {
     }
 
     @Override
-    public ColorVariant get(ServerLevel level, BlockPos pos) {
+    public Paint get(ServerLevel level, BlockPos pos) {
         return PipePaintData.get(level).getOrDefault(pos);
     }
 
     @Override
-    public List<BlockPos> apply(ServerLevel level, List<BlockPos> group, ColorVariant variant, int budget) {
+    public List<BlockPos> apply(ServerLevel level, List<BlockPos> group, Paint variant, int budget) {
         var data = PipePaintData.get(level);
-        var before = new LinkedHashMap<BlockPos, ColorVariant>();
+        var before = new LinkedHashMap<BlockPos, Paint>();
         if (isolated) {
             for (var pos : group) before.put(pos, data.getOrDefault(pos));
         }
@@ -153,7 +153,7 @@ public final class WorldPaintTarget implements PaintTarget {
 
     /** The colour a block just placed at {@code pos} takes over from its neighbours, or null. */
     @Nullable
-    public ColorVariant inheritanceColor(ServerLevel level, BlockPos pos) {
+    public Paint inheritanceColor(ServerLevel level, BlockPos pos) {
         if (!inherits) return null;
         return WorldPaint.inheritanceColor(level, pos, family, reach);
     }

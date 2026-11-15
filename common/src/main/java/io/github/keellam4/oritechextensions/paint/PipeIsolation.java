@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.block.blocks.pipes.AbstractPipeBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
@@ -39,7 +38,7 @@ public final class PipeIsolation {
     }
 
     /** Whether two pipes of the same kind with these colours may connect. */
-    public static boolean compatible(ColorVariant a, ColorVariant b) {
+    public static boolean compatible(Paint a, Paint b) {
         return !PaintColors.isPainted(a) || !PaintColors.isPainted(b) || a == b;
     }
 
@@ -59,7 +58,7 @@ public final class PipeIsolation {
      * colour edge that became incompatible disconnect; edges that became compatible reconnect (on both sides).
      * The affected pipe networks are then rebuilt, so items and fluids stop (or start) crossing over.
      */
-    public static void onPaintChanged(ServerLevel level, Map<BlockPos, ColorVariant> before) {
+    public static void onPaintChanged(ServerLevel level, Map<BlockPos, Paint> before) {
         if (!enabled() || before.isEmpty()) return;
         var data = PipePaintData.get(level);
 

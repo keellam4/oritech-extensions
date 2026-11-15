@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.List;
 
@@ -31,7 +30,7 @@ public interface PaintTarget {
     List<BlockPos> group(Level level, BlockPos pos);
 
     /** Current colour at {@code pos}; ORANGE means unpainted. */
-    ColorVariant get(ServerLevel level, BlockPos pos);
+    Paint get(ServerLevel level, BlockPos pos);
 
     /**
      * Paints {@code group} (ORANGE clears), stopping after {@code budget} blocks have changed, and tells nearby
@@ -39,13 +38,13 @@ public interface PaintTarget {
      *
      * @return the positions whose colour changed.
      */
-    List<BlockPos> apply(ServerLevel level, List<BlockPos> group, ColorVariant variant, int budget);
+    List<BlockPos> apply(ServerLevel level, List<BlockPos> group, Paint variant, int budget);
 
     /**
      * Client-side shortcut: true when a click with {@code variant} would change nothing, so the click is left
      * alone. Targets whose colours the client can't see return false; the server decides for them.
      */
-    default boolean alreadyPainted(Level level, BlockPos pos, ColorVariant variant) {
+    default boolean alreadyPainted(Level level, BlockPos pos, Paint variant) {
         return false;
     }
 

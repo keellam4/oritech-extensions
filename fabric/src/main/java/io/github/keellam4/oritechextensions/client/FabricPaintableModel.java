@@ -16,7 +16,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import java.util.function.Supplier;
 
@@ -61,7 +61,7 @@ final class FabricPaintableModel extends ForwardingBakedModel {
 
     /** The block entity's paint (machine addons), else the world-stored paint (pipes, glass, reactors, tagged blocks). */
     @Nullable
-    private static ColorVariant paintAt(BlockAndTintGetter level, BlockPos pos) {
+    private static Paint paintAt(BlockAndTintGetter level, BlockPos pos) {
         var blockEntity = level.getBlockEntity(pos);
         if (blockEntity != null) {
             var paint = ((AttachmentTarget) blockEntity).getAttached(FabricPlatform.PAINT);

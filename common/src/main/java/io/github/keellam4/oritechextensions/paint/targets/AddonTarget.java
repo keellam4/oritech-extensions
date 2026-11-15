@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
-import rearth.oritech.util.ColorableMachine.ColorVariant;
+import io.github.keellam4.oritechextensions.paint.Paint;
 
 import java.util.List;
 
@@ -38,13 +38,13 @@ public final class AddonTarget implements PaintTarget {
     }
 
     @Override
-    public ColorVariant get(ServerLevel level, BlockPos pos) {
+    public Paint get(ServerLevel level, BlockPos pos) {
         var blockEntity = level.getBlockEntity(pos);
-        return PaintEvents.isPaintable(blockEntity) ? PaintEvents.getPaint(blockEntity) : ColorVariant.ORANGE;
+        return PaintEvents.isPaintable(blockEntity) ? PaintEvents.getPaint(blockEntity) : Paint.ORANGE;
     }
 
     @Override
-    public List<BlockPos> apply(ServerLevel level, List<BlockPos> group, ColorVariant variant, int budget) {
+    public List<BlockPos> apply(ServerLevel level, List<BlockPos> group, Paint variant, int budget) {
         if (budget <= 0 || group.isEmpty()) return List.of();
         var blockEntity = level.getBlockEntity(group.get(0));
         if (!PaintEvents.isPaintable(blockEntity) || PaintEvents.getPaint(blockEntity) == variant) return List.of();
@@ -53,7 +53,7 @@ public final class AddonTarget implements PaintTarget {
     }
 
     @Override
-    public boolean alreadyPainted(Level level, BlockPos pos, ColorVariant variant) {
+    public boolean alreadyPainted(Level level, BlockPos pos, Paint variant) {
         var blockEntity = level.getBlockEntity(pos);
         return PaintEvents.isPaintable(blockEntity) && PaintEvents.getPaint(blockEntity) == variant;
     }
