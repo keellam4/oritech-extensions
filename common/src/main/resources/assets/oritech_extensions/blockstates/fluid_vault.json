@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "oritech_extensions:block/fluid_vault"
+    },
+    "facing=east": {
+      "model": "oritech_extensions:block/fluid_vault",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "oritech_extensions:block/fluid_vault",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "oritech_extensions:block/fluid_vault",
+      "y": 270
+    }
+  }
+}

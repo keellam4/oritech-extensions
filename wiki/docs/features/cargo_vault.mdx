@@ -1,7 +1,7 @@
 ---
 title: Cargo Vault
 icon: oritech_extensions:cargo_vault
-related_items: ["oritech_extensions:cargo_vault", "oritech_extensions:quad_vault", "oritech_extensions:grid_vault", "oritech_extensions:dual_vault", "oritech_extensions:compacting_vault", "oritech_extensions:dual_compacting_vault", "oritech_extensions:detailing_tool"]
+related_items: ["oritech_extensions:cargo_vault", "oritech_extensions:quad_vault", "oritech_extensions:grid_vault", "oritech_extensions:dual_vault", "oritech_extensions:compacting_vault", "oritech_extensions:dual_compacting_vault", "oritech_extensions:fluid_vault", "oritech_extensions:detailing_tool"]
 ---
 
 # Cargo Vault
@@ -44,6 +44,12 @@ The **Dual Compacting Vault** works the same with two forms (ingots and blocks, 
 Each step can be a 3 × 3 or a 2 × 2 recipe, but it must also craft back: vanilla Quartz Blocks can't be turned back into quartz, so quartz stays a single form.
 
 Crafting: Steel Ingot, Piston, Steel Ingot / Motor, Cargo Vault, Motor / Steel Ingot, Piston, Steel Ingot. The Dual Compacting Vault has Steel Ingots instead of the bottom Piston.
+
+## Fluid Vault
+
+The **Fluid Vault** holds one fluid: 256 buckets by default (`fluidVaultBuckets`), more with capacity upgrades. The fluid fills its glass from the bottom and the neon strip shows how full it is. Right-click it with a bucket or any fluid tank item to fill or empty it; fluid pipes connect like to any tank. It takes the same upgrades: Pull and Push move up to a bucket a second, Void deletes overflow of its fluid, and the lock keeps its fluid type when empty. Breaking it keeps the fluid.
+
+Crafting: Steel Ingot, Industrial Glass, Steel Ingot / Fluid Pipe, Portable Tank, Fluid Pipe / Steel Ingot, Industrial Glass, Steel Ingot.
 
 ## Upgrades
 

@@ -104,6 +104,43 @@ public final class NeoForgePlatform implements Platform {
     }
 
     @Override
+    public boolean interactWithFluidItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+                                         io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity vault) {
+        var held = player.getItemInHand(hand);
+        if (player.level().isClientSide()) return net.neoforged.neoforge.fluids.FluidUtil.getFluidHandler(held).isPresent();
+        return net.neoforged.neoforge.fluids.FluidUtil.interactWithFluidHandler(player, hand, new VaultFluidHandler(vault));
+    }
+
+    @Override
+    public long insertFluid(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side,
+                            net.minecraft.world.level.material.Fluid fluid, long max, boolean simulate) {
+        var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, pos, side);
+        if (handler == null || max <= 0) return 0;
+        var action = simulate ? net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE
+                : net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
+        return handler.fill(new net.neoforged.neoforge.fluids.FluidStack(fluid, (int) Math.min(Integer.MAX_VALUE, max)), action);
+    }
+
+    @Override
+    public io.github.keellam4.oritechextensions.storage.FluidAmount extractFluid(ServerLevel level, net.minecraft.core.BlockPos pos,
+                                                                               net.minecraft.core.Direction side,
+                                                                               java.util.function.Predicate<net.minecraft.world.level.material.Fluid> filter,
+                                                                               long max, boolean simulate) {
+        var none = io.github.keellam4.oritechextensions.storage.FluidAmount.EMPTY;
+        var handler = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, pos, side);
+        if (handler == null || max <= 0) return none;
+        var action = simulate ? net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE
+                : net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE;
+        for (int tank = 0; tank < handler.getTanks(); tank++) {
+            var inTank = handler.getFluidInTank(tank);
+            if (inTank.isEmpty() || !filter.test(inTank.getFluid())) continue;
+            var drained = handler.drain(inTank.copyWithAmount((int) Math.min(Integer.MAX_VALUE, max)), action);
+            if (!drained.isEmpty()) return new io.github.keellam4.oritechextensions.storage.FluidAmount(drained.getFluid(), drained.getAmount());
+        }
+        return none;
+    }
+
+    @Override
     public void sendToServer(CustomPacketPayload payload) {
         PacketDistributor.sendToServer(payload);
     }

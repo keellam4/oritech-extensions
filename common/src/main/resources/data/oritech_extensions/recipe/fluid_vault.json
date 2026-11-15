@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SGS",
+    "PTP",
+    "SGS"
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "G": {
+      "item": "oritech:industrial_glass_block"
+    },
+    "P": {
+      "item": "oritech:fluid_pipe"
+    },
+    "T": {
+      "item": "oritech:small_tank_block"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:fluid_vault",
+    "count": 1
+  }
+}

@@ -60,6 +60,7 @@ public final class OritechExtensionsNeoForge {
             event.accept(ModContent.GRID_VAULT_ITEM.get());
             event.accept(ModContent.COMPACTING_VAULT_ITEM.get());
             event.accept(ModContent.DUAL_COMPACTING_VAULT_ITEM.get());
+            event.accept(ModContent.FLUID_VAULT_ITEM.get());
             ModContent.VAULT_UPGRADES.values().forEach(upgrade -> event.accept(upgrade.get()));
         }
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
@@ -85,6 +86,7 @@ public final class OritechExtensionsNeoForge {
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModContent.CARGO_VAULT_ENTITY.get(), (vault, side) -> new VaultItemHandler(vault));
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModContent.COMPACTING_VAULT_ENTITY.get(), (vault, side) -> new VaultItemHandler(vault));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.FLUID_VAULT_ENTITY.get(), (vault, side) -> new VaultFluidHandler(vault));
     }
 
     private static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {

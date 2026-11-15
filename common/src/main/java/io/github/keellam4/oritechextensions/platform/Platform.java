@@ -56,6 +56,20 @@ public interface Platform {
     net.minecraft.world.item.ItemStack extractItem(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side,
                                                    java.util.function.Predicate<net.minecraft.world.item.ItemStack> filter, int max, boolean simulate);
 
+    /** Fills or empties a held fluid container (buckets, tanks) from or into the Fluid Vault. Returns whether anything happened. */
+    boolean interactWithFluidItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+                                  io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity vault);
+
+    /** Fills the fluid handler at {@code pos} (reached from {@code side}) with up to {@code max} millibuckets. Returns how much went in. */
+    long insertFluid(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side,
+                     net.minecraft.world.level.material.Fluid fluid, long max, boolean simulate);
+
+    /** Drains up to {@code max} millibuckets of the first fluid matching {@code filter} from the handler at {@code pos}. */
+    io.github.keellam4.oritechextensions.storage.FluidAmount extractFluid(ServerLevel level, net.minecraft.core.BlockPos pos,
+                                                                        net.minecraft.core.Direction side,
+                                                                        java.util.function.Predicate<net.minecraft.world.level.material.Fluid> filter,
+                                                                        long max, boolean simulate);
+
     boolean isModLoaded(String modId);
 
     /** True on the game client (also while it hosts a singleplayer world), false on a dedicated server. */

@@ -101,6 +101,50 @@ public final class FabricPlatform implements Platform {
     }
 
     @Override
+    public boolean interactWithFluidItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+                                         io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity vault) {
+        if (player.level().isClientSide()) {
+            return net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext.forPlayerInteraction(player, hand)
+                    .find(net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.ITEM) != null;
+        }
+        return net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorageUtil.interactWithFluidStorage(new VaultFluidStorage(vault), player, hand);
+    }
+
+    @Override
+    public long insertFluid(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction side,
+                            net.minecraft.world.level.material.Fluid fluid, long max, boolean simulate) {
+        var storage = net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.find(level, pos, side);
+        if (storage == null || max <= 0) return 0;
+        try (var transaction = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+            long droplets = storage.insert(net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant.of(fluid), max * VaultFluidStorage.DROPLETS_PER_MB, transaction);
+            long mb = droplets / VaultFluidStorage.DROPLETS_PER_MB;
+            if (!simulate && droplets % VaultFluidStorage.DROPLETS_PER_MB == 0) transaction.commit();
+            return droplets % VaultFluidStorage.DROPLETS_PER_MB == 0 ? mb : 0;
+        }
+    }
+
+    @Override
+    public io.github.keellam4.oritechextensions.storage.FluidAmount extractFluid(ServerLevel level, net.minecraft.core.BlockPos pos,
+                                                                               net.minecraft.core.Direction side,
+                                                                               java.util.function.Predicate<net.minecraft.world.level.material.Fluid> filter,
+                                                                               long max, boolean simulate) {
+        var none = io.github.keellam4.oritechextensions.storage.FluidAmount.EMPTY;
+        var storage = net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.find(level, pos, side);
+        if (storage == null || max <= 0) return none;
+        try (var transaction = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+            for (var view : storage.nonEmptyViews()) {
+                var resource = view.getResource();
+                if (!filter.test(resource.getFluid())) continue;
+                long droplets = view.extract(resource, max * VaultFluidStorage.DROPLETS_PER_MB, transaction);
+                if (droplets <= 0 || droplets % VaultFluidStorage.DROPLETS_PER_MB != 0) return none;
+                if (!simulate) transaction.commit();
+                return new io.github.keellam4.oritechextensions.storage.FluidAmount(resource.getFluid(), droplets / VaultFluidStorage.DROPLETS_PER_MB);
+            }
+        }
+        return none;
+    }
+
+    @Override
     public void sendToServer(CustomPacketPayload payload) {
         // Only called on the client; the class is only loaded when this runs.
         net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(payload);

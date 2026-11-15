@@ -25,6 +25,19 @@ public class CargoVaultItem extends BlockItem {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> lines, TooltipFlag flag) {
+        if (getBlock() instanceof CargoVaultBlock fluidVault && fluidVault.layout() == VaultLayout.FLUID) {
+            var fluid = stack.get(ModContent.FLUID_CONTENTS.get());
+            if (fluid == null || fluid.isEmpty()) {
+                lines.add(Component.translatable("tooltip.oritech_extensions.fluid_vault.empty").withStyle(ChatFormatting.GRAY));
+            } else {
+                lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.contains",
+                        String.format("%,d mB", fluid.amount()), fluid.fluid().defaultFluidState().createLegacyBlock().getBlock().getName())
+                        .withStyle(ChatFormatting.GRAY));
+                if (fluid.locked()) lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.locked").withStyle(ChatFormatting.GRAY));
+            }
+            lines.add(Component.translatable("tooltip.oritech_extensions.fluid_vault.help").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+            return;
+        }
         var contents = stack.get(ModContent.VAULT_CONTENTS.get());
         if (contents == null || contents.isEmpty()) {
             lines.add(Component.translatable("tooltip.oritech_extensions.cargo_vault.empty." + slotWord()).withStyle(ChatFormatting.GRAY));

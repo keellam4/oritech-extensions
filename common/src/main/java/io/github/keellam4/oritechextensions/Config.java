@@ -51,6 +51,10 @@ public class Config {
                     "Quad and Grid Vaults split this evenly between their 4 or 16 windows.")
             .defineInRange("cargoVaultStacks", 64, 1, 1024);
 
+    public static final ModConfigSpec.IntValue FLUID_VAULT_BUCKETS = BUILDER
+            .comment("How many buckets one Fluid Vault holds before capacity upgrades.")
+            .defineInRange("fluidVaultBuckets", 256, 1, 100000);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     /** How many extension blocks may be attached to one door. Safe to call before the config has loaded. */
@@ -81,5 +85,9 @@ public class Config {
 
     public static int cargoVaultStacks() {
         return SPEC.isLoaded() ? CARGO_VAULT_STACKS.get() : CARGO_VAULT_STACKS.getDefault();
+    }
+
+    public static int fluidVaultBuckets() {
+        return SPEC.isLoaded() ? FLUID_VAULT_BUCKETS.get() : FLUID_VAULT_BUCKETS.getDefault();
     }
 }
