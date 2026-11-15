@@ -209,11 +209,18 @@ public class PaintTargetGameTests {
             helper.fail("painting the extension was refused");
             return;
         }
-        if (!(level.getBlockEntity(anchor) instanceof ColorableMachine door) || door.getCurrentColor() != Paint.WHITE) {
+        if (!(level.getBlockEntity(anchor) instanceof ColorableMachine door) || Paint.of(door.getCurrentColor()) != Paint.WHITE) {
             helper.fail("the door isn't white after painting its extension");
             return;
         }
         if (player.getMainHandItem().getCount() != 3) helper.fail("painting a door should use one cartridge");
+
+        // Oritech paints the door itself, so a Rainbow Cartridge leaves it alone and isn't used up.
+        var rainbow = new ItemStack(ModContent.RAINBOW_CARTRIDGE.get(), 2);
+        player.setItemInHand(InteractionHand.MAIN_HAND, rainbow);
+        if (paint(level, extension, player)) helper.fail("a Rainbow Cartridge painted a hangar door");
+        if (player.getMainHandItem().getCount() != 2) helper.fail("a Rainbow Cartridge was used on a hangar door");
+        if (Paint.of(door.getCurrentColor()) != Paint.WHITE) helper.fail("a Rainbow Cartridge changed the door's colour");
         if (paint(level, extension, player)) helper.fail("repainted the door with the same colour");
         helper.succeed();
     }
