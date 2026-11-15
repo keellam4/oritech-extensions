@@ -63,9 +63,9 @@ public class CargoControllerBlockEntity extends BlockEntity {
         }
         var wanted = new java.util.HashSet<Long>();
         wanted.add(net.minecraft.world.level.ChunkPos.asLong(worldPosition));
-        var net = network();
-        for (var vault : net.vaults()) wanted.add(net.minecraft.world.level.ChunkPos.asLong(vault.getBlockPos()));
-        for (var tank : net.tanks()) {
+        var cargo = network();
+        for (var vault : cargo.vaults()) wanted.add(net.minecraft.world.level.ChunkPos.asLong(vault.getBlockPos()));
+        for (var tank : cargo.tanks()) {
             if (tank instanceof net.minecraft.world.level.block.entity.BlockEntity entity) {
                 wanted.add(net.minecraft.world.level.ChunkPos.asLong(entity.getBlockPos()));
             }
