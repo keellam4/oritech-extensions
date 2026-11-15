@@ -1,7 +1,7 @@
 ---
 title: Cargo Vault
 icon: oritech_extensions:cargo_vault
-related_items: ["oritech_extensions:cargo_vault", "oritech_extensions:quad_vault", "oritech_extensions:grid_vault", "oritech_extensions:dual_vault", "oritech_extensions:compacting_vault", "oritech_extensions:dual_compacting_vault", "oritech_extensions:fluid_vault", "oritech_extensions:detailing_tool"]
+related_items: ["oritech_extensions:cargo_vault", "oritech_extensions:quad_vault", "oritech_extensions:grid_vault", "oritech_extensions:dual_vault", "oritech_extensions:compacting_vault", "oritech_extensions:dual_compacting_vault", "oritech_extensions:fluid_vault", "oritech_extensions:cargo_controller", "oritech_extensions:detailing_tool"]
 ---
 
 # Cargo Vault
@@ -50,6 +50,20 @@ Crafting: Steel Ingot, Piston, Steel Ingot / Motor, Cargo Vault, Motor / Steel I
 The **Fluid Vault** holds one fluid: 256 buckets by default (`fluidVaultBuckets`), more with capacity upgrades. The fluid fills its glass from the bottom and the neon strip shows how full it is. Right-click it with a bucket or any fluid tank item to fill or empty it; fluid pipes connect like to any tank. It takes the same upgrades: Pull and Push move up to a bucket a second, Void deletes overflow of its fluid, and the lock keeps its fluid type when empty. Breaking it keeps the fluid.
 
 Crafting: Steel Ingot, Industrial Glass, Steel Ingot / Fluid Pipe, Portable Tank, Fluid Pipe / Steel Ingot, Industrial Glass, Steel Ingot.
+
+## Cargo Controller
+
+A **Cargo Controller** links every item vault touching it, and every vault touching those, into one inventory (a Cargo Wall, up to 1,024 vaults). Fluid Vaults join too: items go to item vaults, fluids to Fluid Vaults.
+
+- **Pipes:** connect a pipe to the controller instead of to each vault. Items go to the vault that already holds them first, then to a vault with room for a new item type, so one full window never jams the pipe. Pulling from the controller takes from any vault.
+- **Terminal:** right-click the controller to see everything in the wall with totals.
+  - Left-click an item to take a stack, right-click to take one, shift-click to send a stack to your inventory.
+  - With items on your cursor, left-click the grid to put them all in, right-click to put one in. Shift-click items in your inventory to put them in.
+  - Fluids show with their amount in buckets: click one with an empty bucket to fill it, or with a full bucket of that fluid to empty it in. Fluid pipes on the controller reach every Fluid Vault.
+  - Type in the search box to filter by name, or `@mod` to filter by mod.
+- The controller paints with its wall.
+
+Crafting: Steel Ingot, Processing Unit, Steel Ingot / Magnetic Coil, Cargo Vault, Magnetic Coil / Steel Ingot, Item Pipe, Steel Ingot.
 
 ## Upgrades
 

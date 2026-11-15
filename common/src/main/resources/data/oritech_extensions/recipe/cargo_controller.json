@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "MVM",
+    "SIS"
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "P": {
+      "item": "oritech:processing_unit"
+    },
+    "M": {
+      "item": "oritech:magnetic_coil"
+    },
+    "V": {
+      "item": "oritech_extensions:cargo_vault"
+    },
+    "I": {
+      "item": "oritech:item_pipe"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:cargo_controller",
+    "count": 1
+  }
+}

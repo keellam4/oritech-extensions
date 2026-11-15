@@ -8,6 +8,7 @@
     "oritech_extensions:dual_vault",
     "oritech_extensions:compacting_vault",
     "oritech_extensions:dual_compacting_vault",
-    "oritech_extensions:fluid_vault"
+    "oritech_extensions:fluid_vault",
+    "oritech_extensions:cargo_controller"
   ]
 }

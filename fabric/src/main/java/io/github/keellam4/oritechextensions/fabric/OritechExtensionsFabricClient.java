@@ -34,6 +34,10 @@ public final class OritechExtensionsFabricClient implements ClientModInitializer
 
         net.minecraft.client.gui.screens.MenuScreens.register(ModContent.VAULT_UPGRADE_MENU.get(),
                 io.github.keellam4.oritechextensions.client.VaultUpgradeScreen::new);
+        net.minecraft.client.gui.screens.MenuScreens.register(ModContent.TERMINAL_MENU.get(),
+                io.github.keellam4.oritechextensions.client.TerminalScreen::new);
+        ClientPlayNetworking.registerGlobalReceiver(io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.TYPE,
+                (payload, context) -> io.github.keellam4.oritechextensions.client.TerminalScreen.receive(payload));
 
         FabricPaintModels.register();
         ClientTickEvents.END_CLIENT_TICK.register(FabricPaintModels::afterReload);

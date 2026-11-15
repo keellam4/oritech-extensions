@@ -38,6 +38,16 @@ public final class OritechExtensionsFabric implements ModInitializer {
         PayloadTypeRegistry.playS2C().register(PaintSyncPayload.TYPE, PaintSyncPayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(DetailingToolPayload.TYPE, DetailingToolPayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(VaultTakePayload.TYPE, VaultTakePayload.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(io.github.keellam4.oritechextensions.storage.TerminalActionPayload.TYPE,
+                io.github.keellam4.oritechextensions.storage.TerminalActionPayload.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.TYPE,
+                io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.STREAM_CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(io.github.keellam4.oritechextensions.storage.TerminalActionPayload.TYPE, (payload, context) -> {
+            if (context.player().containerMenu instanceof io.github.keellam4.oritechextensions.storage.TerminalMenu menu
+                    && menu.containerId == payload.containerId()) menu.handle(payload.action(), payload.item(), payload.fluid());
+        });
+        ItemStorage.SIDED.registerForBlockEntity((controller, side) -> new ControllerItemStorage(controller), ModContent.CARGO_CONTROLLER_ENTITY.get());
+        net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((controller, side) -> new ControllerFluidStorage(controller), ModContent.CARGO_CONTROLLER_ENTITY.get());
         ServerPlayNetworking.registerGlobalReceiver(VaultTakePayload.TYPE,
                 (payload, context) -> CargoVault.take(context.player(), payload.pos(), payload.slot(), payload.one()));
         ItemStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultItemStorage(vault), ModContent.CARGO_VAULT_ENTITY.get());
@@ -56,6 +66,7 @@ public final class OritechExtensionsFabric implements ModInitializer {
             entries.accept(ModContent.COMPACTING_VAULT_ITEM.get());
             entries.accept(ModContent.DUAL_COMPACTING_VAULT_ITEM.get());
             entries.accept(ModContent.FLUID_VAULT_ITEM.get());
+            entries.accept(ModContent.CARGO_CONTROLLER_ITEM.get());
             ModContent.VAULT_UPGRADES.values().forEach(upgrade -> entries.accept(upgrade.get()));
         });
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> {

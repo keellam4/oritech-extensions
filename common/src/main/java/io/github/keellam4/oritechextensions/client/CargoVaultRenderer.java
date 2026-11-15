@@ -94,9 +94,10 @@ public class CargoVaultRenderer<T extends CargoVaultBlockEntity> implements Bloc
         int light = fluid.defaultFluidState().createLegacyBlock().getLightEmission() > 0 ? LightTexture.FULL_BRIGHT
                 : net.minecraft.client.renderer.LevelRenderer.getLightColor(level, tank.getBlockPos().relative(facing));
 
-        // The fluid fills the glass from the bottom, as high as the tank is full (at least a sliver).
+        // The fluid fills the glass from the bottom, as high as the tank is full. Upgraded tanks are huge, so a
+        // little fluid still shows as a quarter of the glass; the gauge and readout give the exact amount.
         float height = cell.glassV1() - cell.glassV0();
-        float level01 = Math.max(0.06f, tank.fill());
+        float level01 = 0.25f + 0.75f * tank.fill();
         float left = cell.glassU0() - 0.5f;
         float right = cell.glassU1() - 0.5f;
         float bottom = 0.5f - cell.glassV1();
