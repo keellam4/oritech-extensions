@@ -7,6 +7,8 @@ import io.github.keellam4.oritechextensions.storage.CargoVaultBlock;
 import io.github.keellam4.oritechextensions.storage.CargoVaultBlockEntity;
 import io.github.keellam4.oritechextensions.storage.CargoVaultItem;
 import io.github.keellam4.oritechextensions.storage.VaultContents;
+import io.github.keellam4.oritechextensions.storage.VaultLayout;
+import io.github.keellam4.oritechextensions.storage.CompactingVaultBlockEntity;
 import net.minecraft.world.level.block.SoundType;
 import io.github.keellam4.oritechextensions.tool.ToolContents;
 import io.github.keellam4.oritechextensions.hangar.HangarDoorExtensionBlock;
@@ -49,16 +51,34 @@ public final class ModContent {
             "detailing_tool", () -> new DetailingToolItem(new Item.Properties().stacksTo(1)));
 
     /** Bulk storage for one item type. */
-    public static final Supplier<CargoVaultBlock> CARGO_VAULT = PLATFORM.register(BuiltInRegistries.BLOCK, "cargo_vault",
-            () -> new CargoVaultBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f).sound(SoundType.METAL)));
+    public static final Supplier<CargoVaultBlock> CARGO_VAULT = vault("cargo_vault", VaultLayout.SINGLE);
+    /** Two item types, half the space each. */
+    public static final Supplier<CargoVaultBlock> DUAL_VAULT = vault("dual_vault", VaultLayout.DUAL);
+    /** Four item types, a quarter of the space each. */
+    public static final Supplier<CargoVaultBlock> QUAD_VAULT = vault("quad_vault", VaultLayout.QUAD);
+    /** Sixteen item types, a sixteenth of the space each. */
+    public static final Supplier<CargoVaultBlock> GRID_VAULT = vault("grid_vault", VaultLayout.GRID);
+    /** One item in up to three forms (nugget, ingot, block): stored once, taken out in any form. */
+    public static final Supplier<CargoVaultBlock> COMPACTING_VAULT = vault("compacting_vault", VaultLayout.COMPACTING);
+    /** One item in two forms, for items that compact only once. */
+    public static final Supplier<CargoVaultBlock> DUAL_COMPACTING_VAULT = vault("dual_compacting_vault", VaultLayout.COMPACTING_DUAL);
 
-    public static final Supplier<CargoVaultItem> CARGO_VAULT_ITEM = PLATFORM.register(BuiltInRegistries.ITEM,
-            "cargo_vault", () -> new CargoVaultItem(CARGO_VAULT.get(), new Item.Properties().stacksTo(1)));
+    public static final Supplier<CargoVaultItem> CARGO_VAULT_ITEM = vaultItem("cargo_vault", CARGO_VAULT);
+    public static final Supplier<CargoVaultItem> DUAL_VAULT_ITEM = vaultItem("dual_vault", DUAL_VAULT);
+    public static final Supplier<CargoVaultItem> QUAD_VAULT_ITEM = vaultItem("quad_vault", QUAD_VAULT);
+    public static final Supplier<CargoVaultItem> GRID_VAULT_ITEM = vaultItem("grid_vault", GRID_VAULT);
+    public static final Supplier<CargoVaultItem> COMPACTING_VAULT_ITEM = vaultItem("compacting_vault", COMPACTING_VAULT);
+    public static final Supplier<CargoVaultItem> DUAL_COMPACTING_VAULT_ITEM = vaultItem("dual_compacting_vault", DUAL_COMPACTING_VAULT);
 
     @SuppressWarnings("DataFlowIssue")
     public static final Supplier<BlockEntityType<CargoVaultBlockEntity>> CARGO_VAULT_ENTITY = PLATFORM.register(
             BuiltInRegistries.BLOCK_ENTITY_TYPE, "cargo_vault",
-            () -> BlockEntityType.Builder.of(CargoVaultBlockEntity::new, CARGO_VAULT.get()).build(null));
+            () -> BlockEntityType.Builder.of(CargoVaultBlockEntity::new, CARGO_VAULT.get(), DUAL_VAULT.get(), QUAD_VAULT.get(), GRID_VAULT.get()).build(null));
+
+    @SuppressWarnings("DataFlowIssue")
+    public static final Supplier<BlockEntityType<CompactingVaultBlockEntity>> COMPACTING_VAULT_ENTITY = PLATFORM.register(
+            BuiltInRegistries.BLOCK_ENTITY_TYPE, "compacting_vault",
+            () -> BlockEntityType.Builder.of(CompactingVaultBlockEntity::new, COMPACTING_VAULT.get(), DUAL_COMPACTING_VAULT.get()).build(null));
 
     /** A Cargo Vault's contents, kept on its item. */
     public static final Supplier<DataComponentType<VaultContents>> VAULT_CONTENTS = PLATFORM.register(
@@ -85,6 +105,15 @@ public final class ModContent {
                     .persistent(ToolContents.CODEC)
                     .networkSynchronized(ToolContents.STREAM_CODEC)
                     .build());
+
+    private static Supplier<CargoVaultBlock> vault(String name, VaultLayout layout) {
+        return PLATFORM.register(BuiltInRegistries.BLOCK, name,
+                () -> new CargoVaultBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3.5f, 6f).sound(SoundType.METAL), layout));
+    }
+
+    private static Supplier<CargoVaultItem> vaultItem(String name, Supplier<CargoVaultBlock> block) {
+        return PLATFORM.register(BuiltInRegistries.ITEM, name, () -> new CargoVaultItem(block.get(), new Item.Properties().stacksTo(1)));
+    }
 
     private ModContent() {
     }

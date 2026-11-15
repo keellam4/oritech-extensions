@@ -22,7 +22,8 @@ import java.util.WeakHashMap;
  *     <li>Right-click with items: put the held stack in. Right-click again quickly: put in every matching item.</li>
  *     <li>Right-click with an empty hand: put in every matching item from the inventory.</li>
  *     <li>Sneak + right-click with an empty hand: lock the item type, so an empty vault keeps it.</li>
- *     <li>Left-click the front: take a stack. Sneak + left-click the front: take one. Break it from another side.</li>
+ *     <li>Left-click the front: take a stack from the window under the crosshair. Sneak + left-click: take one.
+ *     Break it from another side, or from the front once it's empty.</li>
  * </ul>
  */
 public final class CargoVault {
@@ -38,7 +39,11 @@ public final class CargoVault {
     private CargoVault() {
     }
 
-    public static void insertHeld(CargoVaultBlockEntity vault, Player player, InteractionHand hand) {
+    /** Client side: the slot under the crosshair on the vault at a position (set by the client entry points). */
+    public static java.util.function.ToIntFunction<BlockPos> clientSlotLookup = pos -> 0;
+
+    /** Puts the held stack into the clicked slot (or the slot that holds that item, or the first empty one). */
+    public static void insertHeld(CargoVaultBlockEntity vault, Player player, InteractionHand hand, int clickedSlot) {
         var level = vault.getLevel();
         if (level == null) return;
         long now = level.getGameTime();
@@ -48,7 +53,8 @@ public final class CargoVault {
             return;
         }
         var stack = player.getItemInHand(hand);
-        int moved = vault.insert(stack, false);
+        int moved = clickedSlot >= 0 && clickedSlot < vault.slots() ? vault.insert(clickedSlot, stack, false) : 0;
+        if (moved == 0) moved = vault.insert(stack, false);
         if (moved > 0) {
             if (!player.getAbilities().instabuild) stack.shrink(moved);
             sound(level, vault.getBlockPos(), true);
@@ -57,16 +63,16 @@ public final class CargoVault {
         }
     }
 
-    /** Puts every item matching the vault's type from the player's inventory in. Returns whether anything moved. */
+    /** Puts every item matching one of the vault's item types from the player's inventory in. Returns whether anything moved. */
     public static boolean insertAll(Level level, CargoVaultBlockEntity vault, Player player) {
-        if (vault.item().isEmpty() || level.isClientSide()) return false;
+        if (!vault.hasAnyItemType() || level.isClientSide()) return false;
         var inventory = player.getInventory();
         int total = 0;
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             var stack = inventory.getItem(i);
-            if (stack.isEmpty() || !vault.accepts(stack)) continue;
+            if (stack.isEmpty() || vault.slotOf(stack) < 0) continue;
             int moved = vault.insert(stack, false);
-            if (moved <= 0) break;
+            if (moved <= 0) continue;
             stack.shrink(moved);
             total += moved;
         }
@@ -79,7 +85,7 @@ public final class CargoVault {
 
     public static void toggleLock(CargoVaultBlockEntity vault, Player player) {
         boolean locked = !vault.isLocked();
-        if (locked && vault.item().isEmpty()) {
+        if (locked && !vault.hasAnyItemType()) {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.cargo_vault.nothing_to_lock"), true);
             return;
         }
@@ -99,21 +105,25 @@ public final class CargoVault {
         var state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof CargoVaultBlock) || player.isSpectator()) return false;
         if (face != state.getValue(BlockStateProperties.HORIZONTAL_FACING)) return false;
-        if (!(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault) || vault.count() == 0) return false;
-        if (level.isClientSide()) Platform.INSTANCE.sendToServer(new VaultTakePayload(pos, player.isShiftKeyDown()));
+        if (!(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault) || vault.isEmpty()) return false;
+        if (level.isClientSide()) {
+            int slot = clientSlotLookup.applyAsInt(pos);
+            Platform.INSTANCE.sendToServer(new VaultTakePayload(pos, Math.max(0, slot), player.isShiftKeyDown()));
+        }
         return true;
     }
 
-    /** Payload handler: take a stack (or one item) from the vault at {@code pos}. */
-    public static void take(ServerPlayer player, BlockPos pos, boolean one) {
+    /** Payload handler: take a stack (or one item) from a slot of the vault at {@code pos}. */
+    public static void take(ServerPlayer player, BlockPos pos, int slot, boolean one) {
         var level = player.serverLevel();
         if (!player.canInteractWithBlock(pos, 1.0) || !(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault)) return;
+        if (slot < 0 || slot >= vault.slots()) return;
         long now = level.getGameTime();
         Long last = LAST_TAKE.get(player.getUUID());
         if (last != null && now >= last && now - last < TAKE_COOLDOWN_TICKS) return;
         LAST_TAKE.put(player.getUUID(), now);
 
-        var taken = vault.extract(one ? 1 : vault.item().getMaxStackSize(), false);
+        var taken = vault.extract(slot, one ? 1 : vault.item(slot).getMaxStackSize(), false);
         if (taken.isEmpty()) return;
         if (!player.getInventory().add(taken)) player.drop(taken, false);
         sound(level, pos, false);

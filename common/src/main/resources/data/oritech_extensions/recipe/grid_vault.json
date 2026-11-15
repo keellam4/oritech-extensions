@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "QSQ",
+    "SPS",
+    "QSQ"
+  ],
+  "key": {
+    "Q": {
+      "item": "oritech_extensions:quad_vault"
+    },
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "P": {
+      "item": "oritech:processing_unit"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:grid_vault",
+    "count": 1
+  }
+}

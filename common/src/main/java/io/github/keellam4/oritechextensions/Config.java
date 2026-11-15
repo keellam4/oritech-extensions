@@ -47,7 +47,8 @@ public class Config {
             .defineInRange("detailingToolAreaSize", 32, 1, 128);
 
     public static final ModConfigSpec.IntValue CARGO_VAULT_STACKS = BUILDER
-            .comment("How many stacks of its item one Cargo Vault holds (64 stacks of 64 = 4,096 items by default).")
+            .comment("How many stacks one vault holds (64 stacks of 64 = 4,096 items by default).",
+                    "Quad and Grid Vaults split this evenly between their 4 or 16 windows.")
             .defineInRange("cargoVaultStacks", 64, 1, 1024);
 
     public static final ModConfigSpec SPEC = BUILDER.build();

@@ -39,14 +39,22 @@ public final class OritechExtensionsFabric implements ModInitializer {
         PayloadTypeRegistry.playC2S().register(DetailingToolPayload.TYPE, DetailingToolPayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(VaultTakePayload.TYPE, VaultTakePayload.STREAM_CODEC);
         ServerPlayNetworking.registerGlobalReceiver(VaultTakePayload.TYPE,
-                (payload, context) -> CargoVault.take(context.player(), payload.pos(), payload.one()));
+                (payload, context) -> CargoVault.take(context.player(), payload.pos(), payload.slot(), payload.one()));
         ItemStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultItemStorage(vault), ModContent.CARGO_VAULT_ENTITY.get());
+        ItemStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultItemStorage(vault), ModContent.COMPACTING_VAULT_ENTITY.get());
         ServerPlayNetworking.registerGlobalReceiver(DetailingToolPayload.TYPE,
                 (payload, context) -> DetailingTool.onScroll(context.player(), payload.direction()));
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> entries.accept(ModContent.HANGAR_DOOR_EXTENSION_ITEM.get()));
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.BUILDING_BLOCKS).register(entries -> entries.accept(ModContent.HANGAR_DOOR_EXTENSION_ITEM.get()));
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> entries.accept(ModContent.CARGO_VAULT_ITEM.get()));
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> {
+            entries.accept(ModContent.CARGO_VAULT_ITEM.get());
+            entries.accept(ModContent.DUAL_VAULT_ITEM.get());
+            entries.accept(ModContent.QUAD_VAULT_ITEM.get());
+            entries.accept(ModContent.GRID_VAULT_ITEM.get());
+            entries.accept(ModContent.COMPACTING_VAULT_ITEM.get());
+            entries.accept(ModContent.DUAL_COMPACTING_VAULT_ITEM.get());
+        });
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> {
             entries.accept(ModContent.GUIDE.get());
             entries.accept(ModContent.DETAILING_TOOL.get());

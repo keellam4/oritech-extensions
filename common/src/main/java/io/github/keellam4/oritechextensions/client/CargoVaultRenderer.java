@@ -3,7 +3,9 @@ package io.github.keellam4.oritechextensions.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import io.github.keellam4.oritechextensions.storage.CargoVaultBlock;
 import io.github.keellam4.oritechextensions.storage.CargoVaultBlockEntity;
+import io.github.keellam4.oritechextensions.storage.VaultLayout;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,15 +20,11 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.joml.Matrix4f;
 
 /**
- * Draws what's inside a Cargo Vault: the item floating in the glass, the count under it, and the neon fill gauge
- * above it (the dim strip in the texture lights up from left to right as the vault fills).
+ * Draws what's inside a vault, for each slot: the item floating in its glass window, the count under it, and the
+ * neon fill gauge above it (the dim strip in the texture lights up from left to right as the slot fills).
  */
-public class CargoVaultRenderer implements BlockEntityRenderer<CargoVaultBlockEntity> {
+public class CargoVaultRenderer<T extends CargoVaultBlockEntity> implements BlockEntityRenderer<T> {
 
-    /** The gauge: texture row 3, columns 3 to 12. */
-    private static final int GAUGE_ROW = 3;
-    private static final int GAUGE_FROM = 3;
-    private static final int GAUGE_PIXELS = 10;
     private static final int GAUGE_COLOUR = 0xFF9CFFF5;
     private static final int TEXT_COLOUR = 0xFFDFFFFB;
     private static final int LOCKED_TEXT_COLOUR = 0xFFFFC27A;
@@ -40,45 +38,58 @@ public class CargoVaultRenderer implements BlockEntityRenderer<CargoVaultBlockEn
     }
 
     @Override
-    public void render(CargoVaultBlockEntity vault, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
+    public void render(T vault, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
         var state = vault.getBlockState();
-        if (!state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) return;
+        if (!state.hasProperty(BlockStateProperties.HORIZONTAL_FACING) || !(state.getBlock() instanceof CargoVaultBlock block)) return;
         var facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        var level = vault.getLevel();
+        if (level == null) return;
 
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(Axis.YP.rotationDegrees(-facing.toYRot()));
-        // Now the front is the +z face, seen from outside: texel (u, v) is at x = u/16 - 0.5, y = 0.5 - v/16.
+        // Now the front is the +z face, seen from outside: a point (u, v) of the front is at x = u - 0.5, y = 0.5 - v.
 
-        if (vault.count() > 0) drawGauge(pose, buffers, vault.fill());
+        var cells = block.layout().cells();
+        float t = level.getGameTime() + partialTick;
+        for (int slot = 0; slot < cells.length && slot < vault.slots(); slot++) {
+            var cell = cells[slot];
+            if (vault.count(slot) > 0) drawGauge(pose, buffers, cell, vault.fill(slot));
+            var item = vault.item(slot);
+            if (item.isEmpty()) continue;
 
-        var item = vault.item();
-        if (!item.isEmpty() && vault.getLevel() != null) {
-            long time = vault.getLevel().getGameTime();
-            float t = time + partialTick;
+            float width = cell.glassU1() - cell.glassU0();
+            float height = cell.glassV1() - cell.glassV0();
+            float cx = (cell.glassU0() + cell.glassU1()) / 2 - 0.5f;
+            float cy = 0.5f - (cell.glassV0() + height * 0.42f);
+            float size = Math.min(width, height) * (block.layout() == VaultLayout.SINGLE ? 0.84f : 0.7f);
+            float phase = slot * 1.7f;
+
             pose.pushPose();
-            pose.translate(0, 0.02 + Mth.sin(t / 20f) * 0.012, 0.5 + 0.04);
-            pose.mulPose(Axis.YP.rotationDegrees(180f + Mth.sin(t / 30f) * 18f));
-            pose.scale(0.42f, 0.42f, 0.42f);
+            pose.translate(cx, cy + Mth.sin(t / 20f + phase) * height * 0.02f, 0.5 + size * 0.1f);
+            pose.mulPose(Axis.YP.rotationDegrees(180f + Mth.sin(t / 30f + phase) * 18f));
+            pose.scale(size, size, size);
             items.renderStatic(item, ItemDisplayContext.FIXED, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, pose, buffers,
-                    vault.getLevel(), (int) vault.getBlockPos().asLong());
+                    level, (int) vault.getBlockPos().asLong() + slot);
             pose.popPose();
 
-            drawCount(pose, buffers, format(vault.count()), vault.isLocked());
+            drawCount(pose, buffers, format(vault.count(slot)), vault.isLocked(), cx, 0.5f - (cell.glassV1() - height * 0.2f), height * 0.19f);
         }
         pose.popPose();
     }
 
-    private static void drawGauge(PoseStack pose, MultiBufferSource buffers, float fill) {
-        int lit = Math.max(1, Math.min(GAUGE_PIXELS, Math.round(fill * GAUGE_PIXELS)));
+    private static void drawGauge(PoseStack pose, MultiBufferSource buffers, VaultLayout.Cell cell, float fill) {
+        int pixels = cell.gaugePixels();
+        int lit = Math.max(1, Math.min(pixels, Math.round(fill * pixels)));
         VertexConsumer consumer = buffers.getBuffer(RenderType.lightning());
         Matrix4f matrix = pose.last().pose();
         float z = 0.5f + 0.0015f;
-        float top = 0.5f - GAUGE_ROW / 16f;
-        float bottom = top - 1 / 16f;
+        float top = 0.5f - cell.gaugeV0();
+        float bottom = 0.5f - cell.gaugeV1();
+        float pixel = (cell.gaugeU1() - cell.gaugeU0()) / pixels;
         for (int i = 0; i < lit; i++) {
-            float left = (GAUGE_FROM + i) / 16f - 0.5f;
-            float right = left + 1 / 16f;
+            float left = cell.gaugeU0() + i * pixel - 0.5f;
+            float right = left + pixel;
             // Counter-clockwise seen from the front.
             consumer.addVertex(matrix, left, bottom, z).setColor(GAUGE_COLOUR);
             consumer.addVertex(matrix, right, bottom, z).setColor(GAUGE_COLOUR);
@@ -87,15 +98,14 @@ public class CargoVaultRenderer implements BlockEntityRenderer<CargoVaultBlockEn
         }
     }
 
-    private void drawCount(PoseStack pose, MultiBufferSource buffers, String text, boolean locked) {
+    /** Count text centred at ({@code x}, {@code y}), {@code height} blocks tall. */
+    private void drawCount(PoseStack pose, MultiBufferSource buffers, String text, boolean locked, float x, float y, float height) {
         pose.pushPose();
-        // Bottom of the glass, texture rows 9 to 11.
-        pose.translate(0, 0.5 - 9.6 / 16f, 0.5 + 0.002);
-        float scale = 1.5f / 16f / font.lineHeight;
+        pose.translate(x, y, 0.5 + 0.002);
+        float scale = height / font.lineHeight;
         pose.scale(scale, -scale, scale);
-        float x = -font.width(text) / 2f;
-        font.drawInBatch(text, x, 0, locked ? LOCKED_TEXT_COLOUR : TEXT_COLOUR, false, pose.last().pose(), buffers,
-                Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(text, -font.width(text) / 2f, -font.lineHeight / 2f, locked ? LOCKED_TEXT_COLOUR : TEXT_COLOUR, false,
+                pose.last().pose(), buffers, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
         pose.popPose();
     }
 

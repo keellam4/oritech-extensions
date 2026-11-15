@@ -22,21 +22,38 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The Cargo Vault: bulk storage for one item type. The item floats in the glass front, the strip above it shows
- * how full the vault is. Interactions are in {@link CargoVault}.
+ * The vaults: bulk storage in one or more windows (see {@link VaultLayout}).
+ * Each slot's item floats in its glass window, the strip above it shows how full it is. Interactions are in
+ * {@link CargoVault}.
  */
 public class CargoVaultBlock extends HorizontalDirectionalBlock implements EntityBlock {
 
-    public static final MapCodec<CargoVaultBlock> CODEC = simpleCodec(CargoVaultBlock::new);
+    private final VaultLayout layout;
+    private final MapCodec<CargoVaultBlock> codec;
 
-    public CargoVaultBlock(Properties properties) {
+    public CargoVaultBlock(Properties properties, VaultLayout layout) {
         super(properties);
+        this.layout = layout;
+        this.codec = simpleCodec(p -> new CargoVaultBlock(p, layout));
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
+        return codec;
+    }
+
+    public VaultLayout layout() {
+        return layout;
+    }
+
+    public int slots() {
+        return layout.slots();
+    }
+
+    /** The slot under {@code hit}, or -1 when it isn't on the front. */
+    public int slotAt(BlockState state, BlockPos pos, BlockHitResult hit) {
+        return layout.slotAt(state.getValue(FACING), pos, hit.getLocation(), hit.getDirection());
     }
 
     @Override
@@ -62,16 +79,16 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new CargoVaultBlockEntity(pos, state);
+        return layout.compacting() ? new CompactingVaultBlockEntity(pos, state) : new CargoVaultBlockEntity(pos, state);
     }
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                               InteractionHand hand, BlockHitResult hit) {
         if (!(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault)) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        // Another item: let it be used normally (placing a block against the vault, say).
+        // An item the vault can't take: let it be used normally (placing a block against the vault, say).
         if (!vault.accepts(stack)) return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
-        if (!level.isClientSide()) CargoVault.insertHeld(vault, player, hand);
+        if (!level.isClientSide()) CargoVault.insertHeld(vault, player, hand, slotAt(state, pos, hit));
         return ItemInteractionResult.sidedSuccess(level.isClientSide());
     }
 
@@ -95,7 +112,7 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
 
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
-        if (!(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault) || vault.count() == 0) return 0;
+        if (!(level.getBlockEntity(pos) instanceof CargoVaultBlockEntity vault) || vault.isEmpty()) return 0;
         return 1 + (int) Math.floor(vault.fill() * 14);
     }
 }

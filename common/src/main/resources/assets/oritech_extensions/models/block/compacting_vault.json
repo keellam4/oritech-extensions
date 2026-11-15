@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "oritech_extensions:block/compacting_vault_front",
+    "side": "oritech_extensions:block/cargo_vault_side",
+    "top": "oritech_extensions:block/cargo_vault_top",
+    "particle": "oritech_extensions:block/cargo_vault_side"
+  }
+}

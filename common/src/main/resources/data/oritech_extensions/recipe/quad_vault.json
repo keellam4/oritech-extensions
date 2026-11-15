@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "VV",
+    "VV"
+  ],
+  "key": {
+    "V": {
+      "item": "oritech_extensions:cargo_vault"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:quad_vault",
+    "count": 1
+  }
+}

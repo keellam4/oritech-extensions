@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "MVM",
+    "SPS"
+  ],
+  "key": {
+    "S": {
+      "item": "oritech:steel_ingot"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    },
+    "M": {
+      "item": "oritech:motor"
+    },
+    "V": {
+      "item": "oritech_extensions:cargo_vault"
+    }
+  },
+  "result": {
+    "id": "oritech_extensions:compacting_vault",
+    "count": 1
+  }
+}
