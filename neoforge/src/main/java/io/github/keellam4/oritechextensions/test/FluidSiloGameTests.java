@@ -41,6 +41,12 @@ public class FluidSiloGameTests {
     public static void formsAndHolds(GameTestHelper helper) {
         var silo = build(helper, 4);
         if (!silo.isFormed() || silo.structure().height() != 4) helper.fail("a 3x3x4 silo should form, got " + silo.structure());
+        if (!silo.getBlockState().getValue(io.github.keellam4.oritechextensions.storage.SiloControllerBlock.FORMED)) helper.fail("a formed silo's controller should light up");
+        helper.setBlock(new BlockPos(1, 2, 1), net.minecraft.world.level.block.Blocks.AIR);
+        silo.checkStructure();
+        if (silo.getBlockState().getValue(io.github.keellam4.oritechextensions.storage.SiloControllerBlock.FORMED)) helper.fail("a broken silo's controller should go dark");
+        helper.setBlock(new BlockPos(1, 2, 1), ModContent.SILO_CASING.get());
+        silo.checkStructure();
         if (silo.fluidCapacity() != 36_000_000L) helper.fail("capacity should be 36,000 buckets, is " + silo.fluidCapacity() + " mB");
         if (silo.fill(Fluids.WATER, 5_000, false) != 5_000) helper.fail("water didn't go in");
         if (silo.fill(Fluids.LAVA, 1_000, true) != 0) helper.fail("a second fluid went in");

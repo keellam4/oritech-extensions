@@ -83,6 +83,7 @@
         "oritech_extensions:block/silo_casing",
         "oritech_extensions:block/silo_glass",
         "oritech_extensions:block/silo_controller_front",
+        "oritech_extensions:block/silo_controller_front_off",
         "oritech_extensions:block/induction_pylon_bottom",
         "oritech_extensions:block/induction_pylon_top",
         "oritech_extensions:block/induction_pylon_obelisk_bottom",
@@ -483,6 +484,11 @@
       "type": "minecraft:single",
       "resource": "oritech_extensions:rainbow/oritech_extensions/block/silo_controller_front",
       "sprite": "oritech_extensions:block/silo_controller_front_paint_rainbow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_extensions:rainbow/oritech_extensions/block/silo_controller_front_off",
+      "sprite": "oritech_extensions:block/silo_controller_front_off_paint_rainbow"
     },
     {
       "type": "minecraft:single",

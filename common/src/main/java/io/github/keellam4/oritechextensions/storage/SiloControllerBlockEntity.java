@@ -56,9 +56,19 @@ public class SiloControllerBlockEntity extends BlockEntity implements NetworkTan
     public void checkStructure() {
         if (level == null) return;
         var found = SiloStructure.find(level, worldPosition);
+        showFormed(found != null);
         if (java.util.Objects.equals(found, structure)) return;
         structure = found;
         changed();
+    }
+
+    /** Lights the controller's core while the silo is complete, darkens it otherwise. */
+    private void showFormed(boolean formed) {
+        if (level == null || level.isClientSide()) return;
+        var state = getBlockState();
+        if (state.hasProperty(SiloControllerBlock.FORMED) && state.getValue(SiloControllerBlock.FORMED) != formed) {
+            level.setBlock(worldPosition, state.setValue(SiloControllerBlock.FORMED, formed), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+        }
     }
 
     @Nullable
