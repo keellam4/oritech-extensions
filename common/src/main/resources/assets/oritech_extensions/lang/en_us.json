@@ -191,7 +191,7 @@
   "message.oritech_extensions.link.bound": "Cargo Link linked to this Cargo Wall",
   "message.oritech_extensions.link.unbound": "Not linked: sneak + right-click a Cargo Controller or Crafting Terminal first",
   "message.oritech_extensions.link.dimension": "The linked Cargo Wall is in another dimension",
-  "message.oritech_extensions.link.offline": "Network offline: the linked controller is gone or not loaded",
+  "message.oritech_extensions.link.offline": "Network offline: the linked controller is gone",
   "message.oritech_extensions.link.out_of_range": "Out of range: %s blocks away, range %s",
   "message.oritech_extensions.link.signal": " %s / %s blocks · %s RF",
   "message.oritech_extensions.link.battery": "Cargo Link battery empty or too low: charge it",
@@ -222,5 +222,7 @@
   "screen.oritech_extensions.mast.none": "No upgrade: range from the mast and segments",
   "screen.oritech_extensions.mast.infinite": "Infinite Range: anywhere in this dimension",
   "screen.oritech_extensions.mast.dimensional": "Dimensional: anywhere, any dimension",
-  "jei.oritech_extensions.terminal.missing": "Missing from the network and your inventory"
+  "jei.oritech_extensions.terminal.missing": "Missing from the network and your inventory",
+  "screen.oritech_extensions.terminal.empty": "Nothing stored yet",
+  "message.oritech_extensions.link.unloaded": "The linked Cargo Wall isn't loaded: put a Network Anchor in its controller"
 }

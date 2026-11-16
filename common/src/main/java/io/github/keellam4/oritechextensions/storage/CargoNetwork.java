@@ -50,7 +50,12 @@ public final class CargoNetwork {
                     queue.add(next);
                 } else if (level.getBlockEntity(next) instanceof SiloControllerBlockEntity silo) {
                     // A Fluid Silo joins as one big tank; the network doesn't spread through it.
-                    tanks.add(silo);
+                    if (!tanks.contains(silo)) tanks.add(silo);
+                } else if (level.getBlockState(next).getBlock() instanceof SiloParts.Casing
+                        || level.getBlockState(next).getBlock() instanceof SiloParts.Glass) {
+                    // Any casing or glass block of a formed silo touching the wall joins its controller.
+                    var silo = SiloParts.controllerOf(level, next);
+                    if (silo != null && !tanks.contains(silo)) tanks.add(silo);
                 } else if (level.getBlockEntity(next) instanceof CargoVaultBlockEntity vault) {
                     found.add(vault);
                     queue.add(next);

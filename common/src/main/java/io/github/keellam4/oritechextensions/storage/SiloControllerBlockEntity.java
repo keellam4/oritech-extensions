@@ -221,6 +221,11 @@ public class SiloControllerBlockEntity extends BlockEntity implements NetworkTan
         return tanks.size() <= 1;
     }
 
+    /** Whether the upgrade may be swapped for {@code replacement}: it has to fit every fluid the silo holds. */
+    public boolean canReplaceUpgradeWith(net.minecraft.world.item.ItemStack replacement) {
+        return replacement.getItem() instanceof PartitionUpgradeItem part && tanks.size() <= part.partitions();
+    }
+
     @Override
     public FluidContents fluidContents() {
         return new FluidContents(fluid(), amount(), false);

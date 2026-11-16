@@ -59,10 +59,14 @@ public final class WorldPaintTarget implements PaintTarget {
             block -> block == BlockContent.METAL_BEAM_BLOCK || block == BlockContent.METAL_GIRDER_BLOCK ? "supports" : null,
             Config::maxPaintGroupSize, 1);
 
-    /** Vaults and Cargo Controllers: a touching wall paints together, and a vault keeps its paint on its item. */
+    /**
+     * Vaults and Cargo Controllers: a touching wall paints together, and a vault keeps its paint on its item. A Fluid
+     * Silo touching the wall is part of it, so it paints with the wall (and a lone silo still paints on its own).
+     */
     public static final WorldPaintTarget VAULTS = new WorldPaintTarget(
             block -> block instanceof io.github.keellam4.oritechextensions.storage.CargoVaultBlock
-                    || block instanceof io.github.keellam4.oritechextensions.storage.CargoControllerBlock ? "cargo_vault" : null,
+                    || block instanceof io.github.keellam4.oritechextensions.storage.CargoControllerBlock
+                    || isSiloPart(block) ? "cargo_vault" : null,
             Config::maxPaintGroupSize, 1);
 
     /** Fluid Silo casing, glass and controller: one click paints the whole silo. */
@@ -124,6 +128,12 @@ public final class WorldPaintTarget implements PaintTarget {
         this.reach = reach;
         this.isolated = isolated;
         this.inherits = inherits;
+    }
+
+    private static boolean isSiloPart(Block block) {
+        return block instanceof io.github.keellam4.oritechextensions.storage.SiloParts.Casing
+                || block instanceof io.github.keellam4.oritechextensions.storage.SiloParts.Glass
+                || block instanceof io.github.keellam4.oritechextensions.storage.SiloControllerBlock;
     }
 
     private static boolean isAcceleratorPart(Block block) {

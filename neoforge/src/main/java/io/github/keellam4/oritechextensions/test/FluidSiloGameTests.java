@@ -111,6 +111,9 @@ public class FluidSiloGameTests {
         long room = silo.roomFor(Fluids.WATER);
         if (room != 27_000_000L - 3_000) helper.fail("water's room should be what's left of the shared space, is " + room);
         if (silo.canRemoveUpgrade()) helper.fail("the upgrade can't come out while it holds two fluids");
+        if (!silo.canReplaceUpgradeWith(new net.minecraft.world.item.ItemStack(ModContent.PARTITION_UPGRADE_2.get())))
+            helper.fail("a bigger upgrade should be able to replace it while it holds two fluids");
+        if (silo.canReplaceUpgradeWith(net.minecraft.world.item.ItemStack.EMPTY)) helper.fail("an empty hand isn't a replacement");
         var contents = new java.util.HashSet<net.minecraft.world.level.material.Fluid>();
         for (var held : silo.fluids()) contents.add(held.fluid());
         if (!contents.contains(Fluids.LAVA) || !contents.contains(Fluids.WATER)) helper.fail("both fluids should be listed");
@@ -157,6 +160,23 @@ public class FluidSiloGameTests {
         copy.loadWithComponents(tag, registries);
         if (copy.tanks().size() != 2 || copy.tanks().get(1).amount != 4_000 || !copy.tanks().get(1).locked) helper.fail("tanks didn't survive saving");
         if (copy.partitions() != Integer.MAX_VALUE) helper.fail("the Partition Matrix didn't survive saving");
+        helper.succeed();
+    }
+
+    /** Any casing or glass block touching a Cargo Wall joins the silo to it, and the wall's paint covers the silo. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void siloJoinsWallThroughCasing(GameTestHelper helper) {
+        var silo = build(helper, 3);
+        silo.fill(Fluids.WATER, 4_000, false);
+        // A vault against the side casing (not the controller), and a Cargo Controller on the vault.
+        helper.setBlock(new BlockPos(4, 2, 2), ModContent.CARGO_VAULT.get());
+        helper.setBlock(new BlockPos(5, 2, 2), ModContent.CARGO_CONTROLLER.get());
+        var controller = (io.github.keellam4.oritechextensions.storage.CargoControllerBlockEntity) helper.getBlockEntity(new BlockPos(5, 2, 2));
+        controller.invalidate();
+        if (!controller.network().tanks().contains(silo)) helper.fail("the silo should join the wall through its casing");
+        var group = io.github.keellam4.oritechextensions.paint.targets.WorldPaintTarget.VAULTS
+                .group(helper.getLevel(), helper.absolutePos(new BlockPos(4, 2, 2)));
+        if (!group.contains(silo.getBlockPos())) helper.fail("painting the wall should paint the silo touching it");
         helper.succeed();
     }
 }
