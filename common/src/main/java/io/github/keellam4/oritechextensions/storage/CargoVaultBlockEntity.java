@@ -613,6 +613,13 @@ public class CargoVaultBlockEntity extends BlockEntity {
             for (int i = 0; i < UPGRADE_SLOTS; i++) list.add(upgrades.getItem(i).copy());
             components.set(net.minecraft.core.component.DataComponents.CONTAINER, net.minecraft.world.item.component.ItemContainerContents.fromItems(list));
         }
+        // Empty vaults stack to 64; one that carries anything stays on its own.
+        if (carriesData()) components.set(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE, 1);
+    }
+
+    /** Whether the vault's item keeps something: contents or item types, the lock, paint or upgrades. */
+    protected boolean carriesData() {
+        return hasAnyItemType() || locked || PaintColors.isPainted(currentPaint()) || !upgrades.isEmpty();
     }
 
     @Override

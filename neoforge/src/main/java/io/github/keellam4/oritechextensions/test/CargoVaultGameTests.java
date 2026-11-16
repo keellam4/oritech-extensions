@@ -334,4 +334,23 @@ public class CargoVaultGameTests {
         if (tank.fluid() != net.minecraft.world.level.material.Fluids.EMPTY || !tank.isLocked()) helper.fail("Clear should forget lava and stay locked");
         helper.succeed();
     }
+
+    /** JNI-99: an empty vault's item stacks to 64; one with contents, a lock or a fluid stays at 1. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void emptyVaultsStack(GameTestHelper helper) {
+        if (new ItemStack(ModContent.CARGO_VAULT_ITEM.get()).getMaxStackSize() != 64) helper.fail("an empty vault item should stack to 64");
+        var vault = place(helper, new BlockPos(2, 1, 2), ModContent.CARGO_VAULT.get());
+        if (vault.collectComponents().has(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE)) helper.fail("an empty vault's drop should stack");
+        vault.insert(new ItemStack(Items.COBBLESTONE, 4), false);
+        if (!Integer.valueOf(1).equals(vault.collectComponents().get(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE)))
+            helper.fail("a vault with items should drop as a single item");
+        var tank = (io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity) place(helper, new BlockPos(4, 1, 2), ModContent.FLUID_VAULT.get());
+        tank.fill(net.minecraft.world.level.material.Fluids.WATER, 1000, false);
+        if (!Integer.valueOf(1).equals(tank.collectComponents().get(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE)))
+            helper.fail("a Fluid Vault with fluid should drop as a single item");
+        var locked = place(helper, new BlockPos(2, 1, 4), ModContent.CARGO_VAULT.get());
+        locked.setLocked(true);
+        if (!locked.collectComponents().has(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE)) helper.fail("a locked empty vault keeps its lock, so it doesn't stack");
+        helper.succeed();
+    }
 }

@@ -5,6 +5,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
+- **Empty vaults stack to 64.** A vault that keeps contents, upgrades, a lock or paint on its item still stacks to 1.
 - **Exact silo limits.** Shift-click a fluid's Limit or Reserve in the Silo Controller screen to type an exact amount in buckets (decimals allowed). Percentages still work with left- and right-click.
 - **Lock indicator.** Locked vaults show a small padlock in the corner of every window, empty ones included.
 - **Lock empty vaults.** Lock a vault while it's empty and pipes put nothing in until you put an item (or fluid) in by hand, which becomes its type. A **Clear** button in the vault screen forgets an empty vault's type and keeps it locked, ready for a new item.

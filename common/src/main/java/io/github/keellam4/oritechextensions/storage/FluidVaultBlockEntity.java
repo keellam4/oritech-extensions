@@ -229,6 +229,11 @@ public class FluidVaultBlockEntity extends CargoVaultBlockEntity implements Netw
     }
 
     @Override
+    protected boolean carriesData() {
+        return super.carriesData() || fluid != Fluids.EMPTY;
+    }
+
+    @Override
     @SuppressWarnings("deprecation")
     public void removeComponentsFromTag(CompoundTag tag) {
         super.removeComponentsFromTag(tag);
