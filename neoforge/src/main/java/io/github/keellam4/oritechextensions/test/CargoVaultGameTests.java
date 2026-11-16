@@ -275,4 +275,21 @@ public class CargoVaultGameTests {
         if (state.getAnalogOutputSignal(level, pos) != 15) helper.fail("a full vault should give 15");
         helper.succeed();
     }
+
+    /** Oritech's item pipes find a vault through Oritech's item API, see its contents by slot and pull from it. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void oritechPipesCanExtract(GameTestHelper helper) {
+        var pos = helper.absolutePos(new net.minecraft.core.BlockPos(1, 1, 1));
+        helper.getLevel().setBlockAndUpdate(pos, ModContent.CARGO_VAULT.get().defaultBlockState());
+        var vault = (CargoVaultBlockEntity) helper.getLevel().getBlockEntity(pos);
+        vault.insert(new ItemStack(net.minecraft.world.item.Items.ICE, 100), false);
+        var storage = rearth.oritech.api.item.ItemApi.BLOCK.find(helper.getLevel(), pos, net.minecraft.core.Direction.DOWN);
+        if (storage == null || !storage.supportsExtraction()) helper.fail("Oritech's item API should find the vault and allow extracting");
+        if (storage.getSlotCount() < 1) helper.fail("Oritech's pipes only pull from slots: the vault shows " + storage.getSlotCount());
+        var shown = storage.getStackInSlot(0);
+        if (!shown.is(net.minecraft.world.item.Items.ICE)) helper.fail("slot 0 should show ice, shows " + shown);
+        int pulled = storage.extractFromSlot(new ItemStack(net.minecraft.world.item.Items.ICE, 16), 0, false);
+        if (pulled != 16 || vault.count() != 84) helper.fail("a pipe pulling 16 should leave 84, pulled " + pulled + ", left " + vault.count());
+        helper.succeed();
+    }
 }

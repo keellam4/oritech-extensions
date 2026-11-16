@@ -4,7 +4,7 @@ import io.github.keellam4.oritechextensions.storage.CargoVaultBlockEntity;
 import io.github.keellam4.oritechextensions.storage.VaultContents;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedSlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
@@ -15,9 +15,10 @@ import java.util.List;
 /**
  * Lets pipes and other mods reach a vault through Fabric's transfer API: one storage slot per window. Inserting
  * goes to the window that already holds the item first, then to an empty one. A transaction that rolls back puts
- * the whole vault back as it was (a Compacting Vault's windows share one stock).
+ * the whole vault back as it was (a Compacting Vault's windows share one stock). It's a slotted storage: Oritech's
+ * item pipes on Fabric only see and extract from slotted storages.
  */
-public final class VaultItemStorage extends CombinedStorage<ItemVariant, VaultItemStorage.Slot> {
+public final class VaultItemStorage extends CombinedSlottedStorage<ItemVariant, VaultItemStorage.Slot> {
 
     private final CargoVaultBlockEntity vault;
 

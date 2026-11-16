@@ -31,6 +31,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 - **Paintable block tags for modpacks.** Add blocks to `oritech_extensions:paintable` (one block per click) or `oritech_extensions:paintable_connected` (touching blocks paint together) with a datapack, and list their textures in the painted-texture atlas with a resource pack. See "For Modpack Makers" on the website.
 
 ### Fixed
+- Oritech item pipes set to extract couldn't pull from vaults or a Cargo Wall on Fabric; now they can, with no Push upgrade needed.
 - A crash on Fabric when a Cargo Controller's network had Fluid Vaults or a Fluid Silo.
 - The config screen showed raw keys instead of names for the colour-isolated pipes and Fluid Silo options.
 
