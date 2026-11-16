@@ -5,6 +5,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
+- **See fluid in Transparent Fluid Pipes.** While fluid moves through a network, its Transparent Fluid Pipes show it, like Oritech's item pipes show items; they drain a couple of seconds after the flow stops.
 - **Silo formed indicator.** The Silo Controller's core lights up once the silo is complete and goes dark when it isn't.
 - **The Crafting Terminal uses power.** Connect a cable; each craft uses 100 RF (`terminalEnergyPerCraft`, 0 turns it off; `terminalEnergyBuffer` sets its storage). The Cargo Controller stays free.
 - **Empty vaults stack to 64.** A vault that keeps contents, upgrades, a lock or paint on its item still stacks to 1.
