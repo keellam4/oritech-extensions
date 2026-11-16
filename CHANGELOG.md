@@ -4,48 +4,33 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 
 ## [Unreleased]
 
-### Added
-- **See fluid in Transparent Fluid Pipes.** While fluid moves through a network, its Transparent Fluid Pipes show it, like Oritech's item pipes show items; they drain a couple of seconds after the flow stops.
-- **Silo formed indicator.** The Silo Controller's core lights up once the silo is complete and goes dark when it isn't.
-- **The Crafting Terminal uses power.** Connect a cable; each craft uses 100 RF (`terminalEnergyPerCraft`, 0 turns it off; `terminalEnergyBuffer` sets its storage). The Cargo Controller stays free.
-- **Empty vaults stack to 64.** A vault that keeps contents, upgrades, a lock or paint on its item still stacks to 1.
-- **Exact silo limits.** Shift-click a fluid's Limit or Reserve in the Silo Controller screen to type an exact amount in buckets (decimals allowed). Percentages still work with left- and right-click.
-- **Lock indicator.** Locked vaults show a small padlock in the corner of every window, empty ones included.
-- **Lock empty vaults.** Lock a vault while it's empty and pipes put nothing in until you put an item (or fluid) in by hand, which becomes its type. A **Clear** button in the vault screen forgets an empty vault's type and keeps it locked, ready for a new item.
-- **JEI in the Crafting Terminal.** JEI's "+" on a crafting recipe fills the terminal's grid, taking ingredients from the network first and then your inventory; missing ingredients turn red. The Crafting Terminal also shows as a crafting station in JEI.
-- **Cargo Link.** A handheld terminal: link it to a Cargo Controller or Crafting Terminal, then open the wall's crafting terminal from up to 32 blocks away. An **Uplink Mast** on the wall raises that to 64, and each **Antenna Segment** on the mast adds 16 (up to 192). Transfers use a little of its battery, which Induction Pylons recharge. Upgrades go in the mast (right-click it): the **Infinite Range Upgrade** removes the range limit in the wall's dimension, and the **Dimensional Upgrade** works in any dimension. Config: `linkRange`, `linkMastRange`, `linkSegmentRange`, `linkEnergyPerItem`.
-- **Network Anchor.** Installed in a Cargo Controller, it keeps every block of the network chunk-loaded. Config: `allowNetworkChunkLoading`.
-- **Transparent Fluid Pipe.** A see-through fluid pipe with a line through its centre, so it's easy to tell from the transparent item pipe. It joins Oritech fluid pipe networks and paints with them.
-- **Tinted glass.** Paint Industrial Glass the colour it already has to tint the pane with that colour (Rainbow too); paint it again to clear the tint.
-- **Induction Pylon animations.** The pylon is dark without power, pulses when powered, and races with light and sparks while charging. Pylons can now be painted.
-- **Creative tab.** Everything from Oritech Extensions is in its own creative tab, which JEI and EMI list.
-- **In-game wiki pages** for every new block, under Items & Blocks.
-- **Fluid Silo partitions.** Partition upgrades in the Silo Controller let one silo hold several fluids sharing its space (4, 9, or any number with the Partition Matrix). Right-click the controller for its screen: each fluid can have a limit, reserved space, a lock that keeps its place when empty, and void overflow. The fluids show through the glass in layers by density.
-- **Induction Pylon.** A two-block pylon that wirelessly charges the energy items players carry within 8 blocks: armour first, then Curios slots, held items and the inventory. Charging is fully efficient at the pylon and half as efficient at the edge of its range, and a teal arc shows who it's charging. It charges its owner, the owner's team, or everyone. Comes in three styles (Tesla Spire, Coil Obelisk, Ring Pylon); put one alone in a crafting grid to switch. Config: `pylonRange`, `pylonRate`, `pylonBuffer`.
-- **Fluid Silo.** A multiblock tank: a solid 3 × 3 column of Silo Casing and Silo Glass, 3 to 9 blocks tall, with a Silo Controller in the bottom layer. Holds 1,000 buckets per block (27,000 to 81,000 buckets, `siloBucketsPerBlock`), and the fluid shows through the glass. Buckets and fluid pipes work on any block of the silo. Its controller joins a Cargo network when it touches a vault or controller. A broken silo keeps its fluid, and a mined controller carries it. One click paints the whole silo.
-- **Crafting Terminal.** Placed against a Cargo Wall, it opens the terminal with a 3 × 3 crafting grid that refills from the wall after each craft; shift-click the result to craft as many as the wall has ingredients for.
-- **Terminal redesign.** A bigger list, buttons to sort by amount, name or mod (ascending or descending) and to show only items or only fluids, and an Oritech-style look.
-- **Dual, Quad and Grid Vaults.** Two, four or sixteen glass windows, one item type each, sharing the vault's space. Click the window you want to put items in or take them out. Pipes see one slot per window.
-- **Compacting Vault.** Stores one item in up to three forms found from crafting recipes (nuggets, ingots and blocks; clay balls and clay; and so on). Put in or take out any form and it converts. The **Dual Compacting Vault** does the same with two forms, for items that only compact once.
-- **Cargo Controller.** Links every item vault touching it (and touching those) into one inventory. Pipes connect to the controller and items go to the vault already holding them, then to one with room, so a full window never jams a pipe. Right-click it for a terminal listing everything in the wall: search (type @mod to search by mod), click to take a stack, right-click for one, shift-click to your inventory, click with items to put them in. Fluid Vaults join too: their fluids show in the terminal (click with a bucket to fill or empty it), and fluid pipes on the controller reach every tank.
-- **Fluid Vault.** A tank for one fluid (256 buckets by default, `fluidVaultBuckets`) with the vault look: the fluid fills the glass and the neon gauge shows how full it is. Right-click with a bucket or tank to fill or empty it. Takes the same upgrades (Pull and Push move fluid, a bucket a second per side) and keeps its fluid when broken.
-- **Vault upgrades.** Sneak + right-click a vault (or right-click its side) for its upgrade screen: one slot per kind, with the lock. Capacity upgrades (Steel ×2, Electrum ×4, Energite ×8, Duratium ×16, Prometheum ×32, up to five of one tier) add up; Void deletes overflow of items the vault holds; Pull and Push move items with inventories on the sides you pick; Redstone makes the vault give off a signal as strong as it is full, and a redstone signal pauses Pull and Push. Right-click a vault with an upgrade to put it straight in. Upgrades stay in a broken vault.
-- **Vault readout.** Aim at any vault's window to see its item and how many it holds out of how many fit.
-- **Cargo Vault.** Bulk storage for one item type (64 stacks by default, `cargoVaultStacks`). The item floats in the vault's glass front with its count, and the neon strip above it fills up as the vault does. Right-click to put items in (twice quickly, or with an empty hand, for every matching item), left-click the front to take a stack (sneak: one), sneak + right-click with an empty hand to lock the item type. Pipes and comparators work with it. Breaking it keeps its items and paint. Touching vaults paint together.
-- **Detailing Tool.** A paintbrush that holds Color Cartridges: right-click them onto it in your inventory (up to 64 of each colour, Rainbow included). Sneak + scroll switches colour, sneak + right-click a block picks its colour, sneak + right-click the air switches between Group, Single block and Area mode. Area mode paints everything in a box between two clicked corners (up to 32 blocks a side, `detailingToolAreaSize`). Paints everything cartridges paint, plus Oritech's own machines, at the same cost. Crafted from an adamant, a steel and a nickel ingot.
-- **Rainbow Color Cartridge.** Paints like a Color Cartridge, but the block keeps blending through red, yellow, green, cyan, blue and pink, in step with every other rainbow block. Works on everything this mod paints (not hangar doors or Oritech's own machines). Crafted from one each of the redstone, industrial, camo, adamant, sculk and fluxite cartridges, giving 6. Rainbow pipes only connect to rainbow pipes.
-- **More paintable blocks.** Color Cartridges now also paint Metal Beams and Metal Girders (a touching support structure paints in one click), Pipe Boosters (one at a time), item and fluid pipe ducts and framed pipes (with their pipe network), and energy pipes and superconductors with their framed and duct versions (their orange connectors, light duct rings and teal parts take the colour). Colour-isolated pipes work for all of them, including ducts placed side by side.
-- **Paintable block tags for modpacks.** Add blocks to `oritech_extensions:paintable` (one block per click) or `oritech_extensions:paintable_connected` (touching blocks paint together) with a datapack, and list their textures in the painted-texture atlas with a resource pack. See "For Modpack Makers" on the website.
+The storage and wireless update: a connected storage wall with crafting, a multiblock fluid silo, wireless charging, and new ways to paint your factory. Everything here is for Minecraft 1.21.1 on NeoForge and Fabric; the 26.1.2 version doesn't have it yet.
+
+### Storage
+- **Cargo Vaults.** Bulk storage for one item type, with the item and its count shown in the glass. Dual, Quad and Grid Vaults hold 2, 4 or 16 item types; Compacting Vaults convert between nuggets, ingots and blocks. A broken vault keeps its contents.
+- **Fluid Vault.** A 256-bucket tank in vault form.
+- **Vault upgrades.** Capacity (×2 to ×32), Void, Pull, Push and Redstone. Lock a vault to keep its item type, even while it's empty. Empty vaults stack to 64.
+- **Cargo Controller.** Joins every touching vault into one inventory, with a searchable terminal and one pipe connection for the whole wall.
+- **Crafting Terminal.** The terminal with a crafting grid that refills from the wall, and JEI's "+" button. Uses 100 RF per craft.
+- **Fluid Silo.** A 3 × 3 multiblock tank, 3 to 9 blocks tall, holding up to 81,000 buckets. Partition upgrades let it hold several fluids, each with its own limit, reserve and void.
+
+### Wireless
+- **Induction Pylon.** Charges the energy items you carry within 8 blocks, including Curios slots on NeoForge. Three styles.
+- **Cargo Link.** Opens your wall's terminal from 32 blocks away, further with an Uplink Mast and Antenna Segments, and anywhere with the Infinite Range or Dimensional upgrade. Each transfer uses a little battery.
+- **Network Anchor.** Keeps a Cargo Wall chunk-loaded.
+
+### Painting
+- **Detailing Tool.** Holds Color Cartridges and paints a group, a single block or a whole area, including Oritech's own machines.
+- **Rainbow Color Cartridge.** Paint that keeps cycling through the colours.
+- **Tinted glass.** Paint Industrial Glass its own colour to tint the pane.
+- **More paintable blocks:** Metal Beams and Girders, Pipe Boosters, pipe ducts, framed pipes, energy pipes and superconductors. Modpacks can make more blocks paintable with block tags.
+
+### Also new
+- **Transparent Fluid Pipe**, which shows the fluid flowing through it.
+- A creative tab, and in-game wiki pages for every block and item.
 
 ### Fixed
-- A Fluid Silo joins a Cargo Wall when any of its blocks touches the wall (not only the controller), and painting the wall paints the silo too.
-- Vault counts are no longer hidden behind block items and tall items.
-- The Cargo Link's signal bars showed as `\u25AE` codes; and with the wall's chunks unloaded it wrongly said the wall was in another dimension (it now says to add a Network Anchor).
-- A bigger Partition Upgrade can replace the current one while the silo holds several fluids.
-- The terminal showed a raw text key when the wall was empty.
-- Oritech item pipes set to extract couldn't pull from vaults or a Cargo Wall on Fabric; now they can, with no Push upgrade needed.
-- A crash on Fabric when a Cargo Controller's network had Fluid Vaults or a Fluid Silo.
-- The config screen showed raw keys instead of names for the colour-isolated pipes and Fluid Silo options.
+- The config screen showed a raw key instead of a name for the colour-isolated pipes option.
 
 ## [0.4.1+fabric] - Beta (Fabric)
 
