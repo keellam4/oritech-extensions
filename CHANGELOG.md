@@ -5,6 +5,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
+- **JEI in the Crafting Terminal.** JEI's "+" on a crafting recipe fills the terminal's grid, taking ingredients from the network first and then your inventory; missing ingredients turn red. The Crafting Terminal also shows as a crafting station in JEI.
 - **Cargo Link.** A handheld terminal: link it to a Cargo Controller or Crafting Terminal, then open the wall's crafting terminal from up to 32 blocks away. An **Uplink Mast** on the wall raises that to 64, and each **Antenna Segment** on the mast adds 16 (up to 192). Transfers use a little of its battery, which Induction Pylons recharge. Upgrades go in the mast (right-click it): the **Infinite Range Upgrade** removes the range limit in the wall's dimension, and the **Dimensional Upgrade** works in any dimension. Config: `linkRange`, `linkMastRange`, `linkSegmentRange`, `linkEnergyPerItem`.
 - **Network Anchor.** Installed in a Cargo Controller, it keeps every block of the network chunk-loaded. Config: `allowNetworkChunkLoading`.
 - **Transparent Fluid Pipe.** A see-through fluid pipe with a line through its centre, so it's easy to tell from the transparent item pipe. It joins Oritech fluid pipe networks and paints with them.
@@ -30,6 +31,12 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 - **Paintable block tags for modpacks.** Add blocks to `oritech_extensions:paintable` (one block per click) or `oritech_extensions:paintable_connected` (touching blocks paint together) with a datapack, and list their textures in the painted-texture atlas with a resource pack. See "For Modpack Makers" on the website.
 
 ### Fixed
+- A Fluid Silo joins a Cargo Wall when any of its blocks touches the wall (not only the controller), and painting the wall paints the silo too.
+- Vault counts are no longer hidden behind block items and tall items.
+- The Cargo Link's signal bars showed as `\u25AE` codes; and with the wall's chunks unloaded it wrongly said the wall was in another dimension (it now says to add a Network Anchor).
+- A bigger Partition Upgrade can replace the current one while the silo holds several fluids.
+- The terminal showed a raw text key when the wall was empty.
+- Oritech item pipes set to extract couldn't pull from vaults or a Cargo Wall on Fabric; now they can, with no Push upgrade needed.
 - A crash on Fabric when a Cargo Controller's network had Fluid Vaults or a Fluid Silo.
 - The config screen showed raw keys instead of names for the colour-isolated pipes and Fluid Silo options.
 

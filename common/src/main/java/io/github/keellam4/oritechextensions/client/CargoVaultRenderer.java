@@ -69,6 +69,8 @@ public class CargoVaultRenderer<T extends CargoVaultBlockEntity> implements Bloc
             float cx = (cell.glassU0() + cell.glassU1()) / 2 - 0.5f;
             float cy = 0.5f - (cell.glassV0() + height * 0.42f);
             float size = Math.min(width, height) * (block.layout() == VaultLayout.SINGLE ? 0.84f : 0.7f);
+            // Block items render as cubes that stand out of the glass: a bit smaller, so the count below stays clear.
+            if (item.getItem() instanceof net.minecraft.world.item.BlockItem) size *= 0.8f;
             float phase = slot * 1.7f;
 
             pose.pushPose();
@@ -79,7 +81,9 @@ public class CargoVaultRenderer<T extends CargoVaultBlockEntity> implements Bloc
                     level, (int) vault.getBlockPos().asLong() + slot);
             pose.popPose();
 
-            drawCount(pose, buffers, format(vault.count(slot)), vault.isLocked(), cx, 0.5f - (cell.glassV1() - height * 0.2f), height * 0.19f);
+            // In front of the item, so a cube or a tall item never covers the number.
+            drawCount(pose, buffers, format(vault.count(slot)), vault.isLocked(), cx, 0.5f - (cell.glassV1() - height * 0.2f), height * 0.19f,
+                    size * (item.getItem() instanceof net.minecraft.world.item.BlockItem ? 0.36f : 0.14f));
         }
         pose.popPose();
     }
@@ -116,7 +120,7 @@ public class CargoVaultRenderer<T extends CargoVaultBlockEntity> implements Bloc
 
         float cx = (cell.glassU0() + cell.glassU1()) / 2 - 0.5f;
         drawCount(pose, buffers, format((int) Math.min(Integer.MAX_VALUE, tank.amount() / 1000)) + "B", tank.isLocked(),
-                cx, 0.5f - (cell.glassV1() - height * 0.2f), height * 0.19f);
+                cx, 0.5f - (cell.glassV1() - height * 0.2f), height * 0.19f, 0);
     }
 
     private static void drawGauge(PoseStack pose, MultiBufferSource buffers, VaultLayout.Cell cell, float fill) {
@@ -139,10 +143,10 @@ public class CargoVaultRenderer<T extends CargoVaultBlockEntity> implements Bloc
         }
     }
 
-    /** Count text centred at ({@code x}, {@code y}), {@code height} blocks tall. */
-    private void drawCount(PoseStack pose, MultiBufferSource buffers, String text, boolean locked, float x, float y, float height) {
+    /** Count text centred at ({@code x}, {@code y}), {@code height} blocks tall, {@code out} blocks in front of the glass. */
+    private void drawCount(PoseStack pose, MultiBufferSource buffers, String text, boolean locked, float x, float y, float height, float out) {
         pose.pushPose();
-        pose.translate(x, y, 0.5 + 0.002);
+        pose.translate(x, y, 0.5 + 0.002 + out);
         float scale = height / font.lineHeight;
         pose.scale(scale, -scale, scale);
         font.drawInBatch(text, -font.width(text) / 2f, -font.lineHeight / 2f, locked ? LOCKED_TEXT_COLOUR : TEXT_COLOUR, false,

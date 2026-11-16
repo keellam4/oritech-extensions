@@ -16,6 +16,7 @@
   "entrypoints": {
     "main": ["io.github.keellam4.oritechextensions.fabric.OritechExtensionsFabric"],
     "client": ["io.github.keellam4.oritechextensions.fabric.OritechExtensionsFabricClient"],
+    "jei_mod_plugin": ["io.github.keellam4.oritechextensions.compat.jei.OritechExtensionsJeiPlugin"],
     "fabric-gametest": [
       "io.github.keellam4.oritechextensions.test.GuideGameTests",
       "io.github.keellam4.oritechextensions.test.HangarDoorExtensionGameTests",

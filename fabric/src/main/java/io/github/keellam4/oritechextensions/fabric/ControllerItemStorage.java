@@ -10,9 +10,11 @@ import java.util.ArrayList;
 
 /**
  * The whole Cargo Wall as one item storage. Inserting goes to vaults already holding the item first, then to one
- * with room for a new item type.
+ * with room for a new item type. Its slots are every vault window on the wall, in order (Oritech's item pipes on
+ * Fabric only see slotted storages).
  */
-public final class ControllerItemStorage extends CombinedStorage<ItemVariant, VaultItemStorage> {
+public final class ControllerItemStorage extends CombinedStorage<ItemVariant, VaultItemStorage>
+        implements net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage<ItemVariant> {
 
     public ControllerItemStorage(CargoControllerBlockEntity controller) {
         super(parts(controller));
@@ -38,5 +40,21 @@ public final class ControllerItemStorage extends CombinedStorage<ItemVariant, Va
             if (part.vault().slotOf(stack) < 0) moved += part.insert(resource, maxAmount - moved, transaction);
         }
         return moved;
+    }
+
+    @Override
+    public int getSlotCount() {
+        int count = 0;
+        for (var part : parts) count += part.getSlotCount();
+        return count;
+    }
+
+    @Override
+    public net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage<ItemVariant> getSlot(int slot) {
+        for (var part : parts) {
+            if (slot < part.getSlotCount()) return part.getSlot(slot);
+            slot -= part.getSlotCount();
+        }
+        throw new IndexOutOfBoundsException("No slot " + slot + " on this Cargo Wall");
     }
 }

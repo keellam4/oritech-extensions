@@ -50,7 +50,9 @@ public class SiloMenu extends AbstractContainerMenu {
 
             @Override
             public boolean mayPickup(Player player) {
-                return SiloMenu.this.silo == null || SiloMenu.this.silo.canRemoveUpgrade();
+                // Swapping in an upgrade with room for every fluid is fine; taking it out only with one fluid or less.
+                return SiloMenu.this.silo == null || SiloMenu.this.silo.canRemoveUpgrade()
+                        || SiloMenu.this.silo.canReplaceUpgradeWith(player.containerMenu.getCarried());
             }
 
             @Override

@@ -106,8 +106,11 @@ public class CargoLinkItem extends Item {
         }
         var controller = controller(level, stack);
         if (controller == null || controller.getLevel() == null) {
-            player.displayClientMessage(Component.translatable(target.dimension() != level.dimension()
-                    ? "message.oritech_extensions.link.dimension" : "message.oritech_extensions.link.offline").withStyle(ChatFormatting.RED), true);
+            // Not loaded (or broken): say which, so a far-away wall points at the Network Anchor rather than the upgrade.
+            var targetLevel = level.getServer().getLevel(target.dimension());
+            boolean loaded = targetLevel != null && targetLevel.isLoaded(target.pos());
+            player.displayClientMessage(Component.translatable(loaded ? "message.oritech_extensions.link.offline"
+                    : "message.oritech_extensions.link.unloaded").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
         // The wall's Uplink Mast decides the reach: its range, and any upgrade in it.
@@ -116,7 +119,7 @@ public class CargoLinkItem extends Item {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.link.dimension").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.fail(stack);
         }
-        int range = upgrade >= LinkUpgradeItem.INFINITE ? Integer.MAX_VALUE : LinkRange.range(level, controller);
+        int range = upgrade >= LinkUpgradeItem.INFINITE ? Integer.MAX_VALUE : LinkRange.range(controller.getLevel(), controller);
         boolean elsewhere = target.dimension() != level.dimension();
         double distance = elsewhere ? 0 : player.position().distanceTo(target.pos().getCenter());
         if (distance > range) {
@@ -138,8 +141,8 @@ public class CargoLinkItem extends Item {
                     .append(Component.translatable("message.oritech_extensions.link.signal_unlimited", String.format("%,d", energy)).withStyle(ChatFormatting.GRAY));
         }
         int bars = LinkRange.bars(distance, range);
-        var text = Component.literal("\\u25AE".repeat(bars)).withStyle(bars <= 1 ? ChatFormatting.RED : ChatFormatting.AQUA)
-                .append(Component.literal("\\u25AF".repeat(4 - bars)).withStyle(ChatFormatting.DARK_GRAY));
+        var text = Component.literal("\u25AE".repeat(bars)).withStyle(bars <= 1 ? ChatFormatting.RED : ChatFormatting.AQUA)
+                .append(Component.literal("\u25AF".repeat(4 - bars)).withStyle(ChatFormatting.DARK_GRAY));
         return text.append(Component.translatable("message.oritech_extensions.link.signal", (int) distance, range, String.format("%,d", energy))
                 .withStyle(ChatFormatting.GRAY));
     }

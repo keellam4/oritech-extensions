@@ -89,6 +89,12 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         receivedVaults = payload.vaults();
     }
 
+    /** Whether the network behind this terminal screen holds the item (JEI's "+" checks this before filling the grid). */
+    public static boolean networkHas(int containerId, ItemStack stack) {
+        return receivedFor == containerId && received.stream()
+                .anyMatch(entry -> !entry.isFluid() && entry.count() > 0 && ItemStack.isSameItem(entry.item(), stack));
+    }
+
     @Override
     protected void init() {
         super.init();

@@ -143,6 +143,62 @@ public class TerminalMenu extends AbstractContainerMenu {
         }
     }
 
+    /**
+     * JEI's "+": empties the grid, then puts one of each ingredient of the recipe in it, taken from the network
+     * first and then the player's inventory. Taking the result refills the grid from the network as usual.
+     */
+    public void fill(net.minecraft.resources.ResourceLocation recipeId) {
+        if (!crafting || controller == null || !(player.level() instanceof net.minecraft.server.level.ServerLevel level)) return;
+        var holder = level.getRecipeManager().byKey(recipeId).orElse(null);
+        if (holder == null || !(holder.value() instanceof net.minecraft.world.item.crafting.CraftingRecipe recipe)) return;
+        var layout = layout(recipe);
+        if (layout == null) return;
+        if (remote != null && !remote.pay(player, (int) layout.stream().filter(i -> !i.isEmpty()).count())) return;
+        clearGrid();
+        var network = controller.network();
+        for (int i = 0; i < layout.size(); i++) {
+            if (layout.get(i).isEmpty()) continue;
+            var stack = take(network, layout.get(i));
+            if (!stack.isEmpty()) craftSlots.setItem(i, stack);
+        }
+        slotsChanged(craftSlots);
+        lastSent = null;
+        broadcastChanges();
+    }
+
+    /** A crafting recipe's ingredients as they sit in a 3 × 3 grid, or null if it doesn't fit. */
+    @Nullable
+    public static List<net.minecraft.world.item.crafting.Ingredient> layout(net.minecraft.world.item.crafting.CraftingRecipe recipe) {
+        var ingredients = recipe.getIngredients();
+        var grid = net.minecraft.core.NonNullList.withSize(9, net.minecraft.world.item.crafting.Ingredient.EMPTY);
+        if (recipe instanceof net.minecraft.world.item.crafting.ShapedRecipe shaped) {
+            int width = shaped.getWidth(), height = shaped.getHeight();
+            if (width > 3 || height > 3 || ingredients.size() < width * height) return null;
+            for (int row = 0; row < height; row++)
+                for (int col = 0; col < width; col++) grid.set(row * 3 + col, ingredients.get(row * width + col));
+        } else {
+            if (ingredients.size() > 9) return null;
+            for (int i = 0; i < ingredients.size(); i++) grid.set(i, ingredients.get(i));
+        }
+        return grid;
+    }
+
+    /** One item matching the ingredient: the network's most plentiful match, otherwise one from the player's inventory. */
+    private ItemStack take(CargoNetwork network, net.minecraft.world.item.crafting.Ingredient ingredient) {
+        CargoNetwork.Entry best = null;
+        for (var entry : network.contents()) {
+            if (entry.isFluid() || entry.count() <= 0 || !ingredient.test(entry.item())) continue;
+            if (best == null || entry.count() > best.count()) best = entry;
+        }
+        if (best != null) {
+            var taken = network.extract(best.item(), 1, false);
+            if (!taken.isEmpty()) return taken;
+        }
+        var items = player.getInventory().items;
+        for (var stack : items) if (!stack.isEmpty() && ingredient.test(stack)) return stack.split(1);
+        return ItemStack.EMPTY;
+    }
+
     private void clearGrid() {
         for (int i = 0; i < craftSlots.getContainerSize(); i++) {
             var stack = craftSlots.removeItemNoUpdate(i);
