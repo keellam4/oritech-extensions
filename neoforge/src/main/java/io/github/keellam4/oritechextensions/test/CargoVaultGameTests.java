@@ -292,4 +292,46 @@ public class CargoVaultGameTests {
         if (pulled != 16 || vault.count() != 84) helper.fail("a pipe pulling 16 should leave 84, pulled " + pulled + ", left " + vault.count());
         helper.succeed();
     }
+
+    /**
+     * JNI-93: an empty vault can be locked; then pipes put nothing in, a player's first item by hand becomes its
+     * type, and Clear forgets the type at 0 items while staying locked. Same for Compacting and Fluid Vaults.
+     */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void lockedEmptyVaultTakesTypeByHand(GameTestHelper helper) {
+        var vault = place(helper, new BlockPos(2, 1, 2), ModContent.CARGO_VAULT.get());
+        vault.setLocked(true);
+        if (!vault.isLocked()) helper.fail("an empty vault should lock");
+        if (vault.insert(new ItemStack(Items.COBBLESTONE, 8), false) != 0) helper.fail("pipes shouldn't fill a locked empty vault");
+        if (vault.byHand(() -> vault.insert(new ItemStack(Items.IRON_INGOT, 8), false)) != 8) helper.fail("the first item by hand should go in");
+        if (vault.insert(new ItemStack(Items.IRON_INGOT, 2), false) != 2) helper.fail("pipes can add more of the locked type");
+        vault.extract(0, 10, false);
+        if (!vault.item().is(Items.IRON_INGOT)) helper.fail("emptied, it should stay locked to iron");
+        if (!vault.canClearTypes()) helper.fail("Clear should be available on a locked empty vault");
+        vault.clearTypes();
+        if (!vault.item().isEmpty() || !vault.isLocked()) helper.fail("Clear should forget iron and stay locked");
+        if (vault.insert(new ItemStack(Items.COBBLESTONE, 1), false) != 0) helper.fail("after Clear, pipes still put nothing in");
+        if (vault.byHand(() -> vault.insert(new ItemStack(Items.GOLD_INGOT, 1), false)) != 1) helper.fail("after Clear, a new item by hand sets the type");
+        if (vault.canClearTypes()) helper.fail("Clear shouldn't work while items are in");
+
+        var compacting = place(helper, new BlockPos(4, 1, 2), ModContent.COMPACTING_VAULT.get());
+        compacting.setLocked(true);
+        if (compacting.insert(new ItemStack(Items.IRON_INGOT, 9), false) != 0) helper.fail("a locked empty Compacting Vault refuses pipes");
+        if (compacting.byHand(() -> compacting.insert(new ItemStack(Items.IRON_INGOT, 9), false)) != 9) helper.fail("by hand it takes iron");
+        compacting.extract(0, 64, false);
+        compacting.extract(1, 64, false);
+        compacting.extract(2, 64, false);
+        if (!compacting.canClearTypes()) helper.fail("an emptied locked Compacting Vault can be cleared");
+        compacting.clearTypes();
+        if (compacting.hasAnyItemType()) helper.fail("Clear should forget the compacting chain");
+
+        var tank = (io.github.keellam4.oritechextensions.storage.FluidVaultBlockEntity) place(helper, new BlockPos(2, 1, 4), ModContent.FLUID_VAULT.get());
+        tank.setLocked(true);
+        if (tank.fill(net.minecraft.world.level.material.Fluids.WATER, 1000, false) != 0) helper.fail("a locked empty Fluid Vault refuses pipes");
+        if (tank.byHand(() -> tank.fill(net.minecraft.world.level.material.Fluids.LAVA, 1000, false)) != 1000) helper.fail("by hand it takes lava");
+        tank.drain(null, 1000, false);
+        tank.clearTypes();
+        if (tank.fluid() != net.minecraft.world.level.material.Fluids.EMPTY || !tank.isLocked()) helper.fail("Clear should forget lava and stay locked");
+        helper.succeed();
+    }
 }

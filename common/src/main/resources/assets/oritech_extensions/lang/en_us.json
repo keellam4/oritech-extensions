@@ -101,7 +101,7 @@
   "screen.oritech_extensions.vault_upgrades.push_missing": "Needs a Push Upgrade.",
   "screen.oritech_extensions.vault_upgrades.locked": "Locked",
   "screen.oritech_extensions.vault_upgrades.unlocked": "Unlocked",
-  "screen.oritech_extensions.vault_upgrades.lock_help": "A locked vault keeps its item types when empty and takes nothing else.",
+  "screen.oritech_extensions.vault_upgrades.lock_help": "A locked vault keeps its item types when empty and takes nothing else. Lock it empty to choose the type by hand.",
   "side.oritech_extensions.front": "Front",
   "side.oritech_extensions.back": "Back",
   "side.oritech_extensions.left": "Left",
@@ -224,5 +224,10 @@
   "screen.oritech_extensions.mast.dimensional": "Dimensional: anywhere, any dimension",
   "jei.oritech_extensions.terminal.missing": "Missing from the network and your inventory",
   "screen.oritech_extensions.terminal.empty": "Nothing stored yet",
-  "message.oritech_extensions.link.unloaded": "The linked Cargo Wall isn't loaded: put a Network Anchor in its controller"
+  "message.oritech_extensions.link.unloaded": "The linked Cargo Wall isn't loaded: put a Network Anchor in its controller",
+  "message.oritech_extensions.cargo_vault.locked_empty": "Vault locked while empty: nothing goes in until you put an item in by hand, which becomes its type.",
+  "message.oritech_extensions.cargo_vault.cleared": "Cleared: the vault stays locked and takes the next item you put in by hand.",
+  "screen.oritech_extensions.vault_upgrades.clear": "Clear",
+  "screen.oritech_extensions.vault_upgrades.clear_help": "Forget the type of every empty window and stay locked: the next item you put in by hand becomes the new type.",
+  "screen.oritech_extensions.vault_upgrades.clear_disabled": "Works on a locked vault whose windows are empty."
 }

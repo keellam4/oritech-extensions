@@ -33,6 +33,8 @@ public class VaultUpgradeScreen extends AbstractContainerScreen<VaultUpgradeMenu
     private static final int PUSH_X = 112;
     private static final int LOCK_X = 146;
     private static final int LOCK_Y = 19;
+    /** Clear sits at the left end of the upgrade row, mirroring the lock on the right. */
+    private static final int CLEAR_X = 14;
     /** Where each side sits in the unfolded cube: column, row. */
     private static final int[][] NET = {{1, 1}, {3, 1}, {0, 1}, {2, 1}, {1, 0}, {1, 2}};
     private static final String[] LETTERS = {"F", "B", "L", "R", "U", "D"};
@@ -91,6 +93,7 @@ public class VaultUpgradeScreen extends AbstractContainerScreen<VaultUpgradeMenu
         graphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
 
         drawLock(graphics, menu.locked());
+        drawClear(graphics, menu.clearable());
 
         boolean pull = has(VaultUpgrade.Kind.PULL);
         boolean push = has(VaultUpgrade.Kind.PUSH);
@@ -143,11 +146,25 @@ public class VaultUpgradeScreen extends AbstractContainerScreen<VaultUpgradeMenu
         graphics.fill(x + 8, y + 11, x + 10, y + 13, 0xFF101418);
     }
 
-    /** Which side cell (0-5) or lock (-2) the mouse is over, and in which cube; -1 for none. */
+    /** Clear: a small eraser cross, lit when there's an empty type to forget. */
+    private void drawClear(GuiGraphics graphics, boolean enabled) {
+        int x = CLEAR_X;
+        int y = LOCK_Y;
+        graphics.fill(x, y, x + 18, y + 18, 0xFF0E1013);
+        graphics.fill(x + 1, y + 1, x + 17, y + 17, enabled ? 0xFF203A40 : 0xFF2B3038);
+        int colour = enabled ? TEAL : 0xFF555B63;
+        for (int i = 0; i < 8; i++) {
+            graphics.fill(x + 5 + i, y + 5 + i, x + 6 + i, y + 6 + i, colour);
+            graphics.fill(x + 12 - i, y + 5 + i, x + 13 - i, y + 6 + i, colour);
+        }
+    }
+
+    /** Which side cell (0-5), lock or Clear the mouse is over, and in which cube; -1 for none. */
     private int buttonAt(double mouseX, double mouseY) {
         double x = mouseX - leftPos;
         double y = mouseY - topPos;
         if (x >= LOCK_X && x < LOCK_X + 18 && y >= LOCK_Y && y < LOCK_Y + 18) return VaultUpgradeMenu.BUTTON_LOCK;
+        if (x >= CLEAR_X && x < CLEAR_X + 18 && y >= LOCK_Y && y < LOCK_Y + 18) return VaultUpgradeMenu.BUTTON_CLEAR;
         for (int cube = 0; cube < 2; cube++) {
             int x0 = cube == 0 ? PULL_X : PUSH_X;
             for (var side : VaultSide.values()) {
@@ -166,7 +183,7 @@ public class VaultUpgradeScreen extends AbstractContainerScreen<VaultUpgradeMenu
         int id = buttonAt(mouseX, mouseY);
         if (button == 0 && id >= 0 && minecraft != null && minecraft.gameMode != null) {
             boolean enabled = id == VaultUpgradeMenu.BUTTON_LOCK
-                    || (id < VaultUpgradeMenu.BUTTON_PUSH ? has(VaultUpgrade.Kind.PULL) : has(VaultUpgrade.Kind.PUSH));
+                    || (id == VaultUpgradeMenu.BUTTON_CLEAR ? menu.clearable() : id < VaultUpgradeMenu.BUTTON_PUSH ? has(VaultUpgrade.Kind.PULL) : has(VaultUpgrade.Kind.PUSH));
             if (enabled) {
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id);
                 minecraft.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(
@@ -189,6 +206,13 @@ public class VaultUpgradeScreen extends AbstractContainerScreen<VaultUpgradeMenu
         }
         int id = buttonAt(mouseX, mouseY);
         if (id < 0) return;
+        if (id == VaultUpgradeMenu.BUTTON_CLEAR) {
+            graphics.renderComponentTooltip(font, List.of(
+                    Component.translatable("screen.oritech_extensions.vault_upgrades.clear"),
+                    Component.translatable(menu.clearable() ? "screen.oritech_extensions.vault_upgrades.clear_help"
+                            : "screen.oritech_extensions.vault_upgrades.clear_disabled").withStyle(net.minecraft.ChatFormatting.GRAY)), mouseX, mouseY);
+            return;
+        }
         if (id == VaultUpgradeMenu.BUTTON_LOCK) {
             graphics.renderComponentTooltip(font, List.of(
                     Component.translatable(menu.locked() ? "screen.oritech_extensions.vault_upgrades.locked" : "screen.oritech_extensions.vault_upgrades.unlocked"),
