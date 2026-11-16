@@ -58,8 +58,7 @@ jobs:
           else:
               version = name.split("+")[0]
               loaders = ["NeoForge"] + (["Fabric"] if os.path.isdir("fabric") and fabric_version == neoforge_version else [])
-          if "+mc" in name:
-              minecraft = name.split("+mc", 1)[1]
+          # The Minecraft version comes from the tag's own gradle.properties (exact, e.g. 26.1.2), not the tag suffix.
 
           # The changelog section for this tag (same lookup as the Release workflow).
           text = open("CHANGELOG.md", encoding="utf-8").read()
@@ -82,12 +81,19 @@ jobs:
 
           repo = os.environ.get("GITHUB_REPOSITORY", "keellam4/oritech-extensions")
           icon = f"https://raw.githubusercontent.com/{repo}/main/common/src/main/resources/icon.png"
-          modrinth_version = f"{version}+fabric" if loaders == ["Fabric"] else version
-          downloads = " · ".join([
-              f"[Modrinth](https://modrinth.com/mod/oritech-extensions/version/{modrinth_version})",
-              "[CurseForge](https://www.curseforge.com/minecraft/mc-mods/oritech-extensions/files)",
-              f"[GitHub]({release['url']})",
-          ])
+          # Modrinth's version number is the tag without the "v" (0.4.0, 0.4.0+mc26.1, 0.4.1+fabric).
+          # Link it only while the project is public: a project still under review is a 404 for everyone else.
+          links = []
+          try:
+              check = urllib.request.Request("https://api.modrinth.com/v2/project/oritech-extensions",
+                                             headers={"User-Agent": "keellam4/oritech-extensions release"})
+              with urllib.request.urlopen(check, timeout=15) as response:
+                  if response.status == 200:
+                      links.append(f"[Modrinth](https://modrinth.com/mod/oritech-extensions/version/{name})")
+          except Exception as error:
+              print("Modrinth project not public, leaving it out:", error)
+          links += ["[CurseForge](https://www.curseforge.com/minecraft/mc-mods/oritech-extensions/files)", f"[GitHub]({release['url']})"]
+          downloads = " · ".join(links)
           embed = {
               "title": f"Oritech Extensions {version}" + (" for Fabric" if loaders == ["Fabric"] else ""),
               "url": release["url"],
