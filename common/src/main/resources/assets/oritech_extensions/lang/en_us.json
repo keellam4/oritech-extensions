@@ -231,5 +231,12 @@
   "screen.oritech_extensions.vault_upgrades.clear_help": "Forget the type of every empty window and stay locked: the next item you put in by hand becomes the new type.",
   "screen.oritech_extensions.vault_upgrades.clear_disabled": "Works on a locked vault whose windows are empty.",
   "screen.oritech_extensions.silo.exact": "Exact buckets",
-  "screen.oritech_extensions.silo.exact_hint": "buckets, Enter"
+  "screen.oritech_extensions.silo.exact_hint": "buckets, Enter",
+  "oritech_extensions.configuration.terminalEnergyPerCraft": "Crafting Terminal Energy per Craft",
+  "oritech_extensions.configuration.terminalEnergyPerCraft.tooltip": "Energy (RF) the Crafting Terminal uses per craft. 0: it needs no power.",
+  "oritech_extensions.configuration.terminalEnergyBuffer": "Crafting Terminal Storage",
+  "oritech_extensions.configuration.terminalEnergyBuffer.tooltip": "How much energy (RF) a Crafting Terminal stores.",
+  "screen.oritech_extensions.terminal.energy": "Energy: %s / %s RF",
+  "screen.oritech_extensions.terminal.energy_help": "Each craft uses %s RF. Connect a cable to the Crafting Terminal.",
+  "screen.oritech_extensions.terminal.no_power": "No power: connect a cable"
 }

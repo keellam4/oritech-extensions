@@ -1,10 +1,9 @@
 package io.github.keellam4.oritechextensions.neoforge;
 
-import io.github.keellam4.oritechextensions.wireless.InductionPylonBlockEntity;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-/** Lets cables fill an Induction Pylon. It only takes energy in. */
-public record PylonEnergyStorage(InductionPylonBlockEntity pylon) implements IEnergyStorage {
+/** Lets cables fill an energy buffer: an Induction Pylon or a Crafting Terminal. It only takes energy in. */
+public record PylonEnergyStorage(io.github.keellam4.oritechextensions.EnergyBuffer pylon) implements IEnergyStorage {
 
     @Override
     public int receiveEnergy(int max, boolean simulate) {

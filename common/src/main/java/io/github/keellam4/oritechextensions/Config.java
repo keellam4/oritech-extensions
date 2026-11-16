@@ -83,6 +83,14 @@ public class Config {
             .comment("Energy (RF) a Cargo Link uses per item moved (a bucket counts as 64 items).")
             .defineInRange("linkEnergyPerItem", 5, 0, 10000);
 
+    public static final ModConfigSpec.IntValue TERMINAL_ENERGY_PER_CRAFT = BUILDER
+            .comment("Energy (RF) the Crafting Terminal uses per craft. 0: it needs no power.")
+            .defineInRange("terminalEnergyPerCraft", 100, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TERMINAL_ENERGY_BUFFER = BUILDER
+            .comment("How much energy (RF) a Crafting Terminal stores.")
+            .defineInRange("terminalEnergyBuffer", 50_000, 1000, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.BooleanValue ALLOW_NETWORK_CHUNK_LOADING = BUILDER
             .comment("Whether a Network Anchor in a Cargo Controller may keep the network's chunks loaded.")
             .define("allowNetworkChunkLoading", true);
@@ -157,6 +165,14 @@ public class Config {
 
     public static int linkEnergyPerItem() {
         return SPEC.isLoaded() ? LINK_ENERGY_PER_ITEM.get() : LINK_ENERGY_PER_ITEM.getDefault();
+    }
+
+    public static int terminalEnergyPerCraft() {
+        return SPEC.isLoaded() ? TERMINAL_ENERGY_PER_CRAFT.get() : TERMINAL_ENERGY_PER_CRAFT.getDefault();
+    }
+
+    public static int terminalEnergyBuffer() {
+        return SPEC.isLoaded() ? TERMINAL_ENERGY_BUFFER.get() : TERMINAL_ENERGY_BUFFER.getDefault();
     }
 
     public static boolean allowNetworkChunkLoading() {

@@ -89,6 +89,9 @@ public final class OritechExtensionsNeoForge {
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.CARGO_CONTROLLER_ENTITY.get(), (controller, side) -> new ControllerFluidHandler(controller));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.SILO_CONTROLLER_ENTITY.get(), (silo, side) -> new VaultFluidHandler(silo));
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, ModContent.INDUCTION_PYLON_ENTITY.get(), (pylon, side) -> new PylonEnergyStorage(pylon));
+        // Crafting Terminals take power (a plain Cargo Controller has no capacity, so cables don't connect).
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, ModContent.CARGO_CONTROLLER_ENTITY.get(),
+                (controller, side) -> controller.needsPower() ? new PylonEnergyStorage(controller) : null);
         event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, context) -> new net.neoforged.neoforge.energy.ComponentEnergyStorage(stack,
                 ModContent.LINK_ENERGY.get(), io.github.keellam4.oritechextensions.wireless.CargoLinkItem.CAPACITY,
                 io.github.keellam4.oritechextensions.wireless.CargoLinkItem.MAX_INPUT, 0), ModContent.CARGO_LINK.get());

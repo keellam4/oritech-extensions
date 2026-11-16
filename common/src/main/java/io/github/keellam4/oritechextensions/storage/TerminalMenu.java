@@ -63,6 +63,9 @@ public class TerminalMenu extends AbstractContainerMenu {
     private List<CargoNetwork.Entry> lastSent;
     private int ticks;
 
+    /** Crafting Terminal power for the screen: energy and capacity as 16-bit halves, then flags (1 needs power). */
+    private final net.minecraft.world.inventory.ContainerData power;
+
     /** Client side of the plain terminal. */
     public TerminalMenu(int id, Inventory inventory) {
         this(id, inventory, null, false);
@@ -91,6 +94,47 @@ public class TerminalMenu extends AbstractContainerMenu {
             for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col + row * 9 + 9, INVENTORY_X + col * 18, y + row * 18));
         }
         for (int col = 0; col < 9; col++) addSlot(new Slot(inventory, col, INVENTORY_X + col * 18, y + 58));
+        power = controller == null ? new net.minecraft.world.inventory.SimpleContainerData(5) : new net.minecraft.world.inventory.ContainerData() {
+            @Override
+            public int get(int index) {
+                long energy = Math.min(controller.energy(), 0xFFFF_FFFFL), capacity = Math.min(controller.capacity(), 0xFFFF_FFFFL);
+                return switch (index) {
+                    case 0 -> (int) (energy & 0xFFFF);
+                    case 1 -> (int) (energy >>> 16 & 0xFFFF);
+                    case 2 -> (int) (capacity & 0xFFFF);
+                    case 3 -> (int) (capacity >>> 16 & 0xFFFF);
+                    default -> controller.needsPower() ? 1 : 0;
+                };
+            }
+
+            @Override
+            public void set(int index, int value) {
+            }
+
+            @Override
+            public int getCount() {
+                return 5;
+            }
+        };
+        if (crafting) addDataSlots(power);
+    }
+
+    /** Whether this Crafting Terminal needs power to craft (synced to the screen). */
+    public boolean needsPower() {
+        return power.get(4) != 0;
+    }
+
+    public long energy() {
+        return (power.get(0) & 0xFFFFL) | (power.get(1) & 0xFFFFL) << 16;
+    }
+
+    public long energyCapacity() {
+        return (power.get(2) & 0xFFFFL) | (power.get(3) & 0xFFFFL) << 16;
+    }
+
+    /** Server: whether there's power for one more craft. */
+    private boolean powered() {
+        return controller == null || controller.canCraft(1);
     }
 
     /** Makes this a remote terminal (Cargo Link). */
@@ -128,7 +172,14 @@ public class TerminalMenu extends AbstractContainerMenu {
         }
 
         @Override
+        public boolean mayPickup(Player player) {
+            // A Crafting Terminal without power for a craft keeps its result.
+            return powered() && super.mayPickup(player);
+        }
+
+        @Override
         public void onTake(Player taker, ItemStack stack) {
+            if (controller != null) controller.spendCraft();
             var before = new ItemStack[craftSlots.getContainerSize()];
             for (int i = 0; i < before.length; i++) before[i] = craftSlots.getItem(i).copyWithCount(1);
             super.onTake(taker, stack);
@@ -311,7 +362,8 @@ public class TerminalMenu extends AbstractContainerMenu {
         if (!slot.hasItem()) return ItemStack.EMPTY;
         var stack = slot.getItem();
         if (crafting && index == 0) {
-            // The result: into the inventory; vanilla repeats this while the result stays the same.
+            // The result: into the inventory; vanilla repeats this while the result stays the same (and power lasts).
+            if (!powered()) return ItemStack.EMPTY;
             var copy = stack.copy();
             stack.getItem().onCraftedBy(stack, player.level(), player);
             if (!moveItemStackTo(stack, inventoryStart, slots.size(), true)) return ItemStack.EMPTY;

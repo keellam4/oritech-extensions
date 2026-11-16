@@ -5,6 +5,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
+- **The Crafting Terminal uses power.** Connect a cable; each craft uses 100 RF (`terminalEnergyPerCraft`, 0 turns it off; `terminalEnergyBuffer` sets its storage). The Cargo Controller stays free.
 - **Empty vaults stack to 64.** A vault that keeps contents, upgrades, a lock or paint on its item still stacks to 1.
 - **Exact silo limits.** Shift-click a fluid's Limit or Reserve in the Silo Controller screen to type an exact amount in buckets (decimals allowed). Percentages still work with left- and right-click.
 - **Lock indicator.** Locked vaults show a small padlock in the corner of every window, empty ones included.

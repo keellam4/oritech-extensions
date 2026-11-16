@@ -1,16 +1,15 @@
 package io.github.keellam4.oritechextensions.fabric;
 
-import io.github.keellam4.oritechextensions.wireless.InductionPylonBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import team.reborn.energy.api.EnergyStorage;
 
-/** Lets cables fill an Induction Pylon (Team Reborn Energy). It only takes energy in. */
+/** Lets cables fill an energy buffer: an Induction Pylon or a Crafting Terminal (Team Reborn Energy). It only takes energy in. */
 public class PylonEnergyStorage extends SnapshotParticipant<Long> implements EnergyStorage {
 
-    private final InductionPylonBlockEntity pylon;
+    private final io.github.keellam4.oritechextensions.EnergyBuffer pylon;
 
-    public PylonEnergyStorage(InductionPylonBlockEntity pylon) {
+    public PylonEnergyStorage(io.github.keellam4.oritechextensions.EnergyBuffer pylon) {
         this.pylon = pylon;
     }
 

@@ -158,6 +158,13 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         refilter();
         super.render(graphics, mouseX, mouseY, partialTick);
+        if (overEnergy(mouseX, mouseY)) {
+            graphics.renderComponentTooltip(font, List.of(
+                    Component.translatable("screen.oritech_extensions.terminal.energy", String.format("%,d", menu.energy()), String.format("%,d", menu.energyCapacity())),
+                    Component.translatable("screen.oritech_extensions.terminal.energy_help", String.format("%,d", io.github.keellam4.oritechextensions.Config.terminalEnergyPerCraft()))
+                            .withStyle(ChatFormatting.GRAY)), mouseX, mouseY);
+            return;
+        }
         var hovered = entryAt(mouseX, mouseY);
         int button = buttonAt(mouseX, mouseY);
         if (hovered != null && hovered.isFluid()) {
@@ -228,6 +235,33 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
             graphics.fill(ax + i, y, ax + 8 - i, y + 1, TEAL);
         }
         if (menu.isCrafting()) drawClearButton(graphics, mouseX, mouseY);
+        if (menu.isCrafting() && menu.needsPower()) drawEnergy(graphics);
+    }
+
+    private static final int ENERGY_X = TerminalMenu.RESULT_X + 28, ENERGY_W = 6, ENERGY_H = 54;
+
+    /** The Crafting Terminal's energy, beside the result; the result dims when there isn't enough for a craft. */
+    private void drawEnergy(GuiGraphics graphics) {
+        int x = leftPos + ENERGY_X, y = topPos + TerminalMenu.CRAFT_Y;
+        long capacity = Math.max(1, menu.energyCapacity());
+        int filled = (int) Math.round(ENERGY_H * Math.min(1.0, (double) menu.energy() / capacity));
+        graphics.fill(x - 1, y - 1, x + ENERGY_W + 1, y + ENERGY_H + 1, 0xFF0E1013);
+        graphics.fill(x, y, x + ENERGY_W, y + ENERGY_H, 0xFF1E2228);
+        graphics.fill(x, y + ENERGY_H - filled, x + ENERGY_W, y + ENERGY_H, 0xFFC0392B);
+        graphics.fill(x, y + ENERGY_H - filled, x + 1, y + ENERGY_H, 0xFFE8604C);
+        if (!hasPowerForCraft()) {
+            int rx = leftPos + TerminalMenu.RESULT_X, ry = topPos + TerminalMenu.RESULT_Y;
+            graphics.fill(rx, ry, rx + 16, ry + 16, 0xB0101418);
+        }
+    }
+
+    private boolean hasPowerForCraft() {
+        return !menu.needsPower() || menu.energy() >= io.github.keellam4.oritechextensions.Config.terminalEnergyPerCraft();
+    }
+
+    private boolean overEnergy(double mouseX, double mouseY) {
+        double x = mouseX - leftPos - ENERGY_X, y = mouseY - topPos - TerminalMenu.CRAFT_Y;
+        return menu.isCrafting() && menu.needsPower() && x >= -1 && x < ENERGY_W + 1 && y >= -1 && y < ENERGY_H + 1;
     }
 
     private void drawButton(GuiGraphics graphics, int index, ItemStack icon, int mouseX, int mouseY) {
@@ -272,6 +306,10 @@ public class TerminalScreen extends AbstractContainerScreen<TerminalMenu> {
         var info = Component.translatable("screen.oritech_extensions.terminal.info",
                 receivedFor == menu.containerId ? receivedVaults : 0, shown.size());
         graphics.drawString(font, info, imageWidth - 8 - font.width(info), inventoryLabelY, MUTED, false);
+        if (menu.isCrafting() && !hasPowerForCraft()) {
+            var text = Component.translatable("screen.oritech_extensions.terminal.no_power");
+            graphics.drawString(font, text, TerminalMenu.RESULT_X + 8 - font.width(text) / 2, TerminalMenu.RESULT_Y + 22, 0xFFE8604C, false);
+        }
         if (menu.isCrafting()) {
             // The arrow between the grid and the result.
             int ax = TerminalMenu.CRAFT_X + 3 * 18 + 6;

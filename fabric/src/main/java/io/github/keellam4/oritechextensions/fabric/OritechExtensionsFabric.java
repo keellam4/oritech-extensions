@@ -65,6 +65,8 @@ public final class OritechExtensionsFabric implements ModInitializer {
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultFluidStorage(vault), ModContent.FLUID_VAULT_ENTITY.get());
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((silo, side) -> new VaultFluidStorage(silo), ModContent.SILO_CONTROLLER_ENTITY.get());
         team.reborn.energy.api.EnergyStorage.SIDED.registerForBlockEntity((pylon, side) -> new PylonEnergyStorage(pylon), ModContent.INDUCTION_PYLON_ENTITY.get());
+        team.reborn.energy.api.EnergyStorage.SIDED.registerForBlockEntity(
+                (controller, side) -> controller.needsPower() ? new PylonEnergyStorage(controller) : null, ModContent.CARGO_CONTROLLER_ENTITY.get());
         team.reborn.energy.api.EnergyStorage.ITEM.registerForItems((stack, context) -> new LinkEnergyStorage(context), ModContent.CARGO_LINK.get());
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlocks((level, pos, state, blockEntity, side) -> {
             var silo = io.github.keellam4.oritechextensions.storage.SiloParts.controllerOf(level, pos);
