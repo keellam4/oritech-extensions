@@ -22,6 +22,8 @@ public final class OritechExtensionsFabricClient implements ClientModInitializer
         BlockEntityRenderers.register(ModContent.COMPACTING_VAULT_ENTITY.get(), io.github.keellam4.oritechextensions.client.CargoVaultRenderer::new);
         BlockEntityRenderers.register(ModContent.FLUID_VAULT_ENTITY.get(), io.github.keellam4.oritechextensions.client.CargoVaultRenderer::new);
         BlockEntityRenderers.register(ModContent.SILO_CONTROLLER_ENTITY.get(), io.github.keellam4.oritechextensions.client.SiloRenderer::new);
+        // Fluid flowing through Transparent Fluid Pipes, drawn from Oritech's fluid pipe ends.
+        BlockEntityRenderers.register(rearth.oritech.init.BlockEntitiesContent.FLUID_PIPE_ENTITY, io.github.keellam4.oritechextensions.client.FluidFlowRenderer::new);
         BlockEntityRenderers.register(ModContent.INDUCTION_PYLON_ENTITY.get(), io.github.keellam4.oritechextensions.client.PylonRenderer::new);
         for (var pylon : io.github.keellam4.oritechextensions.wireless.InductionPylonBlock.all()) {
             net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlock(pylon, net.minecraft.client.renderer.RenderType.cutout());
@@ -52,6 +54,8 @@ public final class OritechExtensionsFabricClient implements ClientModInitializer
                 io.github.keellam4.oritechextensions.client.SiloScreen::new);
         net.minecraft.client.gui.screens.MenuScreens.register(ModContent.UPLINK_MAST_MENU.get(),
                 io.github.keellam4.oritechextensions.client.UplinkMastScreen::new);
+        ClientPlayNetworking.registerGlobalReceiver(io.github.keellam4.oritechextensions.pipes.FluidFlowPayload.TYPE,
+                (payload, context) -> io.github.keellam4.oritechextensions.client.FluidFlowRenderer.receive(payload));
         ClientPlayNetworking.registerGlobalReceiver(io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.TYPE,
                 (payload, context) -> io.github.keellam4.oritechextensions.client.TerminalScreen.receive(payload));
 

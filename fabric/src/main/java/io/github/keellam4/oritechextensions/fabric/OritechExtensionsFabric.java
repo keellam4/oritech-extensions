@@ -36,6 +36,8 @@ public final class OritechExtensionsFabric implements ModInitializer {
         // Forge Config API Port gives Fabric the same config file and format as NeoForge.
         NeoForgeConfigRegistry.INSTANCE.register(OritechExtensions.MODID, ModConfig.Type.COMMON, Config.SPEC);
         PayloadTypeRegistry.playS2C().register(PaintSyncPayload.TYPE, PaintSyncPayload.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(io.github.keellam4.oritechextensions.pipes.FluidFlowPayload.TYPE,
+                io.github.keellam4.oritechextensions.pipes.FluidFlowPayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(DetailingToolPayload.TYPE, DetailingToolPayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(VaultTakePayload.TYPE, VaultTakePayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(io.github.keellam4.oritechextensions.storage.TerminalActionPayload.TYPE,

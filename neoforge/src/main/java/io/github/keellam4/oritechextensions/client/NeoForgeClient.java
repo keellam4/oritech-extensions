@@ -64,6 +64,7 @@ public final class NeoForgeClient {
         event.registerBlockEntityRenderer(ModContent.COMPACTING_VAULT_ENTITY.get(), CargoVaultRenderer::new);
         event.registerBlockEntityRenderer(ModContent.FLUID_VAULT_ENTITY.get(), CargoVaultRenderer::new);
         event.registerBlockEntityRenderer(ModContent.SILO_CONTROLLER_ENTITY.get(), NeoSiloRenderer::new);
+        event.registerBlockEntityRenderer(rearth.oritech.init.BlockEntitiesContent.FLUID_PIPE_ENTITY, NeoFluidFlowRenderer::new);
         event.registerBlockEntityRenderer(ModContent.INDUCTION_PYLON_ENTITY.get(), NeoPylonRenderer::new);
     }
 
