@@ -130,6 +130,38 @@ public class SiloControllerBlockEntity extends BlockEntity implements NetworkTan
         return fluidCapacity() * value / 100;
     }
 
+    /** A fluid's limit in millibuckets: its exact amount, or its percentage of the silo; 0 = no limit. */
+    public long limitOf(SiloTank tank) {
+        return tank.limitMb > 0 ? tank.limitMb : percent(tank.limit);
+    }
+
+    /** A fluid's reserve in millibuckets: its exact amount, or its percentage of the silo. */
+    public long reserveOf(SiloTank tank) {
+        return tank.reserveMb > 0 ? tank.reserveMb : percent(tank.reserve);
+    }
+
+    /**
+     * Sets an exact limit or reserve, in millibuckets (0 clears it). It replaces the percentage. A reserve can't
+     * push the reserves past the whole silo, so it's capped at what the others leave.
+     */
+    public boolean setExact(int row, boolean reserve, long millibuckets) {
+        if (row < 0 || row >= tanks.size()) return false;
+        var tank = tanks.get(row);
+        long amount = Math.max(0, Math.min(millibuckets, fluidCapacity()));
+        if (reserve) {
+            long others = 0;
+            for (var other : tanks) if (other != tank) others += reserveOf(other);
+            tank.reserveMb = Math.min(amount, Math.max(0, fluidCapacity() - others));
+            tank.reserve = 0;
+        } else {
+            tank.limitMb = amount;
+            tank.limit = 0;
+        }
+        if (tank.disposable()) tanks.remove(tank);
+        changed();
+        return true;
+    }
+
     @Override
     public boolean acceptsFluid(Fluid offered) {
         if (offered == Fluids.EMPTY || structure == null) return false;
@@ -141,10 +173,10 @@ public class SiloControllerBlockEntity extends BlockEntity implements NetworkTan
         if (!acceptsFluid(offered)) return 0;
         var own = tankFor(offered);
         long others = 0;
-        for (var tank : tanks) if (tank != own) others += Math.max(tank.amount, percent(tank.reserve));
+        for (var tank : tanks) if (tank != own) others += Math.max(tank.amount, reserveOf(tank));
         long ownAmount = own == null ? 0 : own.amount;
         long room = fluidCapacity() - others - ownAmount;
-        if (own != null && own.limit > 0) room = Math.min(room, percent(own.limit) - ownAmount);
+        if (own != null && limitOf(own) > 0) room = Math.min(room, limitOf(own) - ownAmount);
         return Math.max(0, room);
     }
 
@@ -191,13 +223,20 @@ public class SiloControllerBlockEntity extends BlockEntity implements NetworkTan
         if (row < 0 || row >= tanks.size()) return false;
         var tank = tanks.get(row);
         switch (action) {
-            case 0, 1 -> tank.limit = SiloTank.step(SiloTank.LIMIT_STEPS, tank.limit, action == 1);
+            case 0, 1 -> {
+                // Percent steps; an exact amount gives way to them (and starts from "none").
+                tank.limit = tank.limitMb > 0 ? 0 : tank.limit;
+                tank.limitMb = 0;
+                tank.limit = SiloTank.step(SiloTank.LIMIT_STEPS, tank.limit, action == 1);
+            }
             case 2, 3 -> {
+                if (tank.reserveMb > 0) tank.reserve = 0;
+                tank.reserveMb = 0;
                 int next = SiloTank.step(SiloTank.RESERVE_STEPS, tank.reserve, action == 3);
-                int others = 0;
-                for (var other : tanks) if (other != tank) others += other.reserve;
+                long others = 0;
+                for (var other : tanks) if (other != tank) others += reserveOf(other);
                 // Reserves can't add up to more than the whole silo.
-                tank.reserve = others + next <= 100 ? next : 0;
+                tank.reserve = others + percent(next) <= fluidCapacity() ? next : 0;
             }
             case 4 -> tank.locked = !tank.locked;
             case 5 -> tank.voids = !tank.voids;

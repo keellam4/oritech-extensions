@@ -175,9 +175,9 @@
   "screen.oritech_extensions.silo.none": "none",
   "screen.oritech_extensions.silo.move": "Shift-click to move up: pipes take from the top first",
   "screen.oritech_extensions.silo.limit": "Limit: %s",
-  "screen.oritech_extensions.silo.limit.help": "The most of the silo this fluid may use. Left-click: more, right-click: less.",
+  "screen.oritech_extensions.silo.limit.help": "The most of the silo this fluid may use. Left-click: more, right-click: less, shift-click: type exact buckets.",
   "screen.oritech_extensions.silo.reserve": "Reserve: %s",
-  "screen.oritech_extensions.silo.reserve.help": "Space kept free for this fluid, even when it's empty. Left-click: more, right-click: less.",
+  "screen.oritech_extensions.silo.reserve.help": "Space kept free for this fluid, even when it's empty. Left-click: more, right-click: less, shift-click: type exact buckets.",
   "screen.oritech_extensions.silo.lock": "Lock: %s",
   "screen.oritech_extensions.silo.lock.help": "Keep this fluid's place when it runs empty.",
   "screen.oritech_extensions.silo.void": "Void overflow: %s",
@@ -229,5 +229,7 @@
   "message.oritech_extensions.cargo_vault.cleared": "Cleared: the vault stays locked and takes the next item you put in by hand.",
   "screen.oritech_extensions.vault_upgrades.clear": "Clear",
   "screen.oritech_extensions.vault_upgrades.clear_help": "Forget the type of every empty window and stay locked: the next item you put in by hand becomes the new type.",
-  "screen.oritech_extensions.vault_upgrades.clear_disabled": "Works on a locked vault whose windows are empty."
+  "screen.oritech_extensions.vault_upgrades.clear_disabled": "Works on a locked vault whose windows are empty.",
+  "screen.oritech_extensions.silo.exact": "Exact buckets",
+  "screen.oritech_extensions.silo.exact_hint": "buckets, Enter"
 }

@@ -179,4 +179,25 @@ public class FluidSiloGameTests {
         if (!group.contains(silo.getBlockPos())) helper.fail("painting the wall should paint the silo touching it");
         helper.succeed();
     }
+
+    /** JNI-96: a limit or reserve can be an exact amount in millibuckets; percent clicks replace it again. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void exactLimitsAndReserves(GameTestHelper helper) {
+        var silo = build(helper, 3); // 27,000 buckets
+        partitions(helper, silo, ModContent.PARTITION_UPGRADE_1.get());
+        silo.fill(Fluids.WATER, 1_000, false);
+        silo.setExact(0, false, 1_250_500); // 1,250.5 B
+        if (silo.roomFor(Fluids.WATER) != 1_250_500 - 1_000) helper.fail("water should stop at 1,250.5 B, room " + silo.roomFor(Fluids.WATER));
+        silo.fill(Fluids.LAVA, 1_000, false);
+        silo.setExact(1, true, 5_000_000); // keep 5,000 B for lava
+        long waterRoom = silo.roomFor(Fluids.WATER);
+        if (waterRoom != 1_250_500 - 1_000) helper.fail("the limit still caps water, room " + waterRoom);
+        silo.setExact(0, false, 0); // clear water's limit
+        if (silo.roomFor(Fluids.WATER) != 27_000_000L - 1_000 - 5_000_000) helper.fail("lava's exact reserve should be kept free, room " + silo.roomFor(Fluids.WATER));
+        silo.setExact(1, true, 999_000_000L);
+        if (silo.tanks().get(1).reserveMb > silo.fluidCapacity()) helper.fail("a reserve can't be more than the silo");
+        silo.configure(1, 2); // a percent click replaces the exact reserve
+        if (silo.tanks().get(1).reserveMb != 0 || silo.tanks().get(1).reserve != 10) helper.fail("a percent click should replace the exact reserve with 10%");
+        helper.succeed();
+    }
 }

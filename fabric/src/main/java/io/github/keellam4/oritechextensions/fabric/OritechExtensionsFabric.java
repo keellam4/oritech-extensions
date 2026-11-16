@@ -46,6 +46,10 @@ public final class OritechExtensionsFabric implements ModInitializer {
             if (context.player().containerMenu instanceof io.github.keellam4.oritechextensions.storage.TerminalMenu menu
                     && menu.containerId == payload.containerId()) menu.handle(payload.action(), payload.item(), payload.fluid());
         });
+        PayloadTypeRegistry.playC2S().register(io.github.keellam4.oritechextensions.storage.SiloExactPayload.TYPE,
+                io.github.keellam4.oritechextensions.storage.SiloExactPayload.STREAM_CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(io.github.keellam4.oritechextensions.storage.SiloExactPayload.TYPE,
+                (payload, context) -> io.github.keellam4.oritechextensions.storage.SiloExactPayload.handle(payload, context.player()));
         PayloadTypeRegistry.playC2S().register(io.github.keellam4.oritechextensions.storage.TerminalFillPayload.TYPE,
                 io.github.keellam4.oritechextensions.storage.TerminalFillPayload.STREAM_CODEC);
         ServerPlayNetworking.registerGlobalReceiver(io.github.keellam4.oritechextensions.storage.TerminalFillPayload.TYPE, (payload, context) -> {
