@@ -256,4 +256,13 @@ public class PipePaintGameTests {
         }
         helper.succeed();
     }
+
+    /** JNI-98: the hook that reports fluid moving through Oritech's fluid pipes is applied (it's optional, so check). */
+    @GameTest(template = TEMPLATE, timeoutTicks = 20)
+    public static void fluidFlowHookApplied(GameTestHelper helper) {
+        boolean hooked = java.util.Arrays.stream(rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity.class.getDeclaredMethods())
+                .anyMatch(method -> method.getName().contains("oritechExtensions$showFlow"));
+        if (!hooked) helper.fail("the fluid flow hook didn't apply to Oritech's FluidPipeInterfaceEntity");
+        helper.succeed();
+    }
 }
