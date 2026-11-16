@@ -31,6 +31,11 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 - **Paintable block tags for modpacks.** Add blocks to `oritech_extensions:paintable` (one block per click) or `oritech_extensions:paintable_connected` (touching blocks paint together) with a datapack, and list their textures in the painted-texture atlas with a resource pack. See "For Modpack Makers" on the website.
 
 ### Fixed
+- A Fluid Silo joins a Cargo Wall when any of its blocks touches the wall (not only the controller), and painting the wall paints the silo too.
+- Vault counts are no longer hidden behind block items and tall items.
+- The Cargo Link's signal bars showed as `\u25AE` codes; and with the wall's chunks unloaded it wrongly said the wall was in another dimension (it now says to add a Network Anchor).
+- A bigger Partition Upgrade can replace the current one while the silo holds several fluids.
+- The terminal showed a raw text key when the wall was empty.
 - Oritech item pipes set to extract couldn't pull from vaults or a Cargo Wall on Fabric; now they can, with no Push upgrade needed.
 - A crash on Fabric when a Cargo Controller's network had Fluid Vaults or a Fluid Silo.
 - The config screen showed raw keys instead of names for the colour-isolated pipes and Fluid Silo options.
