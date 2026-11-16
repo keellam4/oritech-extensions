@@ -1,0 +1,89 @@
+---
+title: Vault Upgrades
+id: oritech_extensions:steel_capacity_upgrade
+icon: oritech_extensions:steel_capacity_upgrade
+related_items: ["oritech_extensions:steel_capacity_upgrade", "oritech_extensions:electrum_capacity_upgrade", "oritech_extensions:energite_capacity_upgrade", "oritech_extensions:duratium_capacity_upgrade", "oritech_extensions:prometheum_capacity_upgrade", "oritech_extensions:void_upgrade", "oritech_extensions:pull_upgrade", "oritech_extensions:push_upgrade", "oritech_extensions:redstone_upgrade"]
+---
+
+# Vault Upgrades
+
+Upgrades change how much a vault holds and how it moves items. They work in every vault, including Fluid Vaults.
+
+Right-click a vault with an upgrade to install it, or sneak + right-click the vault with an empty hand to open its upgrade screen.
+
+## Capacity
+
+| Upgrade | Each adds |
+| --- | --- |
+| Steel Capacity Upgrade | ×2 |
+| Electrum Capacity Upgrade | ×4 |
+| Energite Capacity Upgrade | ×8 |
+| Duratium Capacity Upgrade | ×16 |
+| Prometheum Capacity Upgrade | ×32 |
+
+Up to five, all of one tier; they add up, so two Electrum upgrades make a vault hold 8 times as much. An upgrade can't come out while the vault holds more than it could without it.
+
+## Other upgrades
+
+- **Void Upgrade:** items that don't fit are deleted instead of backing up. Only items the vault already holds.
+- **Pull Upgrade:** pulls the vault's items from inventories on the sides you pick in the upgrade screen.
+- **Push Upgrade:** pushes the vault's items into inventories on the sides you pick. Oritech's pipes don't accept pushed items; set the pipe to extract instead.
+- **Redstone Upgrade:** the vault gives off a signal as strong as it is full, and a redstone signal pauses Pull and Push.
+
+One of each fits in a vault.
+
+## Recipes
+
+<CraftingRecipe
+    slots={['', 'oritech:steel_ingot', '', 'oritech:steel_ingot', 'minecraft:chest', 'oritech:steel_ingot', '', 'oritech:steel_ingot', '']}
+    result="oritech_extensions:steel_capacity_upgrade"
+    count={1}
+/>
+
+<CraftingRecipe
+    slots={['', 'oritech:electrum_ingot', '', 'oritech:electrum_ingot', 'oritech_extensions:steel_capacity_upgrade', 'oritech:electrum_ingot', '', 'oritech:electrum_ingot', '']}
+    result="oritech_extensions:electrum_capacity_upgrade"
+    count={1}
+/>
+
+<CraftingRecipe
+    slots={['', 'oritech:energite_ingot', '', 'oritech:energite_ingot', 'oritech_extensions:electrum_capacity_upgrade', 'oritech:energite_ingot', '', 'oritech:energite_ingot', '']}
+    result="oritech_extensions:energite_capacity_upgrade"
+    count={1}
+/>
+
+<CraftingRecipe
+    slots={['', 'oritech:duratium_ingot', '', 'oritech:duratium_ingot', 'oritech_extensions:energite_capacity_upgrade', 'oritech:duratium_ingot', '', 'oritech:duratium_ingot', '']}
+    result="oritech_extensions:duratium_capacity_upgrade"
+    count={1}
+/>
+
+<CraftingRecipe
+    slots={['', 'oritech:prometheum_ingot', '', 'oritech:prometheum_ingot', 'oritech_extensions:duratium_capacity_upgrade', 'oritech:prometheum_ingot', '', 'oritech:prometheum_ingot', '']}
+    result="oritech_extensions:prometheum_capacity_upgrade"
+    count={1}
+/>
+
+<CraftingRecipe
+    slots={['', 'minecraft:obsidian', '', 'minecraft:obsidian', 'oritech:enderic_compound', 'minecraft:obsidian', '', 'minecraft:obsidian', '']}
+    result="oritech_extensions:void_upgrade"
+    count={1}
+/>
+
+<CraftingRecipe
+    slots={['', 'minecraft:hopper', '', 'oritech:steel_ingot', 'oritech:motor', 'oritech:steel_ingot', '', '', '']}
+    result="oritech_extensions:pull_upgrade"
+    count={1}
+/>
+
+<CraftingRecipe
+    slots={['', 'minecraft:dropper', '', 'oritech:steel_ingot', 'oritech:motor', 'oritech:steel_ingot', '', '', '']}
+    result="oritech_extensions:push_upgrade"
+    count={1}
+/>
+
+<CraftingRecipe
+    slots={['', 'minecraft:comparator', '', 'oritech:steel_ingot', 'minecraft:redstone_block', 'oritech:steel_ingot', '', '', '']}
+    result="oritech_extensions:redstone_upgrade"
+    count={1}
+/>

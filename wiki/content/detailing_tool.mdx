@@ -1,0 +1,37 @@
+---
+title: Detailing Tool
+id: oritech_extensions:detailing_tool
+icon: oritech_extensions:detailing_tool
+related_items: ["oritech_extensions:detailing_tool"]
+---
+
+# Detailing Tool
+
+A paint tool for everything this mod paints, plus Oritech's own machines. It only changes how blocks look, never how they work.
+
+## Loading it
+
+Right-click Color Cartridges onto the tool in your inventory, like filling a bundle. It holds several colours at once; the tooltip shows the selected colour and how much is left. Painting costs the same as using the cartridges directly, and is free in creative.
+
+## Using it
+
+- **Right-click:** paint, using the current mode.
+- **Sneak + scroll:** switch between the loaded colours.
+- **Sneak + right-click a block:** pick up that block's colour.
+- **Sneak + right-click the air:** switch mode.
+
+## Modes
+
+- **Group:** paints what a cartridge would paint: a whole pipe network, a glass wall, a reactor, a vault wall or a silo.
+- **Single block:** paints only the block you click.
+- **Area:** click two opposite corners, and every paintable block between them is painted. The longest side is 32 blocks by default (config: `detailingToolAreaSize`, up to 128).
+
+Rainbow works on everything except Oritech's own machines.
+
+## Recipe
+
+<CraftingRecipe
+    slots={['', '', 'oritech:adamant_ingot', '', 'oritech:steel_ingot', '', 'oritech:nickel_ingot', '', '']}
+    result="oritech_extensions:detailing_tool"
+    count={1}
+/>
