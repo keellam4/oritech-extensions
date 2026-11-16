@@ -5,6 +5,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
+- **Lock indicator.** Locked vaults show a small padlock in the corner of every window, empty ones included.
 - **Lock empty vaults.** Lock a vault while it's empty and pipes put nothing in until you put an item (or fluid) in by hand, which becomes its type. A **Clear** button in the vault screen forgets an empty vault's type and keeps it locked, ready for a new item.
 - **JEI in the Crafting Terminal.** JEI's "+" on a crafting recipe fills the terminal's grid, taking ingredients from the network first and then your inventory; missing ingredients turn red. The Crafting Terminal also shows as a crafting station in JEI.
 - **Cargo Link.** A handheld terminal: link it to a Cargo Controller or Crafting Terminal, then open the wall's crafting terminal from up to 32 blocks away. An **Uplink Mast** on the wall raises that to 64, and each **Antenna Segment** on the mast adds 16 (up to 192). Transfers use a little of its battery, which Induction Pylons recharge. Upgrades go in the mast (right-click it): the **Infinite Range Upgrade** removes the range limit in the wall's dimension, and the **Dimensional Upgrade** works in any dimension. Config: `linkRange`, `linkMastRange`, `linkSegmentRange`, `linkEnergyPerItem`.

@@ -52,6 +52,10 @@ public class CargoVaultRenderer<T extends CargoVaultBlockEntity> implements Bloc
         // Now the front is the +z face, seen from outside: a point (u, v) of the front is at x = u - 0.5, y = 0.5 - v.
 
         var cells = block.layout().cells();
+        if (vault.isLocked()) {
+            // A padlock in the corner of every window, empty ones included (an empty locked vault waits for an item).
+            for (int slot = 0; slot < cells.length && slot < Math.max(1, vault.slots()); slot++) drawPadlock(pose, buffers, cells[slot]);
+        }
         if (vault instanceof FluidVaultBlockEntity tank) {
             renderFluid(tank, cells[0], pose, buffers, facing);
             pose.popPose();
@@ -140,6 +144,40 @@ public class CargoVaultRenderer<T extends CargoVaultBlockEntity> implements Bloc
             consumer.addVertex(matrix, right, bottom, z).setColor(GAUGE_COLOUR);
             consumer.addVertex(matrix, right, top, z).setColor(GAUGE_COLOUR);
             consumer.addVertex(matrix, left, top, z).setColor(GAUGE_COLOUR);
+        }
+    }
+
+    /** The padlock, 6 × 7 pixels; '#' is lit. */
+    private static final String[] PADLOCK = {
+            ".####.",
+            ".#..#.",
+            ".#..#.",
+            "######",
+            "##..##",
+            "######",
+            "######"};
+
+    /** A small lit padlock in the top-right corner of a window's glass. */
+    private static void drawPadlock(PoseStack pose, MultiBufferSource buffers, VaultLayout.Cell cell) {
+        float height = cell.glassV1() - cell.glassV0();
+        float width = cell.glassU1() - cell.glassU0();
+        float pixel = Math.max(0.006f, Math.min(width, height) * 0.024f);
+        float right = cell.glassU1() - 0.5f - pixel * 1.5f;
+        float top = 0.5f - cell.glassV0() - pixel * 1.5f;
+        float left = right - pixel * PADLOCK[0].length();
+        VertexConsumer consumer = buffers.getBuffer(RenderType.lightning());
+        Matrix4f matrix = pose.last().pose();
+        float z = 0.5f + 0.0015f;
+        for (int row = 0; row < PADLOCK.length; row++) {
+            for (int col = 0; col < PADLOCK[row].length(); col++) {
+                if (PADLOCK[row].charAt(col) != '#') continue;
+                float x0 = left + col * pixel, x1 = x0 + pixel;
+                float y1 = top - row * pixel, y0 = y1 - pixel;
+                consumer.addVertex(matrix, x0, y0, z).setColor(LOCKED_TEXT_COLOUR);
+                consumer.addVertex(matrix, x1, y0, z).setColor(LOCKED_TEXT_COLOUR);
+                consumer.addVertex(matrix, x1, y1, z).setColor(LOCKED_TEXT_COLOUR);
+                consumer.addVertex(matrix, x0, y1, z).setColor(LOCKED_TEXT_COLOUR);
+            }
         }
     }
 
