@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "GenericPipeBlockMixin",
-    "GenericPipeDuctBlockMixin"
+    "GenericPipeDuctBlockMixin",
+    "FluidPipeInterfaceEntityMixin"
   ],
   "client": [
     "MouseHandlerMixin"

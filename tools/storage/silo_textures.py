@@ -80,7 +80,17 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     draw(casing).save(OUT / "silo_casing.png")
     draw(glass).save(OUT / "silo_glass.png")
-    draw(controller).save(OUT / "silo_controller_front.png")
+    front = draw(controller)
+    front.save(OUT / "silo_controller_front.png")
+    # Before the silo forms, the controller's core is dark (JNI-97); it lights up once the structure is complete.
+    dark = {(31, 79, 90): (40, 46, 54), (62, 201, 213): (58, 64, 72), (156, 255, 245): (84, 90, 98)}
+    off = front.copy()
+    for y in range(off.height):
+        for x in range(off.width):
+            r, g, b, a = off.getpixel((x, y))
+            if (r, g, b) in dark:
+                off.putpixel((x, y), dark[(r, g, b)] + (a,))
+    off.save(OUT / "silo_controller_front_off.png")
 
 
 if __name__ == "__main__":

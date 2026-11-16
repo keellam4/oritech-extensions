@@ -83,6 +83,11 @@ public class SiloMenu extends AbstractContainerMenu {
         return new BlockPos(coords[0], coords[1], coords[2]);
     }
 
+    /** An exact limit or reserve typed into the screen ({@link SiloExactPayload}). */
+    public void setExact(int row, boolean reserve, long millibuckets) {
+        if (silo != null) silo.setExact(row, reserve, millibuckets);
+    }
+
     @Override
     public boolean clickMenuButton(Player player, int id) {
         return silo != null && silo.configure(id / 8, id % 8);

@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /** The Cargo Controller: finds its network of touching vaults (refreshed once a second, or sooner when it breaks). */
-public class CargoControllerBlockEntity extends BlockEntity {
+public class CargoControllerBlockEntity extends BlockEntity implements io.github.keellam4.oritechextensions.EnergyBuffer {
 
     private CargoNetwork network;
     private long discoveredAt = Long.MIN_VALUE;
@@ -32,6 +32,53 @@ public class CargoControllerBlockEntity extends BlockEntity {
     /** Forget the network so the next use looks again (a vault next to it was placed or broken). */
     public void invalidate() {
         network = null;
+    }
+
+    // ---------------------------------------------------------------- energy (Crafting Terminal only)
+
+    private long energy;
+
+    /** Whether this is a Crafting Terminal that needs power to craft (the Cargo Controller never does). */
+    public boolean needsPower() {
+        return getBlockState().getBlock() instanceof CraftingTerminalBlock && io.github.keellam4.oritechextensions.Config.terminalEnergyPerCraft() > 0;
+    }
+
+    @Override
+    public long energy() {
+        return energy;
+    }
+
+    @Override
+    public long capacity() {
+        return needsPower() ? io.github.keellam4.oritechextensions.Config.terminalEnergyBuffer() : 0;
+    }
+
+    @Override
+    public long receive(long max, boolean simulate) {
+        long moved = Math.max(0, Math.min(max, capacity() - energy));
+        if (moved > 0 && !simulate) {
+            energy += moved;
+            setChanged();
+        }
+        return moved;
+    }
+
+    @Override
+    public void setEnergy(long energy) {
+        this.energy = Math.max(0, energy);
+        setChanged();
+    }
+
+    /** Whether there's power for {@code crafts} crafts (always, when it needs none). */
+    public boolean canCraft(int crafts) {
+        return !needsPower() || energy >= (long) io.github.keellam4.oritechextensions.Config.terminalEnergyPerCraft() * crafts;
+    }
+
+    /** Uses the power for one craft. */
+    public void spendCraft() {
+        if (!needsPower()) return;
+        energy = Math.max(0, energy - io.github.keellam4.oritechextensions.Config.terminalEnergyPerCraft());
+        setChanged();
     }
 
     // ---------------------------------------------------------------- Network Anchor (chunk loading)
@@ -105,6 +152,7 @@ public class CargoControllerBlockEntity extends BlockEntity {
     protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         if (anchored) tag.putBoolean("anchored", true);
+        if (energy > 0) tag.putLong("energy", energy);
         if (!forced.isEmpty()) tag.putLongArray("forced_chunks", forced.stream().mapToLong(Long::longValue).toArray());
     }
 
@@ -112,6 +160,7 @@ public class CargoControllerBlockEntity extends BlockEntity {
     protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         anchored = tag.getBoolean("anchored");
+        energy = tag.getLong("energy");
         forced.clear();
         for (long chunk : tag.getLongArray("forced_chunks")) forced.add(chunk);
     }

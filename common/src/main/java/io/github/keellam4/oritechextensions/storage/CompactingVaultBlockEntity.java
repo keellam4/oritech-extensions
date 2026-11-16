@@ -87,7 +87,7 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
     @Override
     public boolean accepts(int slot, ItemStack stack) {
         if (stack.isEmpty()) return false;
-        if (!hasForms()) return !isLocked();
+        if (!hasForms()) return takesNewType();
         return slotOf(stack) >= 0;
     }
 
@@ -100,7 +100,7 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
     public int insert(ItemStack stack, boolean simulate) {
         if (stack.isEmpty()) return 0;
         if (!hasForms()) {
-            if (isLocked() || !(level instanceof ServerLevel server)) return 0;
+            if (!takesNewType() || !(level instanceof ServerLevel server)) return 0;
             var chain = Chain.of(server, stack, slotCount);
             int index = chain.forms().indexOf(chain.forms().stream().filter(f -> ItemStack.isSameItemSameComponents(f, stack)).findFirst().orElseThrow());
             long capacity = chainCapacity(chain);
@@ -182,6 +182,18 @@ public class CompactingVaultBlockEntity extends CargoVaultBlockEntity {
     public void setLocked(boolean locked) {
         setLockedQuietly(locked);
         if (!locked && units == 0) clear();
+        changed();
+    }
+
+    @Override
+    public boolean canClearTypes() {
+        return isLocked() && units == 0 && hasForms();
+    }
+
+    @Override
+    public void clearTypes() {
+        if (!canClearTypes()) return;
+        clear();
         changed();
     }
 

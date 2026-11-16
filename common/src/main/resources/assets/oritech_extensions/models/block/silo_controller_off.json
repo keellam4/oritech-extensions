@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "oritech_extensions:block/silo_controller_front_off",
+    "side": "oritech_extensions:block/silo_casing",
+    "top": "oritech_extensions:block/silo_casing",
+    "particle": "oritech_extensions:block/silo_casing"
+  }
+}

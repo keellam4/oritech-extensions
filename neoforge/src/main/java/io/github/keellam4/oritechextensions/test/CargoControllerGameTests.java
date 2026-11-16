@@ -111,6 +111,7 @@ public class CargoControllerGameTests {
         var vault = place(helper, 2, 2, ModContent.CARGO_VAULT.get(), CargoVaultBlockEntity.class);
         vault.insert(new ItemStack(Items.OAK_PLANKS, 10), false);
         terminal.invalidate();
+        terminal.setEnergy(terminal.capacity());
         var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
         var menu = new io.github.keellam4.oritechextensions.storage.TerminalMenu(1, player.getInventory(), terminal, true);
         // grid slots start at 1: top-middle and centre make sticks
@@ -149,6 +150,29 @@ public class CargoControllerGameTests {
         if (vault.count() != 0) helper.fail("all five planks should come from the vault, it still has " + vault.count());
         if (player.getInventory().countItem(Items.COBBLESTONE) != 1) helper.fail("the cobblestone the vault can't take should go to the inventory");
         if (player.getInventory().countItem(Items.OAK_PLANKS) != 0) helper.fail("the sixth plank should come from the inventory");
+        helper.succeed();
+    }
+
+    /** JNI-94: the Crafting Terminal takes power from cables and uses it per craft; without it the result stays. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void craftingTerminalUsesEnergy(GameTestHelper helper) {
+        var terminal = place(helper, 1, 2, ModContent.CRAFTING_TERMINAL.get(), CargoControllerBlockEntity.class);
+        var controller = place(helper, 3, 2, ModContent.CARGO_CONTROLLER.get(), CargoControllerBlockEntity.class);
+        if (controller.needsPower() || controller.capacity() != 0) helper.fail("a plain Cargo Controller needs no power");
+        if (!terminal.needsPower() || terminal.capacity() <= 0) helper.fail("the Crafting Terminal should store power");
+        int cost = io.github.keellam4.oritechextensions.Config.terminalEnergyPerCraft();
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var menu = new io.github.keellam4.oritechextensions.storage.TerminalMenu(1, player.getInventory(), terminal, true);
+        menu.getSlot(1 + 1).set(new ItemStack(Items.OAK_PLANKS, 4));
+        menu.getSlot(1 + 4).set(new ItemStack(Items.OAK_PLANKS, 4));
+        if (menu.getSlot(0).mayPickup(player)) helper.fail("without power the result can't be taken");
+        menu.clicked(0, 0, net.minecraft.world.inventory.ClickType.QUICK_MOVE, player);
+        if (player.getInventory().countItem(Items.STICK) != 0) helper.fail("without power nothing should be crafted");
+        if (terminal.receive(cost * 2L, false) != cost * 2L) helper.fail("cables should fill the terminal");
+        menu.clicked(0, 0, net.minecraft.world.inventory.ClickType.QUICK_MOVE, player);
+        int sticks = player.getInventory().countItem(Items.STICK);
+        if (sticks != 8) helper.fail("power for two crafts should make 8 sticks, made " + sticks);
+        if (terminal.energy() != 0) helper.fail("two crafts should use all the power, left " + terminal.energy());
         helper.succeed();
     }
 }

@@ -1,0 +1,43 @@
+---
+title: Partition Upgrades
+id: oritech_extensions:partition_upgrade
+icon: oritech_extensions:partition_upgrade
+related_items: ["oritech_extensions:partition_upgrade", "oritech_extensions:advanced_partition_upgrade", "oritech_extensions:partition_matrix"]
+---
+
+# Partition Upgrades
+
+A Fluid Silo holds one fluid. Put a partition upgrade in the Silo Controller's upgrade slot to store several.
+
+| Upgrade | Fluids |
+| --- | --- |
+| None | 1 |
+| Partition Upgrade | 4 |
+| Advanced Partition Upgrade | 9 |
+| Partition Matrix | Any number |
+
+## Using it
+
+- Open the Silo Controller and put the upgrade in its slot. Each fluid gets a row with Limit, Reserve, Lock and Void.
+- The upgrade can't come out while the silo holds more than one fluid, but a bigger upgrade can replace it at any time.
+- Fluids settle in layers by density, lightest on top.
+
+## Recipes
+
+<CraftingRecipe
+    slots={['oritech:steel_ingot', 'oritech:fluid_pipe', 'oritech:steel_ingot', 'oritech:industrial_glass_block', 'oritech_extensions:silo_casing', 'oritech:industrial_glass_block', 'oritech:steel_ingot', 'oritech:fluid_pipe', 'oritech:steel_ingot']}
+    result="oritech_extensions:partition_upgrade"
+    count={1}
+/>
+
+<CraftingRecipe
+    slots={['oritech:electrum_ingot', 'oritech:processing_unit', 'oritech:electrum_ingot', 'oritech:energite_ingot', 'oritech_extensions:partition_upgrade', 'oritech:energite_ingot', 'oritech:electrum_ingot', 'oritech:processing_unit', 'oritech:electrum_ingot']}
+    result="oritech_extensions:advanced_partition_upgrade"
+    count={1}
+/>
+
+<CraftingRecipe
+    slots={['oritech:prometheum_ingot', 'oritech:enderic_compound', 'oritech:prometheum_ingot', 'oritech:enderic_compound', 'oritech_extensions:advanced_partition_upgrade', 'oritech:enderic_compound', 'oritech:prometheum_ingot', 'oritech:enderic_compound', 'oritech:prometheum_ingot']}
+    result="oritech_extensions:partition_matrix"
+    count={1}
+/>

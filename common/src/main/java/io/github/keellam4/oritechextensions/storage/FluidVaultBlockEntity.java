@@ -53,7 +53,7 @@ public class FluidVaultBlockEntity extends CargoVaultBlockEntity implements Netw
     public boolean acceptsFluid(Fluid offered) {
         if (offered == Fluids.EMPTY) return false;
         if (fluid != Fluids.EMPTY) return fluid.isSame(offered);
-        return !isLocked();
+        return takesNewType();
     }
 
     /** Fills up to {@code max} millibuckets. Returns how much was taken: with a Void upgrade, all of it. */
@@ -124,6 +124,18 @@ public class FluidVaultBlockEntity extends CargoVaultBlockEntity implements Netw
     public void setLocked(boolean locked) {
         setLockedQuietly(locked);
         if (!locked && amount <= 0) fluid = Fluids.EMPTY;
+        changed();
+    }
+
+    @Override
+    public boolean canClearTypes() {
+        return isLocked() && amount <= 0 && fluid != Fluids.EMPTY;
+    }
+
+    @Override
+    public void clearTypes() {
+        if (!canClearTypes()) return;
+        fluid = Fluids.EMPTY;
         changed();
     }
 
@@ -214,6 +226,11 @@ public class FluidVaultBlockEntity extends CargoVaultBlockEntity implements Netw
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
         if (fluid != Fluids.EMPTY) components.set(ModContent.FLUID_CONTENTS.get(), fluidContents());
+    }
+
+    @Override
+    protected boolean carriesData() {
+        return super.carriesData() || fluid != Fluids.EMPTY;
     }
 
     @Override

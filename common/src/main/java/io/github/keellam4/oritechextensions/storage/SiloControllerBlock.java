@@ -31,11 +31,16 @@ import org.jetbrains.annotations.Nullable;
  */
 public class SiloControllerBlock extends HorizontalDirectionalBlock implements EntityBlock {
 
+    /** Whether the silo around it is complete: the controller's core lights up (JNI-97). */
+    public static final net.minecraft.world.level.block.state.properties.BooleanProperty FORMED =
+            net.minecraft.world.level.block.state.properties.BooleanProperty.create("formed");
+
+
     public static final MapCodec<SiloControllerBlock> CODEC = simpleCodec(SiloControllerBlock::new);
 
     public SiloControllerBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(FORMED, false));
     }
 
     @Override
@@ -45,7 +50,7 @@ public class SiloControllerBlock extends HorizontalDirectionalBlock implements E
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, FORMED);
     }
 
     @Override

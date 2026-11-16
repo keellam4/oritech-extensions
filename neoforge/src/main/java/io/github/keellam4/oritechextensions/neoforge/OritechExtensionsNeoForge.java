@@ -63,12 +63,18 @@ public final class OritechExtensionsNeoForge {
                     if (context.player().containerMenu instanceof io.github.keellam4.oritechextensions.storage.TerminalMenu menu
                             && menu.containerId == payload.containerId()) menu.handle(payload.action(), payload.item(), payload.fluid());
                 }));
+        event.registrar(io.github.keellam4.oritechextensions.storage.SiloExactPayload.VERSION).playToServer(
+                io.github.keellam4.oritechextensions.storage.SiloExactPayload.TYPE, io.github.keellam4.oritechextensions.storage.SiloExactPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> io.github.keellam4.oritechextensions.storage.SiloExactPayload.handle(payload, context.player())));
         event.registrar(io.github.keellam4.oritechextensions.storage.TerminalFillPayload.VERSION).playToServer(
                 io.github.keellam4.oritechextensions.storage.TerminalFillPayload.TYPE, io.github.keellam4.oritechextensions.storage.TerminalFillPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> {
                     if (context.player().containerMenu instanceof io.github.keellam4.oritechextensions.storage.TerminalMenu menu
                             && menu.containerId == payload.containerId()) menu.fill(payload.recipe());
                 }));
+        event.registrar(io.github.keellam4.oritechextensions.pipes.FluidFlowPayload.VERSION).playToClient(
+                io.github.keellam4.oritechextensions.pipes.FluidFlowPayload.TYPE, io.github.keellam4.oritechextensions.pipes.FluidFlowPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> ClientHooks.fluidFlow(payload)));
         event.registrar(io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.VERSION).playToClient(
                 io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.TYPE, io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> ClientHooks.terminalSync(payload)));
@@ -86,6 +92,9 @@ public final class OritechExtensionsNeoForge {
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.CARGO_CONTROLLER_ENTITY.get(), (controller, side) -> new ControllerFluidHandler(controller));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.SILO_CONTROLLER_ENTITY.get(), (silo, side) -> new VaultFluidHandler(silo));
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, ModContent.INDUCTION_PYLON_ENTITY.get(), (pylon, side) -> new PylonEnergyStorage(pylon));
+        // Crafting Terminals take power (a plain Cargo Controller has no capacity, so cables don't connect).
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, ModContent.CARGO_CONTROLLER_ENTITY.get(),
+                (controller, side) -> controller.needsPower() ? new PylonEnergyStorage(controller) : null);
         event.registerItem(Capabilities.EnergyStorage.ITEM, (stack, context) -> new net.neoforged.neoforge.energy.ComponentEnergyStorage(stack,
                 ModContent.LINK_ENERGY.get(), io.github.keellam4.oritechextensions.wireless.CargoLinkItem.CAPACITY,
                 io.github.keellam4.oritechextensions.wireless.CargoLinkItem.MAX_INPUT, 0), ModContent.CARGO_LINK.get());
@@ -138,6 +147,10 @@ public final class OritechExtensionsNeoForge {
 
     /** Keeps client-only classes out of the server: only touched when a payload arrives on the client. */
     private static final class ClientHooks {
+        static void fluidFlow(io.github.keellam4.oritechextensions.pipes.FluidFlowPayload payload) {
+            io.github.keellam4.oritechextensions.client.FluidFlowRenderer.receive(payload);
+        }
+
         static void terminalSync(io.github.keellam4.oritechextensions.storage.TerminalSyncPayload payload) {
             io.github.keellam4.oritechextensions.client.TerminalScreen.receive(payload);
         }

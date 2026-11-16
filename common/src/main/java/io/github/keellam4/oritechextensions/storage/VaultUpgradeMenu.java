@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
  * side or top.
  * <p>
  * Buttons go through vanilla's menu button packet ({@link #clickMenuButton}): ids 0-5 toggle a Pull side, 10-15 a
- * Push side ({@link VaultSide} order), 20 the lock.
+ * Push side ({@link VaultSide} order), 20 the lock, 21 Clear.
  */
 public class VaultUpgradeMenu extends AbstractContainerMenu {
 
@@ -28,10 +28,12 @@ public class VaultUpgradeMenu extends AbstractContainerMenu {
     public static final int BUTTON_PULL = 0;
     public static final int BUTTON_PUSH = 10;
     public static final int BUTTON_LOCK = 20;
+    public static final int BUTTON_CLEAR = 21;
 
     private static final int DATA_PULL = 0;
     private static final int DATA_PUSH = 1;
     private static final int DATA_LOCKED = 2;
+    private static final int DATA_CLEARABLE = 3;
 
     private final Container upgrades;
     private final ContainerData data;
@@ -40,7 +42,7 @@ public class VaultUpgradeMenu extends AbstractContainerMenu {
 
     /** Client side: the slots and data are filled in by the server. */
     public VaultUpgradeMenu(int id, Inventory inventory) {
-        this(id, inventory, new SimpleContainer(CargoVaultBlockEntity.UPGRADE_SLOTS), new SimpleContainerData(3), null);
+        this(id, inventory, new SimpleContainer(CargoVaultBlockEntity.UPGRADE_SLOTS), new SimpleContainerData(4), null);
     }
 
     public VaultUpgradeMenu(int id, Inventory inventory, CargoVaultBlockEntity vault) {
@@ -50,6 +52,7 @@ public class VaultUpgradeMenu extends AbstractContainerMenu {
                 return switch (index) {
                     case DATA_PULL -> vault.pullSides();
                     case DATA_PUSH -> vault.pushSides();
+                    case DATA_CLEARABLE -> vault.canClearTypes() ? 1 : 0;
                     default -> vault.isLocked() ? 1 : 0;
                 };
             }
@@ -60,7 +63,7 @@ public class VaultUpgradeMenu extends AbstractContainerMenu {
 
             @Override
             public int getCount() {
-                return 3;
+                return 4;
             }
         }, vault);
     }
@@ -126,11 +129,20 @@ public class VaultUpgradeMenu extends AbstractContainerMenu {
         return data.get(DATA_LOCKED) != 0;
     }
 
+    /** Whether Clear would do something (locked, with an empty slot that still has a type). */
+    public boolean clearable() {
+        return data.get(DATA_CLEARABLE) != 0;
+    }
+
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (vault == null) return false;
         if (id == BUTTON_LOCK) {
             CargoVault.toggleLock(vault, player);
+            return true;
+        }
+        if (id == BUTTON_CLEAR) {
+            CargoVault.clearTypes(vault, player);
             return true;
         }
         var sides = VaultSide.values();

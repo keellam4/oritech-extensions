@@ -25,7 +25,7 @@ import java.util.UUID;
  * the players it may charge within range. Charging is less efficient further away: 100% at the pylon, 50% at
  * the edge of its range. The client gets the list of players being charged, to draw the arcs.
  */
-public class InductionPylonBlockEntity extends BlockEntity {
+public class InductionPylonBlockEntity extends BlockEntity implements io.github.keellam4.oritechextensions.EnergyBuffer {
 
     public static final int INTERVAL = 10;
 

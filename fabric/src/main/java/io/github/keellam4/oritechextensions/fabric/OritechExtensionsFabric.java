@@ -36,6 +36,8 @@ public final class OritechExtensionsFabric implements ModInitializer {
         // Forge Config API Port gives Fabric the same config file and format as NeoForge.
         NeoForgeConfigRegistry.INSTANCE.register(OritechExtensions.MODID, ModConfig.Type.COMMON, Config.SPEC);
         PayloadTypeRegistry.playS2C().register(PaintSyncPayload.TYPE, PaintSyncPayload.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(io.github.keellam4.oritechextensions.pipes.FluidFlowPayload.TYPE,
+                io.github.keellam4.oritechextensions.pipes.FluidFlowPayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(DetailingToolPayload.TYPE, DetailingToolPayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(VaultTakePayload.TYPE, VaultTakePayload.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(io.github.keellam4.oritechextensions.storage.TerminalActionPayload.TYPE,
@@ -46,6 +48,10 @@ public final class OritechExtensionsFabric implements ModInitializer {
             if (context.player().containerMenu instanceof io.github.keellam4.oritechextensions.storage.TerminalMenu menu
                     && menu.containerId == payload.containerId()) menu.handle(payload.action(), payload.item(), payload.fluid());
         });
+        PayloadTypeRegistry.playC2S().register(io.github.keellam4.oritechextensions.storage.SiloExactPayload.TYPE,
+                io.github.keellam4.oritechextensions.storage.SiloExactPayload.STREAM_CODEC);
+        ServerPlayNetworking.registerGlobalReceiver(io.github.keellam4.oritechextensions.storage.SiloExactPayload.TYPE,
+                (payload, context) -> io.github.keellam4.oritechextensions.storage.SiloExactPayload.handle(payload, context.player()));
         PayloadTypeRegistry.playC2S().register(io.github.keellam4.oritechextensions.storage.TerminalFillPayload.TYPE,
                 io.github.keellam4.oritechextensions.storage.TerminalFillPayload.STREAM_CODEC);
         ServerPlayNetworking.registerGlobalReceiver(io.github.keellam4.oritechextensions.storage.TerminalFillPayload.TYPE, (payload, context) -> {
@@ -61,6 +67,8 @@ public final class OritechExtensionsFabric implements ModInitializer {
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((vault, side) -> new VaultFluidStorage(vault), ModContent.FLUID_VAULT_ENTITY.get());
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity((silo, side) -> new VaultFluidStorage(silo), ModContent.SILO_CONTROLLER_ENTITY.get());
         team.reborn.energy.api.EnergyStorage.SIDED.registerForBlockEntity((pylon, side) -> new PylonEnergyStorage(pylon), ModContent.INDUCTION_PYLON_ENTITY.get());
+        team.reborn.energy.api.EnergyStorage.SIDED.registerForBlockEntity(
+                (controller, side) -> controller.needsPower() ? new PylonEnergyStorage(controller) : null, ModContent.CARGO_CONTROLLER_ENTITY.get());
         team.reborn.energy.api.EnergyStorage.ITEM.registerForItems((stack, context) -> new LinkEnergyStorage(context), ModContent.CARGO_LINK.get());
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlocks((level, pos, state, blockEntity, side) -> {
             var silo = io.github.keellam4.oritechextensions.storage.SiloParts.controllerOf(level, pos);

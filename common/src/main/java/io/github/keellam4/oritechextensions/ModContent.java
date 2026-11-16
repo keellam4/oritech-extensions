@@ -232,7 +232,8 @@ public final class ModContent {
     }
 
     private static Supplier<CargoVaultItem> vaultItem(String name, Supplier<CargoVaultBlock> block) {
-        return PLATFORM.register(BuiltInRegistries.ITEM, name, () -> new CargoVaultItem(block.get(), new Item.Properties().stacksTo(1)));
+        // Empty vaults stack; a vault carrying contents, upgrades, a lock or paint stacks to 1 (see collectImplicitComponents).
+        return PLATFORM.register(BuiltInRegistries.ITEM, name, () -> new CargoVaultItem(block.get(), new Item.Properties().stacksTo(64)));
     }
 
     private static java.util.Map<io.github.keellam4.oritechextensions.storage.VaultUpgrade, Supplier<io.github.keellam4.oritechextensions.storage.VaultUpgradeItem>> upgrades() {

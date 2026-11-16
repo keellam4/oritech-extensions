@@ -106,7 +106,8 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
         }
         if (vault instanceof FluidVaultBlockEntity tank && slotAt(state, pos, hit) >= 0) {
             // Buckets and fluid containers fill or empty the tank (whatever the loader's fluid API supports).
-            if (io.github.keellam4.oritechextensions.platform.Platform.INSTANCE.interactWithFluidItem(player, hand, tank)) {
+            // By hand: a locked, empty Fluid Vault takes the first fluid as its type.
+            if (tank.byHand(() -> io.github.keellam4.oritechextensions.platform.Platform.INSTANCE.interactWithFluidItem(player, hand, tank))) {
                 return ItemInteractionResult.sidedSuccess(level.isClientSide());
             }
             return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
@@ -117,7 +118,7 @@ public class CargoVaultBlock extends HorizontalDirectionalBlock implements Entit
             return ItemInteractionResult.sidedSuccess(level.isClientSide());
         }
         // An item the vault can't take: let it be used normally (placing a block against the vault, say).
-        if (!vault.accepts(stack)) return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+        if (!vault.byHand(() -> vault.accepts(stack))) return ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
         if (!level.isClientSide()) CargoVault.insertHeld(vault, player, hand, slotAt(state, pos, hit));
         return ItemInteractionResult.sidedSuccess(level.isClientSide());
     }

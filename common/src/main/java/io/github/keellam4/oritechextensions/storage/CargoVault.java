@@ -54,12 +54,15 @@ public final class CargoVault {
             return;
         }
         var stack = player.getItemInHand(hand);
-        int moved = clickedSlot >= 0 && clickedSlot < vault.slots() ? vault.insert(clickedSlot, stack, false) : 0;
-        if (moved == 0) moved = vault.insert(stack, false);
+        // By hand: a locked, empty vault takes this item as its type (pipes and the wall can't do that).
+        int moved = vault.byHand(() -> {
+            int in = clickedSlot >= 0 && clickedSlot < vault.slots() ? vault.insert(clickedSlot, stack, false) : 0;
+            return in == 0 ? vault.insert(stack, false) : in;
+        });
         if (moved > 0) {
             if (!player.getAbilities().instabuild) stack.shrink(moved);
             sound(level, vault.getBlockPos(), true);
-        } else if (vault.accepts(stack)) {
+        } else if (vault.byHand(() -> vault.accepts(stack))) {
             player.displayClientMessage(Component.translatable("message.oritech_extensions.cargo_vault.full"), true);
         }
     }
@@ -86,13 +89,11 @@ public final class CargoVault {
 
     public static void toggleLock(CargoVaultBlockEntity vault, Player player) {
         boolean locked = !vault.isLocked();
-        if (locked && !vault.hasContentType()) {
-            player.displayClientMessage(Component.translatable("message.oritech_extensions.cargo_vault.nothing_to_lock"), true);
-            return;
-        }
         vault.setLocked(locked);
-        player.displayClientMessage(Component.translatable(locked ? "message.oritech_extensions.cargo_vault.locked"
-                : "message.oritech_extensions.cargo_vault.unlocked"), true);
+        // An empty vault can be locked too: then nothing goes in until a player puts an item in by hand.
+        player.displayClientMessage(Component.translatable(!locked ? "message.oritech_extensions.cargo_vault.unlocked"
+                : vault.hasContentType() ? "message.oritech_extensions.cargo_vault.locked"
+                : "message.oritech_extensions.cargo_vault.locked_empty"), true);
         var level = vault.getLevel();
         if (level != null) level.playSound(null, vault.getBlockPos(), SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.5f, locked ? 1.4f : 1.1f);
     }
@@ -102,6 +103,15 @@ public final class CargoVault {
      * it; breaking must then be cancelled. The client asks the server to take items ({@link VaultTakePayload}), so
      * it works the same whatever each loader does with a cancelled click.
      */
+    /** Clear (the button next to the lock): empty slots forget their type; the vault stays locked. */
+    public static void clearTypes(CargoVaultBlockEntity vault, Player player) {
+        if (!vault.canClearTypes()) return;
+        vault.clearTypes();
+        player.displayClientMessage(Component.translatable("message.oritech_extensions.cargo_vault.cleared"), true);
+        var level = vault.getLevel();
+        if (level != null) level.playSound(null, vault.getBlockPos(), SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.6f, 1.2f);
+    }
+
     public static boolean onLeftClick(Level level, BlockPos pos, Player player, Direction face) {
         var state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof CargoVaultBlock) || player.isSpectator()) return false;

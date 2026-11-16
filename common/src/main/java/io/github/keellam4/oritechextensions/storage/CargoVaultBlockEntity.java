@@ -261,11 +261,51 @@ public class CargoVaultBlockEntity extends BlockEntity {
         return -1;
     }
 
-    /** Whether {@code slot} takes {@code stack}: its own item, or (when empty and unlocked) an item no other slot holds. */
+    /**
+     * Whether {@code slot} takes {@code stack}: its own item, or (when it has no item type) an item no other slot
+     * holds, if the vault is unlocked or a player is putting it in by hand ({@link #byHand}).
+     */
     public boolean accepts(int slot, ItemStack stack) {
         if (stack.isEmpty()) return false;
         if (!items[slot].isEmpty()) return ItemStack.isSameItemSameComponents(items[slot], stack);
-        return !locked && slotOf(stack) < 0;
+        return takesNewType() && slotOf(stack) < 0;
+    }
+
+    /** True while a player puts something in by hand: a locked slot with no type then takes it as its type. */
+    private boolean byHand;
+
+    /** Runs a player's own insert: a locked, empty vault takes the first item (or fluid) as its locked type. */
+    public <T> T byHand(java.util.function.Supplier<T> insert) {
+        boolean before = byHand;
+        byHand = true;
+        try {
+            return insert.get();
+        } finally {
+            byHand = before;
+        }
+    }
+
+    /** Whether a slot with no type may take a new one: unlocked, or a player putting it in by hand. */
+    protected boolean takesNewType() {
+        return !locked || byHand;
+    }
+
+    /** Whether Clear has something to do: the vault is locked and some empty slot still has a type. */
+    public boolean canClearTypes() {
+        if (!locked) return false;
+        for (int i = 0; i < slots(); i++) {
+            if (counts[i] == 0 && !items[i].isEmpty()) return true;
+        }
+        return false;
+    }
+
+    /** Clear: empty slots forget their type and the vault stays locked, waiting for a new item by hand. */
+    public void clearTypes() {
+        if (!canClearTypes()) return;
+        for (int i = 0; i < slots(); i++) {
+            if (counts[i] == 0) items[i] = ItemStack.EMPTY;
+        }
+        changed();
     }
 
     /** Whether any slot takes {@code stack}. */
@@ -573,6 +613,13 @@ public class CargoVaultBlockEntity extends BlockEntity {
             for (int i = 0; i < UPGRADE_SLOTS; i++) list.add(upgrades.getItem(i).copy());
             components.set(net.minecraft.core.component.DataComponents.CONTAINER, net.minecraft.world.item.component.ItemContainerContents.fromItems(list));
         }
+        // Empty vaults stack to 64; one that carries anything stays on its own.
+        if (carriesData()) components.set(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE, 1);
+    }
+
+    /** Whether the vault's item keeps something: contents or item types, the lock, paint or upgrades. */
+    protected boolean carriesData() {
+        return hasAnyItemType() || locked || PaintColors.isPainted(currentPaint()) || !upgrades.isEmpty();
     }
 
     @Override
