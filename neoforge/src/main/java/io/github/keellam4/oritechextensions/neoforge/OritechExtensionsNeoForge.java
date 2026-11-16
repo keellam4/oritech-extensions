@@ -63,6 +63,12 @@ public final class OritechExtensionsNeoForge {
                     if (context.player().containerMenu instanceof io.github.keellam4.oritechextensions.storage.TerminalMenu menu
                             && menu.containerId == payload.containerId()) menu.handle(payload.action(), payload.item(), payload.fluid());
                 }));
+        event.registrar(io.github.keellam4.oritechextensions.storage.TerminalFillPayload.VERSION).playToServer(
+                io.github.keellam4.oritechextensions.storage.TerminalFillPayload.TYPE, io.github.keellam4.oritechextensions.storage.TerminalFillPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> {
+                    if (context.player().containerMenu instanceof io.github.keellam4.oritechextensions.storage.TerminalMenu menu
+                            && menu.containerId == payload.containerId()) menu.fill(payload.recipe());
+                }));
         event.registrar(io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.VERSION).playToClient(
                 io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.TYPE, io.github.keellam4.oritechextensions.storage.TerminalSyncPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> ClientHooks.terminalSync(payload)));

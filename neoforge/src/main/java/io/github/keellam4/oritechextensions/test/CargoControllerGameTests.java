@@ -128,4 +128,27 @@ public class CargoControllerGameTests {
         if (vault.count() != 8) helper.fail("closing should return the grid to the network, vault has " + vault.count());
         helper.succeed();
     }
+
+    /** JEI's "+": the grid fills with the recipe's shape, from the network first, then the player's inventory. */
+    @GameTest(template = TEMPLATE, timeoutTicks = 40)
+    public static void craftingTerminalFillsFromRecipe(GameTestHelper helper) {
+        var terminal = place(helper, 1, 2, ModContent.CRAFTING_TERMINAL.get(), CargoControllerBlockEntity.class);
+        var vault = place(helper, 2, 2, ModContent.CARGO_VAULT.get(), CargoVaultBlockEntity.class);
+        vault.insert(new ItemStack(Items.OAK_PLANKS, 5), false);
+        terminal.invalidate();
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        player.getInventory().add(new ItemStack(Items.OAK_PLANKS, 1));
+        var menu = new io.github.keellam4.oritechextensions.storage.TerminalMenu(1, player.getInventory(), terminal, true);
+        menu.getSlot(1 + 4).set(new ItemStack(Items.COBBLESTONE)); // something already in the grid goes back first
+        menu.fill(net.minecraft.resources.ResourceLocation.withDefaultNamespace("oak_stairs"));
+        int[] planks = {0, 3, 4, 6, 7, 8};
+        for (int i : planks) {
+            if (!menu.getSlot(1 + i).getItem().is(Items.OAK_PLANKS)) helper.fail("grid slot " + i + " should hold a plank");
+        }
+        if (!menu.getSlot(0).getItem().is(Items.OAK_STAIRS)) helper.fail("the grid should show oak stairs");
+        if (vault.count() != 0) helper.fail("all five planks should come from the vault, it still has " + vault.count());
+        if (player.getInventory().countItem(Items.COBBLESTONE) != 1) helper.fail("the cobblestone the vault can't take should go to the inventory");
+        if (player.getInventory().countItem(Items.OAK_PLANKS) != 0) helper.fail("the sixth plank should come from the inventory");
+        helper.succeed();
+    }
 }

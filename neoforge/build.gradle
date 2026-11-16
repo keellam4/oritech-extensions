@@ -95,6 +95,7 @@ dependencies {
     compileOnly "dev.architectury:architectury-neoforge:${architectury_version}"
     // Curios: the Induction Pylon charges items in Curios slots when it's installed.
     compileOnly "maven.modrinth:curios:9.5.1+1.21.1"
+    compileOnly "maven.modrinth:jei:${jei_neoforge_version_id}" // optional: Crafting Terminal "+" button
 
     // Present when running the game from this project (runClient / runGameTestServer), not shipped.
     // Tests run against the newest Oritech plus Oritech Things, so compatibility with both is checked on every push.

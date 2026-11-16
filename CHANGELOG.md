@@ -5,6 +5,7 @@ Add a line under **[Unreleased]** in every pull request that players would notic
 ## [Unreleased]
 
 ### Added
+- **JEI in the Crafting Terminal.** JEI's "+" on a crafting recipe fills the terminal's grid, taking ingredients from the network first and then your inventory; missing ingredients turn red. The Crafting Terminal also shows as a crafting station in JEI.
 - **Cargo Link.** A handheld terminal: link it to a Cargo Controller or Crafting Terminal, then open the wall's crafting terminal from up to 32 blocks away. An **Uplink Mast** on the wall raises that to 64, and each **Antenna Segment** on the mast adds 16 (up to 192). Transfers use a little of its battery, which Induction Pylons recharge. Upgrades go in the mast (right-click it): the **Infinite Range Upgrade** removes the range limit in the wall's dimension, and the **Dimensional Upgrade** works in any dimension. Config: `linkRange`, `linkMastRange`, `linkSegmentRange`, `linkEnergyPerItem`.
 - **Network Anchor.** Installed in a Cargo Controller, it keeps every block of the network chunk-loaded. Config: `allowNetworkChunkLoading`.
 - **Transparent Fluid Pipe.** A see-through fluid pipe with a line through its centre, so it's easy to tell from the transparent item pipe. It joins Oritech fluid pipe networks and paints with them.

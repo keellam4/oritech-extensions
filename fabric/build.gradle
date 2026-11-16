@@ -69,6 +69,7 @@ dependencies {
     modCompileOnly "software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}"
     modCompileOnly "maven.modrinth:architectury-api:${architectury_fabric_version_id}"
     modCompileOnly "maven.modrinth:forge-config-api-port:${forge_config_api_port_fabric_version_id}"
+    modCompileOnly "maven.modrinth:jei:${jei_fabric_version_id}" // optional: Crafting Terminal "+" button
 
     // Present when running the game from this project (smoke test, game tests), not shipped.
     modLocalRuntime "maven.modrinth:oritech:${oritech_fabric_version_id}"

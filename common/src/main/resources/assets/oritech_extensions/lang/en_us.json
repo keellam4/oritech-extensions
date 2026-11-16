@@ -221,5 +221,6 @@
   "oritech_extensions.configuration.allowNetworkChunkLoading.tooltip": "Whether a Network Anchor in a Cargo Controller may keep the network's chunks loaded.",
   "screen.oritech_extensions.mast.none": "No upgrade: range from the mast and segments",
   "screen.oritech_extensions.mast.infinite": "Infinite Range: anywhere in this dimension",
-  "screen.oritech_extensions.mast.dimensional": "Dimensional: anywhere, any dimension"
+  "screen.oritech_extensions.mast.dimensional": "Dimensional: anywhere, any dimension",
+  "jei.oritech_extensions.terminal.missing": "Missing from the network and your inventory"
 }
